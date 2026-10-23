@@ -115,7 +115,7 @@ export const PERSONAS: Record<PersonaId, Persona> = {
     drivesEv: false,
     systemLabel: 'Sponsored 1 kW slice',
     lang: 'zh',
-    largeText: true,
+    largeText: false,
     home: { x: 178, y: 334 },
     blurb: 'A sponsored slice from the solar dividend, plus heat alerts and the nearest SunD Cool room in one tap.',
   },

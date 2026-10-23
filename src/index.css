@@ -43,6 +43,7 @@
   --font-display: "Inter Variable", "Inter", system-ui, sans-serif;
   --font-body: "Inter Variable", "Inter", system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-weight-bold: 650;
 
   --radius-chip: 8px;
   --radius-input: 12px;
@@ -77,7 +78,8 @@ body {
   font-family: var(--font-body);
   font-size: 16px;
   line-height: 1.5;
-  letter-spacing: -0.005em;
+  letter-spacing: -0.011em;
+  font-feature-settings: 'cv11', 'ss01';
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
 }
@@ -155,8 +157,8 @@ h1, h2, h3, .font-display {
   padding: 0 24px;
   border-radius: var(--radius-btn);
   font-family: var(--font-body);
-  font-weight: 700;
-  font-size: 17px;
+  font-weight: 650;
+  font-size: 16px;
   border: 1px solid transparent;
   cursor: pointer;
   transition: background-color 240ms var(--ease-spring), transform 120ms ease, box-shadow 240ms ease;
@@ -299,7 +301,8 @@ h1, h2, h3, .font-display {
 }
 
 /* Large-text mode (Uncle Tan): the whole phone UI scales up, so px-based sizes grow with it. */
-.phone.large-text .screen { zoom: 1.1; }
+.phone .screen { zoom: 0.93; }
+.phone.large-text .screen { zoom: 1.04; }
 .phone.large-text .stack-lg { grid-template-columns: 1fr; }
 
 /* Pitch mode: make room for the slide tag above the phone. */

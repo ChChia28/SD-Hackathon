@@ -35,7 +35,7 @@ export default function Wallet() {
     <>
       <TabHeader title="Wallet" />
       <div className="flex flex-col gap-6 px-5 pb-8 pt-2">
-        <div className="grid grid-cols-2 gap-3">
+        {persona.drivesEv && <div className="grid grid-cols-2 gap-3">
           {resident ? (
             <div className="card-navy p-4">
               <div className="flex items-center gap-1.5 text-[14px] font-bold text-white/80">
@@ -61,7 +61,7 @@ export default function Wallet() {
             <div className="mt-1 font-display text-[30px] font-bold leading-9 tabular">{fmtRm(prof.saver)}</div>
             <div className="text-[14px] text-ink-muted">60%+ solar bays · eBikes</div>
           </div>
-        </div>
+        </div>}
 
         {persona.reward === 'slice' && <SliceCard />}
         {persona.reward === 'cream' && (
