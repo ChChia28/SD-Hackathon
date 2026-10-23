@@ -199,8 +199,8 @@ export default function Dashboard() {
               </div>
               <div className="rounded-[18px] bg-sky-wash p-4">
                 <div className="text-[13px] font-bold text-ink-muted">Net cash a year</div>
-                <div className={cx('font-display text-[30px] font-bold leading-9 tabular', e.netYear < 0 && 'text-coral-ink')}>RM {fmtInt(e.netYear / 1000)}k</div>
-                <div className="text-[13px] text-ink-muted tabular">RM {fmtInt(e.netDay)} a day</div>
+                <div className={cx('font-display text-[30px] font-bold leading-9 tabular', e.netYear < 0 && 'text-coral-ink')}>RM {fmtInt(Math.floor(e.netYear / 1000))}k</div>
+                <div className="text-[13px] text-ink-muted tabular">RM {fmtInt(Math.floor(e.netDay))} a day</div>
               </div>
               <div className="rounded-[18px] bg-leaf-wash p-4">
                 <div className="text-[13px] font-bold text-ink-muted">CO₂ avoided a year</div>

@@ -67,11 +67,11 @@ export default function Slice() {
             sep={['×', '=']}
             items={[
               { icon: <Sun size={24} />, label: `${SLICE_KWH_PER_MONTH} kWh`, sub: t('per month'), tone: 'sun' },
-              { icon: <ReceiptText size={24} />, label: `${Math.round(tariff * 100)} sen`, sub: t('your tariff'), tone: 'sky' },
+              { icon: <ReceiptText size={24} />, label: '36 sen', sub: t('flat rate'), tone: 'sky' },
               { icon: <HandHeart size={24} />, label: fmtRm(value), sub: t('a month'), tone: 'leaf' },
             ]}
           />
-          <div className="mt-3 text-center text-[13px] text-ink-muted">{t('Credits are issued at your own TNB rate, so the saving equals that kWh coming off your bill')}</div>
+          <div className="mt-3 text-center text-[13px] text-ink-muted">{t('Credits are issued at a flat 36 sen per kWh: about RM 40 off your bill every month')}</div>
         </Card>
 
         {!persona.sponsored && (

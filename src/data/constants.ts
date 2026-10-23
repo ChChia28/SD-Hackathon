@@ -13,7 +13,7 @@ export const SLICE_KWH_PER_MONTH = 110;
 export const SLICE_KW = 1;
 
 /** Effective TNB domestic rates per kWh (A4): ~35 sen at ≤600 kWh/month, ~52 sen above. Base 44.43 sen. */
-export const TARIFF = { base: 0.4443, low: 0.35, high: 0.52, aisyah: 0.36 };
+export const TARIFF = { base: 0.4443, low: 0.35, high: 0.52, aisyah: 0.3306 }; // Aisyah ≈490 kWh: 44.43 − 12 sen EEI, ×1.016 ≈ 33 sen ⇒ bill ≈ RM 162 (A11)
 
 /**
  * Roof hosts (CREAM) — Kin Chung's 22 Oct model, kept as SDP-adjustable settings:

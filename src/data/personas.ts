@@ -70,7 +70,7 @@ export const PERSONAS: Record<PersonaId, Persona> = {
     rewardShare: 1,
     canRebate: true,
     tariff: TARIFF.aisyah,
-    monthlyUseKwh: 450,
+    monthlyUseKwh: 490,
     drivesEv: true,
     systemLabel: '1 kW solar slice',
     lang: 'en',

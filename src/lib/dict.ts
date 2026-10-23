@@ -112,9 +112,9 @@ export const DICT: Record<string, { ms: string; zh: string }> = {
   'your tariff': { ms: 'tarif anda', zh: '你的电价' },
   'flat rate': { ms: 'kadar tetap', zh: '固定费率' },
   'a month': { ms: 'sebulan', zh: '每月' },
-  'Credits are issued at your own TNB rate, so the saving equals that kWh coming off your bill': {
-    ms: 'Kredit dikeluarkan pada kadar TNB anda sendiri, jadi penjimatan sama seperti kWh itu ditolak dari bil',
-    zh: '积分按你自己的 TNB 电价发放，等同于这些 kWh 直接从电费中扣除',
+  'Credits are issued at a flat 36 sen per kWh: about RM 40 off your bill every month': {
+    ms: 'Kredit dikeluarkan pada kadar tetap 36 sen sekWh: kira-kira RM 40 kurang dari bil anda setiap bulan',
+    zh: '积分按固定每 kWh 36 仙发放：每月约少付 RM 40 电费',
   },
   'No roof needed': { ms: 'Tanpa bumbung', zh: '不需要屋顶' },
   'Condo owners': { ms: 'Pemilik kondo', zh: '公寓业主' },

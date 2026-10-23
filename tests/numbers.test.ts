@@ -50,10 +50,11 @@ describe('deck facts (slides 2–10)', () => {
 
 describe('personas (slide 3)', () => {
   it('Mr Lim’s roof is the Elmina Ridge 1 average: 1 MWp ÷ 228 ≈ 4.4 kWp', () => near(PERSONAS.landed.kWp, 1000 / 228, 0.05));
-  it('Aisyah: condo renter on a 1 kW slice at ~36 sen, ~450 kWh a month', () => {
+  it('Aisyah: condo renter, ~490 kWh a month, bill ≈ RM 162, slice → RM 122.40', () => {
     expect(PERSONAS.condo.reward).toBe('slice');
-    expect(PERSONAS.condo.tariff).toBe(0.36);
-    expect(PERSONAS.condo.monthlyUseKwh).toBe(450);
+    expect(PERSONAS.condo.monthlyUseKwh).toBe(490);
+    near((PERSONAS.condo.monthlyUseKwh ?? 0) * (PERSONAS.condo.tariff ?? 0), 162, 0.05);
+    near((PERSONAS.condo.monthlyUseKwh ?? 0) * (PERSONAS.condo.tariff ?? 0) - sliceValueRm(0), 122.4, 0.05);
   });
   it('Uncle Tan: sponsored slice, no EV, 中文 + large text', () => {
     expect(PERSONAS.elder.sponsored).toBe(true);
