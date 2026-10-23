@@ -5,7 +5,7 @@ import { WhyCredits } from '../../components/visual';
 type Tone = 'sky' | 'leaf' | 'sun' | 'berry' | 'slate';
 const RULES: { Icon: LucideIcon; tone: Tone; title: string; fact: string; note: string }[] = [
   { Icon: Building2, tone: 'sun', title: 'Slice', fact: '1 kW', note: '≈110 kWh a month · no roof needed' },
-  { Icon: ReceiptText, tone: 'sky', title: 'Slice value', fact: 'RM 40–57', note: 'a month at your own 35–52 sen TNB rate' },
+  { Icon: ReceiptText, tone: 'sky', title: 'Slice value', fact: 'RM 40', note: 'a month · flat 36 sen per kWh' },
   { Icon: HomeIcon, tone: 'sun', title: 'Roof host earns', fact: 'RM 0.10', note: 'per kWh, on top of the CREAM lease' },
   { Icon: Coins, tone: 'sun', title: 'Credit top-up', fact: '+20%', note: 'roof hosts: RM 1 → RM 1.20 in credits' },
   { Icon: Sun, tone: 'sky', title: '1 credit', fact: 'RM 1', note: 'at SunD Bays, SunD Cool, eBikes, clubhouse' },

@@ -27,7 +27,7 @@ const SLIDES: { title: string; caption: string; visual: ReactNode }[] = [
   },
   {
     title: 'No roof? Own a slice',
-    caption: `A 1 kW slice ≈ ${SLICE_KWH_PER_MONTH} kWh a month, worth RM 40–57 at your own TNB rate`,
+    caption: `A 1 kW slice ≈ ${SLICE_KWH_PER_MONTH} kWh a month, worth ≈ RM 40 in SunD credits`,
     visual: (
       <div className="flex flex-col gap-6">
         <FlowRow
@@ -35,8 +35,8 @@ const SLIDES: { title: string; caption: string; visual: ReactNode }[] = [
           size={60}
           items={[
             { icon: <Sun size={28} />, label: `${SLICE_KWH_PER_MONTH} kWh`, sub: 'per month', tone: 'sun' },
-            { icon: <ReceiptText size={28} />, label: '35–52 sen', sub: 'your tariff', tone: 'sky' },
-            { icon: <Coins size={28} />, label: 'RM 40–57', sub: 'off the bill', tone: 'leaf' },
+            { icon: <ReceiptText size={28} />, label: '36 sen', sub: 'flat rate', tone: 'sky' },
+            { icon: <Coins size={28} />, label: '≈ RM 40', sub: 'off the bill', tone: 'leaf' },
           ]}
         />
         <div className="flex flex-wrap justify-center gap-2">

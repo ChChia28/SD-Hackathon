@@ -18,8 +18,8 @@ import type { BayLive, BayStatus, PersonaId } from '../store/types';
 /**
  * Splits newly generated solar into SunD Credits and a bill rebate, by the person's reward model.
  * - Roof host (CREAM): kWh × selling rate = solar income; credits get the +20% top-up, the rebate is RM for RM.
- * - Slice holder: credits are issued at the resident's own effective tariff, so the saving equals
- *   that kWh coming off the bill (appendix A4). They choose how much goes straight to the bill.
+ * - Slice holder: credits are issued at a flat 36 sen/kWh SunD rate (≈ RM 40 a month for 1 kW),
+ *   paid for by SunD Bay charging profit (appendix A11, A20). They choose how much goes straight to the bill.
  * 1 SC = RM 1 at SunD.
  */
 export function splitReward(kwh: number, persona: PersonaId, billShare: number) {
@@ -29,7 +29,7 @@ export function splitReward(kwh: number, persona: PersonaId, billShare: number) 
     return { income, credits: income * (1 - billShare) * CREDIT_TOPUP, rebateRm: income * billShare };
   }
   if (p.reward === 'slice') {
-    const income = kwh * (p.tariff ?? 0.35);
+    const income = kwh * SLICE_CREDIT_RATE;
     return { income, credits: income * (1 - billShare), rebateRm: income * billShare };
   }
   return { income: 0, credits: 0, rebateRm: 0 };
@@ -81,5 +81,7 @@ export function estimatePayment(
   return { sc, saver, rm };
 }
 
-/** What a 1 kW slice is worth a month at a given effective tariff (A4): 110 kWh × rate. */
-export const sliceValueRm = (tariff: number, kwhMonth = 110) => kwhMonth * tariff;
+/** Slice credits use one flat SunD rate for every household (A11). */
+export const SLICE_CREDIT_RATE = 0.36;
+/** What a 1 kW slice is worth a month (A11): 110 kWh × flat 36 sen ≈ RM 40. The tariff argument is kept for callers. */
+export const sliceValueRm = (_tariff: number, kwhMonth = 110) => kwhMonth * SLICE_CREDIT_RATE;

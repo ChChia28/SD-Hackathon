@@ -21,10 +21,10 @@ describe('deck facts (slides 2–10)', () => {
     expect(C.SLICE_KWH_PER_MONTH).toBe(110);
     expect(C.YIELD_KWH_PER_KWP_DAY).toBe(3.6);
   });
-  it('slice is worth RM 40–57 a month at 35–52 sen (A4)', () => {
+  it('slice is worth ≈ RM 40 a month at a flat 36 sen (A11)', () => {
     expect(Math.round(sliceValueRm(C.TARIFF.aisyah))).toBe(40);
-    expect(Math.round(sliceValueRm(C.TARIFF.high))).toBe(57);
-    near(sliceValueRm(C.TARIFF.low), 38.5, 0.01);
+    expect(Math.round(sliceValueRm(C.TARIFF.high))).toBe(40);
+    near(sliceValueRm(C.TARIFF.low), 39.6, 0.01);
   });
   it('TNB base 27.03 + 4.55 + 12.85 = 44.43 sen', () => near(C.TARIFF.base, 0.2703 + 0.0455 + 0.1285, 1e-9));
   it('public price RM 1.40 (A14) and market DC RM 0.88–1.80 (EV Sifu)', () => {

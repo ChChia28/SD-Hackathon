@@ -75,7 +75,7 @@ export function computeKpis(k: KpiInput): Kpi[] {
   const walkers = Math.round(140 + 60 * hashRand(`walkers-${today}`));
 
   return [
-    { n: 1, name: 'RM saved per subscriber', value: `RM ${Math.round(rmSaved)}`, unit: '/ month', baseline: 'RM 0', target: 'RM 40–57', status: rmSaved >= 0.95 * 40 ? 'met' : 'track', note: `1 kW slice × ${Math.round((PERSONAS.condo.tariff ?? 0.36) * 100)} sen ≈ RM ${sliceValue.toFixed(0)} (A11)` },
+    { n: 1, name: 'RM saved per subscriber', value: `RM ${Math.round(rmSaved)}`, unit: '/ month', baseline: 'RM 0', target: '≈ RM 40', status: rmSaved >= 0.95 * 40 ? 'met' : 'track', note: `1 kW slice × ${Math.round((PERSONAS.condo.tariff ?? 0.36) * 100)} sen ≈ RM ${sliceValue.toFixed(0)} (A11)` },
     { n: 2, name: 'Bay kWh from on-site solar', value: `${Math.round(share * 100)}%`, baseline: '≈0% (grid 92% fossil)', target: '25–35%', status: share >= 0.25 ? 'met' : 'track', note: `Pilot bay · ${PILOT_BAY.canopyKwp} kWp canopy · today’s weather` },
     { n: 3, name: 'Bay utilisation', value: `${Math.round(util * 100)}%`, baseline: 'measured from week 1', target: '≥ 40%', status: util >= 0.4 ? 'met' : 'track', note: 'Lot-hours used ÷ available, 8am–10pm' },
     { n: 4, name: 'SunD Cool visits per heat-alert day', value: k.heat ? `${visits}` : '—', baseline: '0', target: 'measured', status: k.heat ? 'met' : 'waiting', note: k.heat ? `${Math.round(PILOT_COHORT.elderlyB40AtCool * 100)}% aged 65+ or B40 · so far today` : 'No heat alert today' },

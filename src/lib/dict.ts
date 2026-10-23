@@ -110,6 +110,7 @@ export const DICT: Record<string, { ms: string; zh: string }> = {
   'What a slice is worth': { ms: 'Nilai satu bahagian', zh: '一份的价值' },
   'per month': { ms: 'sebulan', zh: '每月' },
   'your tariff': { ms: 'tarif anda', zh: '你的电价' },
+  'flat rate': { ms: 'kadar tetap', zh: '固定费率' },
   'a month': { ms: 'sebulan', zh: '每月' },
   'Credits are issued at your own TNB rate, so the saving equals that kWh coming off your bill': {
     ms: 'Kredit dikeluarkan pada kadar TNB anda sendiri, jadi penjimatan sama seperti kWh itu ditolak dari bil',
