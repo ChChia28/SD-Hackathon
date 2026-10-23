@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>SunD · Proposal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hubot+Sans:wght@500;600;700;800&display=swap" />
+<script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+<style>
+  @page { size: 1280px 720px; margin: 0; }
+  :root {
+    --sky: #3B82F6; --sky-deep: #1D4ED8; --sky-soft: #DBEAFE; --sky-wash: #F3F8FF; --sky-bright: #60A5FA;
+    --sun: #FBBF24; --sun-deep: #D97706; --sun-soft: #FEF3C7; --sun-wash: #FFFBEB; --sun-ink: #92400E;
+    --leaf: #22C55E; --leaf-deep: #16A34A; --leaf-soft: #DCFCE7; --leaf-wash: #F2FCF5; --leaf-ink: #166534;
+    --coral: #F87171; --coral-soft: #FEE2E2; --coral-ink: #B91C1C;
+    --berry: #A855F7; --berry-soft: #F3E8FF; --berry-wash: #FAF5FF; --berry-ink: #7E22CE;
+    --ink: #0F172A; --muted: #475569; --subtle: #94A3B8; --faint: #CBD5E1; --outline: #E2E8F0; --surface: #F8FAFC;
+    --display: 'Hubot Sans', 'Nunito', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #E2E8F0; }
+  body { font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { width: 1280px; height: 720px; position: relative; overflow: hidden; background: #fff; padding: 52px 64px 0; page-break-after: always; break-after: page; }
+  @media screen { .slide { margin: 24px auto; box-shadow: 0 12px 40px rgba(15,23,42,.15); } }
+  .dark { background: var(--ink); color: #fff; }
+
+  .tag { display: inline-flex; align-items: center; gap: 10px; font-weight: 700; font-size: 14px; letter-spacing: .14em; text-transform: uppercase; color: var(--sky-deep); }
+  .tag .keep, .keep { text-transform: none; }
+  .tag b { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 999px; background: var(--sky); color: #fff; font-family: var(--display); letter-spacing: 0; font-size: 14px; }
+  h1 { font-family: var(--display); font-weight: 700; font-size: 40px; line-height: 1.12; margin-top: 12px; max-width: 1040px; letter-spacing: -0.01em; }
+  h1 em { font-style: normal; color: var(--sky); }
+  h2 { font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.2; }
+  h3 { font-family: var(--display); font-weight: 700; font-size: 18px; line-height: 1.25; }
+  p, li { font-size: 16px; line-height: 1.45; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; line-height: 1.4; }
+  .xs { font-size: 12px; line-height: 1.35; }
+  .num { font-family: var(--display); font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .brandmark { position: absolute; top: 46px; right: 64px; font-family: var(--display); font-weight: 800; font-size: 20px; }
+  .brandmark .d, .d { color: var(--sky); }
+  .footer { position: absolute; left: 64px; right: 64px; bottom: 20px; display: flex; justify-content: space-between; font-size: 12px; color: var(--subtle); }
+  .dark .footer { color: #64748B; }
+
+  .card { border: 1px solid var(--outline); border-radius: 20px; padding: 20px; background: #fff; }
+  .w-sky { background: var(--sky-wash); border-color: var(--sky-soft); }
+  .w-leaf { background: var(--leaf-wash); border-color: var(--leaf-soft); }
+  .w-sun { background: var(--sun-wash); border-color: var(--sun-soft); }
+  .w-berry { background: var(--berry-wash); border-color: var(--berry-soft); }
+  .w-coral { background: #FFF7F7; border-color: var(--coral-soft); }
+  .ib { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; flex-shrink: 0; width: 44px; height: 44px; }
+  .ib svg { width: 22px; height: 22px; }
+  .ib.lg { width: 56px; height: 56px; } .ib.lg svg { width: 28px; height: 28px; }
+  .ib.sm { width: 34px; height: 34px; } .ib.sm svg { width: 18px; height: 18px; }
+  .t-sky { background: var(--sky-soft); color: var(--sky-deep); }
+  .t-sun { background: var(--sun-soft); color: var(--sun-deep); }
+  .t-leaf { background: var(--leaf-soft); color: var(--leaf-deep); }
+  .t-coral { background: var(--coral-soft); color: var(--coral-ink); }
+  .t-berry { background: var(--berry-soft); color: var(--berry-ink); }
+  .t-slate { background: #F1F5F9; color: var(--muted); }
+  .pill { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 4px 12px; font-weight: 700; font-size: 13px; }
+  .pill svg { width: 14px; height: 14px; }
+  svg.lucide { stroke-width: 2; }
+  .row { display: flex; gap: 16px; }
+  .col { display: flex; flex-direction: column; }
+  .center { align-items: center; }
+
+  .ph { border: 7px solid var(--ink); border-radius: 30px; overflow: hidden; background: #fff; box-shadow: 0 18px 40px rgba(15,23,42,.18); flex-shrink: 0; }
+  .ph img { display: block; width: 100%; }
+  .cap { margin-top: 10px; text-align: center; font-weight: 700; font-size: 14px; }
+  .cap span { display: block; font-weight: 400; color: var(--muted); font-size: 13px; }
+  .note { position: absolute; left: 64px; bottom: 42px; font-size: 12px; color: var(--subtle); }
+
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 9px 12px; font-size: 14px; border-bottom: 1px solid var(--outline); }
+  table.roomy td { padding: 9px 12px; font-size: 14px; white-space: nowrap; }
+  th { font-size: 13px; font-weight: 700; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ OPENING ═══════════ -->
+<section class="slide dark" style="padding:0">
+  <svg width="1280" height="720" style="position:absolute;inset:0" aria-hidden="true">
+    <defs>
+      <radialGradient id="glow" cx="78%" cy="38%" r="55%"><stop offset="0" stop-color="#FBBF24" stop-opacity=".28"/><stop offset=".45" stop-color="#3B82F6" stop-opacity=".12"/><stop offset="1" stop-color="#0F172A" stop-opacity="0"/></radialGradient>
+    </defs>
+    <rect width="1280" height="720" fill="url(#glow)"/>
+    <g stroke="#FBBF24" stroke-opacity=".18" stroke-width="2" fill="none">
+      <circle cx="1000" cy="270" r="180"/><circle cx="1000" cy="270" r="260"/><circle cx="1000" cy="270" r="340"/>
+    </g>
+  </svg>
+  <div style="position:absolute;left:72px;top:96px;width:600px">
+    <span class="pill" style="background:rgba(255,255,255,.08);color:#CBD5E1;border:1px solid rgba(255,255,255,.14)"><i data-lucide="leaf"></i>Sime Darby Township Hackathon · Theme: Planet</span>
+    <div class="num" style="font-size:150px;line-height:1;margin-top:34px;letter-spacing:-0.04em"><span style="color:var(--sun)">Sun</span><span style="color:var(--sky-bright)">D</span></div>
+    <div style="font-family:var(--display);font-weight:700;font-size:36px;line-height:1.15;margin-top:18px">Powering every drive with<br/>Sime Darby sunshine.</div>
+    <p style="font-size:19px;color:#CBD5E1;margin-top:20px;max-width:520px"><b style="color:#fff">SunD Wallet</b> + <b style="color:#fff">SunD Bay</b>: CREAM rooftops earn the rewards, and SunD Bays' own canopies power cheaper, cleaner rides for everyone, in Elmina and beyond.</p>
+    <div style="margin-top:44px;display:flex;gap:10px">
+      <span class="pill" style="background:rgba(251,191,36,.14);color:var(--sun)"><i data-lucide="zap"></i>Energy efficiency</span>
+      <span class="pill" style="background:rgba(34,197,94,.14);color:#4ADE80"><i data-lucide="car"></i>Green transport</span>
+      <span class="pill" style="background:rgba(96,165,250,.16);color:var(--sky-bright)"><i data-lucide="refresh-cw"></i>Circular economy</span>
+    </div>
+    <div style="margin-top:52px;font-size:15px;color:#94A3B8">Team <b style="color:#fff">UrbanByte</b></div>
+  </div>
+  <div style="position:absolute;left:880px;top:84px;width:250px;transform:rotate(4deg)">
+    <div class="ph" style="border-color:#1E293B;box-shadow:0 30px 60px rgba(0,0,0,.45)"><img src="screenshots/10-home.png" /></div>
+  </div>
+  <div class="card" style="position:absolute;left:746px;top:420px;width:220px;padding:14px 16px;box-shadow:0 18px 40px rgba(0,0,0,.35)">
+    <div class="row center" style="gap:10px"><span class="ib sm t-leaf"><i data-lucide="sun"></i></span><div><div class="num" style="font-size:22px;color:var(--ink)">+136 km</div><div class="xs muted">on 100% solar · 0 RM cash</div></div></div>
+  </div>
+  <div class="card" style="position:absolute;left:1086px;top:200px;width:168px;padding:12px 14px;box-shadow:0 18px 40px rgba(0,0,0,.35)">
+    <div class="xs muted">Solar income / month</div><div class="num" style="font-size:24px;color:var(--sun-ink)">~RM 275</div><div class="xs muted">credits +20% or ≤50% rebate</div>
+  </div>
+</section>
+
+<!-- ═══════════ 1 · PROBLEM ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag"><b>1</b>The Problem</span>
+  <h1>EVs are outrunning chargers, <em>and those chargers run on fossil power</em></h1>
+
+  <div class="row" style="margin-top:24px;gap:18px">
+    <div class="card w-coral" style="flex:1.35;padding:20px 24px">
+      <div class="row" style="align-items:flex-end;gap:14px">
+        <div class="num" style="font-size:78px;line-height:.9;color:var(--coral-ink)">19 : 1</div>
+        <div class="small muted" style="padding-bottom:6px">EVs per public charger</div>
+      </div>
+      <div id="cars" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;align-items:center"></div>
+      <div class="small muted" style="margin-top:12px">122,286 EVs vs 6,416 chargers · 10,000-charger target for 2025 missed</div>
+    </div>
+    <div class="card" style="flex:1;padding:22px 24px">
+      <div class="num" style="font-size:64px;line-height:.95">92%</div>
+      <div style="font-weight:700;margin-top:6px">of Peninsular power is fossil</div>
+      <div style="display:flex;height:14px;border-radius:999px;overflow:hidden;margin-top:14px">
+        <span style="width:58.6%;background:#334155"></span><span style="width:33.1%;background:#94A3B8"></span><span style="width:8.3%;background:var(--leaf)"></span>
+      </div>
+      <div class="xs muted" style="margin-top:8px">Coal 58.6% · Gas 33.1% · Other 8.3%</div>
+    </div>
+    <div class="card" style="flex:1;padding:22px 24px">
+      <div class="num" style="font-size:64px;line-height:.95">27%</div>
+      <div style="font-weight:700;margin-top:6px">of would-be buyers held back by too few chargers</div>
+      <div class="col" style="gap:6px;margin-top:14px">
+        <div class="row center small" style="gap:8px"><span style="width:61%;height:8px;border-radius:9px;background:var(--sky)"></span>61% finding one</div>
+        <div class="row center small" style="gap:8px"><span style="width:53%;height:8px;border-radius:9px;background:var(--sky-bright)"></span>53% waiting</div>
+        <div class="row center small" style="gap:8px"><span style="width:38%;height:8px;border-radius:9px;background:var(--sky-soft)"></span>38% cost</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="small" style="margin-top:16px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase">Inside Sime Darby townships</div>
+  <div class="row" style="margin-top:10px;gap:18px">
+    <div class="card w-sun row center" style="flex:1;gap:16px;padding:16px 20px">
+      <span class="ib lg t-sun"><i data-lucide="banknote"></i></span>
+      <div><h3>CREAM cash leaks out of the loop</h3><p class="small muted">Rooftop lease pays cash, spent anywhere. Residents never use their own solar.</p></div>
+    </div>
+    <div class="card w-sky row center" style="flex:1;gap:16px;padding:16px 20px">
+      <span class="ib lg t-sky"><i data-lucide="unplug"></i></span>
+      <div><h3>Shared solar is hard to deliver</h3><p class="small muted">5 km cap · 9 sen/kWh access charge · midday surplus, night shortfall.</p></div>
+    </div>
+  </div>
+  <div class="card row center" style="margin-top:14px;gap:18px;padding:12px 20px;background:var(--ink);border:0;color:#fff">
+    <span class="small" style="font-weight:700;color:var(--sun);white-space:nowrap">Who is affected</span>
+    <span class="small" style="color:#CBD5E1">EV drivers and would-be buyers · SD residents · Sime Darby · the planet</span>
+    <span style="width:1px;height:22px;background:#334155"></span>
+    <span class="small" style="font-weight:700;color:var(--sun);white-space:nowrap">Why now</span>
+    <span class="small" style="color:#CBD5E1">30,000-charger target by 2030 · SD net zero by 2050 · CREAM just launched</span>
+  </div>
+  <div class="footer"><span>Sources: MITI (May 2026), carz.com.my, EY Malaysia EV survey, Reuters/The Edge power mix 2025</span><span>2</span></div>
+</section>
+
+<!-- ═══════════ 2 · TARGET USERS ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag"><b>2</b>Target Users</span>
+  <h1>Five groups, one gap: <em>solar people can use</em></h1>
+  <div class="row" style="margin-top:26px;gap:14px">
+    <div class="card col " style="flex:1;padding:0;overflow:hidden">
+      <div style="height:190px;background:url(visuals/sund-township-plain.png) -346px -101px/922px auto no-repeat"></div>
+      <div class="col" style="padding:14px 16px 16px;gap:8px">
+        <div class="row center" style="gap:8px"><span class="ib sm t-sun"><i data-lucide="home"></i></span><h3>SD landed owners</h3></div>
+        <p class="small muted row" style="gap:6px"><i data-lucide="x-circle" style="width:16px;color:#F87171;flex-shrink:0;margin-top:2px"></i>Roof solar they never use</p>
+        <p class="small row" style="gap:6px"><i data-lucide="check-circle-2" style="width:16px;color:#16A34A;flex-shrink:0;margin-top:2px"></i><span><b>Solar income</b>: credits +20% or bill rebate</span></p>
+      </div>
+    </div>
+
+    <div class="card col " style="flex:1;padding:0;overflow:hidden">
+      <div style="height:190px;background:url(visuals/sund-township-plain.png) -602px -383px/1348px auto no-repeat"></div>
+      <div class="col" style="padding:14px 16px 16px;gap:8px">
+        <div class="row center" style="gap:8px"><span class="ib sm t-sky"><i data-lucide="building-2"></i></span><h3>SD condo residents</h3></div>
+        <p class="small muted row" style="gap:6px"><i data-lucide="x-circle" style="width:16px;color:#F87171;flex-shrink:0;margin-top:2px"></i>No charger space, little roof</p>
+        <p class="small row" style="gap:6px"><i data-lucide="check-circle-2" style="width:16px;color:#16A34A;flex-shrink:0;margin-top:2px"></i><span><b>Canopy bays</b> in their car park, 15% off</span></p>
+      </div>
+    </div>
+
+    <div class="card col " style="flex:1;padding:0;overflow:hidden">
+      <div style="height:190px;background:url(visuals/sund-bay-plain.png) -283px -193px/1031px auto no-repeat"></div>
+      <div class="col" style="padding:14px 16px 16px;gap:8px">
+        <div class="row center" style="gap:8px"><span class="ib sm t-leaf"><i data-lucide="car"></i></span><h3>Public EV drivers</h3></div>
+        <p class="small muted row" style="gap:6px"><i data-lucide="x-circle" style="width:16px;color:#F87171;flex-shrink:0;margin-top:2px"></i>Few bays, long waits, pricey DC</p>
+        <p class="small row" style="gap:6px"><i data-lucide="check-circle-2" style="width:16px;color:#16A34A;flex-shrink:0;margin-top:2px"></i><span><b>Cheaper rates</b>, surplus deals, Saver +50%</span></p>
+      </div>
+    </div>
+
+    <div class="card col " style="flex:1;padding:0;overflow:hidden">
+      <div style="height:190px;background:url(visuals/sund-township-plain.png) -698px -341px/1298px auto no-repeat"></div>
+      <div class="col" style="padding:14px 16px 16px;gap:8px">
+        <div class="row center" style="gap:8px"><span class="ib sm t-berry"><i data-lucide="sparkles"></i></span><h3>Future EV buyers</h3></div>
+        <p class="small muted row" style="gap:6px"><i data-lucide="x-circle" style="width:16px;color:#F87171;flex-shrink:0;margin-top:2px"></i>Charging anxiety blocks the buy</p>
+        <p class="small row" style="gap:6px"><i data-lucide="check-circle-2" style="width:16px;color:#16A34A;flex-shrink:0;margin-top:2px"></i><span><b>Bays nearby</b> + low running cost → go EV</span></p>
+      </div>
+    </div>
+
+    <div class="card col w-sky" style="flex:1;padding:0;overflow:hidden">
+      <div style="height:190px;background:url(visuals/sund-township-plain.png) -80px -27px/389px auto no-repeat"></div>
+      <div class="col" style="padding:14px 16px 16px;gap:8px">
+        <div class="row center" style="gap:8px"><span class="ib sm" style="background:var(--sky);color:#fff"><i data-lucide="landmark"></i></span><h3>Sime Darby Property</h3></div>
+        <p class="small muted row" style="gap:6px"><i data-lucide="x-circle" style="width:16px;color:#F87171;flex-shrink:0;margin-top:2px"></i>Solar, but no link to EV demand</p>
+        <p class="small row" style="gap:6px"><i data-lucide="check-circle-2" style="width:16px;color:#16A34A;flex-shrink:0;margin-top:2px"></i><span><b>New revenue</b>, ESG, a reason to buy SD</span></p>
+      </div>
+    </div>
+
+  </div>
+  <div class="card w-berry row center" style="margin-top:22px;gap:14px;padding:14px 20px">
+    <span class="ib sm t-berry"><i data-lucide="users"></i></span>
+    <p style="font-weight:700">Beyond drivers: SunD eBike, Gym and Clubhouse bring in kids, families and seniors too</p>
+  </div>
+  <div class="footer"><span>Scenes from the SunD concept illustrations (Appendix A1, A2)</span><span>3</span></div>
+</section>
+
+<!-- ═══════════ 3 · SOLUTION I · WALLET ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag"><b>3</b>Our Solution · 1 of 2</span>
+  <h1>Sun<span class="d">D</span> Wallet: <em>owners earn, everyone saves</em></h1>
+  <div class="row" style="margin-top:26px;gap:40px">
+    <div style="position:relative;width:360px;height:470px;flex-shrink:0">
+      <div class="ph" style="position:absolute;left:0;top:0;width:196px"><img src="screenshots/10-home.png" /></div>
+      <div class="ph" style="position:absolute;left:160px;top:40px;width:196px"><img src="screenshots/11b-wallet-mix.png" /></div>
+    </div>
+    <div class="col" style="flex:1;gap:14px">
+      <div class="card w-sun" style="padding:14px 22px 18px">
+        <div class="row center small" style="gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed var(--sun-bright)"><i data-lucide="share-2" style="width:16px;color:var(--sun-deep)"></i><span>SD controls CREAM energy and routes it to <b>nearby commercial areas or data centres</b>. Owners get rewarded.</span></div>
+        <div class="row center" style="gap:14px">
+          <div class="col center" style="gap:4px;width:112px"><span class="ib lg t-sky"><i data-lucide="home"></i></span><div class="num" style="font-size:20px;white-space:nowrap">1,100 kWh</div><div class="xs muted">sold / month</div></div>
+          <i data-lucide="arrow-right" style="color:var(--subtle);width:24px;height:24px;flex-shrink:0"></i>
+          <div class="col center" style="gap:4px;width:112px"><span class="ib lg t-leaf"><i data-lucide="coins"></i></span><div class="num" style="font-size:20px;white-space:nowrap">× RM 0.25</div><div class="xs muted">normal selling rate</div></div>
+          <i data-lucide="arrow-right" style="color:var(--subtle);width:24px;height:24px;flex-shrink:0"></i>
+          <div style="flex:1">
+            <div class="num" style="font-size:22px;text-align:center;margin-bottom:6px">≈ RM 275 / month</div>
+            <div class="row" style="justify-content:space-between;font-weight:700;font-size:14px"><span style="color:var(--sun-ink)">SunD Credits +20% · unlimited</span><span style="color:var(--sky-deep)">Bill rebate · ≤50%</span></div>
+            <div style="position:relative;margin-top:8px">
+              <div style="display:flex;height:34px;border-radius:12px;overflow:hidden;font-weight:700;font-size:14px">
+                <span style="width:50%;background:var(--sun);display:flex;align-items:center;justify-content:center;color:var(--sun-ink)">always ≥ 50%</span>
+                <span style="width:50%;background:repeating-linear-gradient(135deg,var(--sky-soft) 0 8px,#fff 8px 16px);display:flex;align-items:center;justify-content:center;color:var(--sky-deep);border:2px dashed var(--sky-bright);border-left:0;border-radius:0 12px 12px 0">owner's choice</span>
+              </div>
+            </div>
+            <div class="xs muted" style="margin-top:6px;text-align:center">Owner slides the split · rebate never above 50%</div>
+          </div>
+        </div>
+      </div>
+      <div class="row center" style="gap:10px">
+        <div class="card w-sun" style="flex:1;padding:12px 16px"><div class="xs muted">RM 1 of income as credits</div><div class="num" style="font-size:28px;color:var(--sun-ink)">RM 1.20</div><div class="xs muted">to spend at SunD</div></div>
+        <span class="num" style="font-size:20px;color:var(--subtle)">vs</span>
+        <div class="card w-sky" style="flex:1;padding:12px 16px"><div class="xs muted">RM 1 of income as rebate</div><div class="num" style="font-size:28px;color:var(--sky-deep)">RM 1.00</div><div class="xs muted">off the TNB bill</div></div>
+        <div class="card" style="flex:1.15;padding:12px 16px;background:var(--ink);border:0;color:#fff"><div class="xs" style="color:#CBD5E1">Credits top-up</div><div class="num" style="font-size:28px;color:var(--sun)">+20%</div><div class="xs" style="color:#CBD5E1">cheap for SD: bay solar ~15 sen/kWh</div></div>
+      </div>
+      <div class="row" style="gap:12px">
+        <div class="card" style="flex:1;padding:14px 16px"><span class="ib sm t-sky"><i data-lucide="sliders-horizontal"></i></span><h3 style="margin-top:8px">Owner's choice</h3><p class="small muted">EV owner? Go all credits. No EV yet? Take up to half off the bill.</p></div>
+        <div class="card" style="flex:1;padding:14px 16px"><span class="ib sm t-slate"><i data-lucide="scale"></i></span><h3 style="margin-top:8px">Figures SD can tune</h3><p class="small muted">RM 0.25 rate, +20% top-up, 50% cap: all adjustable later.</p></div>
+        <div class="card w-leaf" style="flex:1;padding:14px 16px"><span class="ib sm t-leaf"><i data-lucide="ticket"></i></span><h3 style="margin-top:8px">Public: Saver Credits</h3><p class="small muted">Pay RM 20, get RM 30. Use at high-solar bays and SunD eBike.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="note" style="left:464px">Estimates: 10 kWp roof ≈ 1,100 kWh/month · RM 0.25/kWh benchmark: avg system marginal price ~RM 0.20–0.25.</div>
+  <div class="footer"><span>Live prototype screens: Home and the redemption mix in Wallet</span><span>4</span></div>
+</section>
+
+<!-- ═══════════ 4 · SOLUTION II · BAY ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag"><b>3</b>Our Solution · 2 of 2</span>
+  <h1>Sun<span class="d">D</span> Bay: <em>solar-first hybrid charging</em></h1>
+  <div class="row" style="margin-top:22px;gap:24px">
+    <div class="col" style="width:700px;gap:10px;flex-shrink:0">
+      <div style="border-radius:20px;overflow:hidden;border:1px solid var(--outline);box-shadow:0 12px 30px rgba(15,23,42,.10)"><img src="visuals/sund-bay.png" style="display:block;width:100%" /></div>
+      <div class="row center small" style="gap:8px;color:var(--leaf-ink);font-weight:700"><i data-lucide="map-pin" style="width:16px;flex-shrink:0"></i>Independent of CREAM: canopy → battery → grid backup, so a bay works anywhere</div>
+    </div>
+    <div class="col" style="flex:1;gap:10px">
+      <div class="card w-leaf row center" style="gap:12px;padding:11px 14px"><span class="ib t-leaf"><i data-lucide="badge-percent"></i></span><div><h3>Open to all, and cheaper</h3><p class="small muted">~RM 1.00 DC vs RM 1.20–1.80 today · or pay with SunD Credits</p></div></div>
+      <div class="card w-leaf row center" style="gap:12px;padding:11px 14px"><span class="ib t-leaf"><i data-lucide="trending-down"></i></span><div><h3>Solar Surplus Discount</h3><p class="small muted">Battery ≥80% → price drops automatically, nothing wasted</p></div></div>
+      <div class="card w-sky row center" style="gap:12px;padding:11px 14px"><span class="ib t-sky"><i data-lucide="ticket"></i></span><div><h3>Saver Credits: RM 20 → RM 30</h3><p class="small muted">Public prepay, valid only at high-solar bays</p></div></div>
+      <div class="card w-berry row center" style="gap:12px;padding:11px 14px"><span class="ib t-berry"><i data-lucide="gift"></i></span><div><h3>Bonus credits +5–10%</h3><p class="small muted">For choosing SunD over fossil-grid bays</p></div></div>
+      <div class="card w-sky" style="padding:12px 16px">
+        <div class="row" style="gap:10px"><span class="pill t-sun" style="flex-shrink:0">Inside</span><span class="small">SD malls · parks · clubhouses · condo car parks</span></div>
+        <div class="row" style="gap:10px;margin-top:6px"><span class="pill t-berry" style="flex-shrink:0">Beyond</span><span class="small">Other townships · offices · highways · petrol stations</span></div>
+        <div class="row" style="gap:10px;margin-top:6px"><span class="pill t-slate" style="flex-shrink:0">Modular</span><span class="small">Add, move or resize canopies by demand</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>Concept illustration: Medium SunD Bay · full view in Appendix A1 · figures are estimates</span><span>5</span></div>
+</section>
+
+<!-- ═══════════ 5 · INNOVATION ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag"><b>4</b>Innovation</span>
+  <h1>Not another charging network: <em>a closed solar loop</em></h1>
+  <div class="row" style="margin-top:22px;gap:28px">
+    <div style="flex:1">
+      <div class="row" style="gap:0;padding:0 18px 8px;font-size:14px;font-weight:700;color:var(--muted)">
+        <span style="width:150px"></span><span style="flex:1">Today</span><span style="width:40px"></span><span style="flex:1.15;color:var(--sky-deep)">With SunD</span>
+      </div>
+      <div class="col" style="gap:8px" id="compare"></div>
+    </div>
+    <div class="col" style="width:290px;gap:14px">
+      <div class="card dark" style="padding:22px;border:0;background:var(--ink)">
+        <div class="small" style="color:var(--sun);font-weight:700;letter-spacing:.1em;text-transform:uppercase">Our edge</div>
+        <p style="font-family:var(--display);font-size:22px;font-weight:700;line-height:1.3;margin-top:10px">Turns <span style="color:var(--sun)">CREAM rooftop value</span> into SunD Credits, while <span style="color:var(--sky-bright)">SunD Bays run on their own sun</span>, anywhere.</p>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="height:150px;background:url(visuals/sund-township-plain.png) -290px -207px/829px auto no-repeat"></div>
+        <div style="padding:12px 16px"><h3>One wallet, many green places</h3><p class="small muted">Bays, eBike trail, Gym, Clubhouse · public welcome</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>CAC: CREAM Community Access Charge · CRESS: Corporate Renewable Energy Supply Scheme (Oct 2026 rates)</span><span>6</span></div>
+</section>
+
+<!-- ═══════════ 6 · HOW IT WORKS ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag"><b>5</b>How It Works</span>
+  <h1>One loop: <em>earn → charge → reuse → expand</em></h1>
+  <div class="row" style="margin-top:14px;gap:30px">
+    <svg width="560" height="520" viewBox="0 0 560 520" style="flex-shrink:0;transform:scale(.9);transform-origin:top left;margin-right:-56px">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 10 5 0 10z" fill="#16A34A"/></marker></defs>
+      <circle cx="280" cy="262" r="175" fill="none" stroke="#DCFCE7" stroke-width="26"/>
+      <path d="M 405 139 A 175 175 0 0 1 403 387" fill="none" stroke="#16A34A" stroke-width="4" marker-end="url(#ah)"/>
+      <path d="M 403 387 A 175 175 0 0 1 157 387" fill="none" stroke="#16A34A" stroke-width="4" marker-end="url(#ah)"/>
+      <path d="M 157 387 A 175 175 0 0 1 155 139" fill="none" stroke="#16A34A" stroke-width="4" marker-end="url(#ah)"/>
+      <path d="M 155 139 A 175 175 0 0 1 405 139" fill="none" stroke="#16A34A" stroke-width="4" marker-end="url(#ah)"/>
+      <circle cx="280" cy="262" r="92" fill="#0F172A"/>
+      <text x="280" y="258" text-anchor="middle" font-family="Hubot Sans" font-weight="800" font-size="44" fill="#FBBF24">Sun<tspan fill="#60A5FA">D</tspan></text>
+      <text x="280" y="286" text-anchor="middle" font-family="Atkinson Hyperlegible" font-size="13" fill="#CBD5E1">value stays in</text>
+      <text x="280" y="304" text-anchor="middle" font-family="Atkinson Hyperlegible" font-size="13" fill="#CBD5E1">the township</text>
+    </svg>
+    <!-- loop nodes positioned over the svg -->
+    <div style="position:absolute;left:64px;top:168px;width:560px;height:520px;pointer-events:none;transform:scale(.9);transform-origin:top left">
+      <div class="card w-sun" style="position:absolute;left:180px;top:0;width:200px;padding:12px 14px;text-align:center"><div class="row center" style="gap:8px;justify-content:center"><span class="ib sm t-sun"><i data-lucide="sun"></i></span><h3>1 · Earn</h3></div><p class="xs muted" style="margin-top:4px">SD sells CREAM energy → owners earn RM 0.25/kWh</p></div>
+      <div class="card w-sky" style="position:absolute;left:380px;top:190px;width:180px;padding:12px 14px;text-align:center"><div class="row center" style="gap:8px;justify-content:center"><span class="ib sm t-sky"><i data-lucide="zap"></i></span><h3>2 · Charge</h3></div><p class="xs muted" style="margin-top:4px">Credits redeem at SunD Bays</p></div>
+      <div class="card w-leaf" style="position:absolute;left:180px;top:410px;width:200px;padding:12px 14px;text-align:center"><div class="row center" style="gap:8px;justify-content:center"><span class="ib sm t-leaf"><i data-lucide="battery-charging"></i></span><h3>3 · Reuse</h3></div><p class="xs muted" style="margin-top:4px">Bay canopy + battery, no transmission</p></div>
+      <div class="card w-berry" style="position:absolute;left:0;top:190px;width:180px;padding:12px 14px;text-align:center"><div class="row center" style="gap:8px;justify-content:center"><span class="ib sm t-berry"><i data-lucide="trending-up"></i></span><h3>4 · Expand</h3></div><p class="xs muted" style="margin-top:4px">Revenue funds more bays, here and beyond</p></div>
+    </div>
+    <div class="col" style="flex:1;gap:10px;padding-top:12px">
+      <div class="small" style="font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">Two engines, one wallet</div>
+      <div class="row" style="gap:12px">
+        <div class="card w-sun" style="flex:1;padding:14px 16px"><div class="row center" style="gap:8px"><span class="ib sm t-sun"><i data-lucide="home"></i></span><h3>CREAM engine</h3></div><p class="small muted" style="margin-top:6px">SD routes roof energy to commercial areas or data centres. Owners earn RM 0.25/kWh sold.</p></div>
+        <div class="card w-leaf" style="flex:1;padding:14px 16px"><div class="row center" style="gap:8px"><span class="ib sm t-leaf"><i data-lucide="zap"></i></span><h3>SunD Bay engine</h3></div><p class="small muted" style="margin-top:6px">Own canopy + battery charges any driver, at any site.</p></div>
+      </div>
+      <div class="small" style="font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:4px">What keeps it spinning</div>
+      <div class="card row" style="gap:14px;padding:12px 16px"><span class="ib t-leaf"><i data-lucide="gauge"></i></span><div><h3>Battery sets the price</h3><p class="small muted">≥80% surplus discount · ≥60% Saver OK · &lt;15% grid backup</p></div></div>
+      <div class="card row" style="gap:14px;padding:12px 16px"><span class="ib t-sky"><i data-lucide="badge-percent"></i></span><div><h3>Public pays less in the sun</h3><p class="small muted">Surplus ~RM 0.80 · Saver +50% · map points to the sunniest bay</p></div></div>
+      <div class="card row" style="gap:14px;padding:12px 16px"><span class="ib t-berry"><i data-lucide="gift"></i></span><div><h3>Bonus, streaks, eBikes, clubhouse</h3><p class="small muted">More reasons to spend credits on green</p></div><div style="margin-left:auto;width:150px;height:66px;border-radius:10px;overflow:hidden;flex-shrink:0;border:1px solid var(--outline)"><div style="width:150px;height:66px;background:url(visuals/sund-township-plain.png) -150px -214px/727px auto no-repeat"></div></div></div>
+      <div class="row" style="gap:8px;flex-wrap:wrap;margin-top:4px">
+        <span class="pill t-sun"><i data-lucide="zap"></i>Energy efficiency</span><span class="pill t-leaf"><i data-lucide="car"></i>Green transport</span><span class="pill t-sky"><i data-lucide="refresh-cw"></i>Circular economy</span><span class="pill t-slate"><i data-lucide="shield"></i>Climate resilience</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>Theme: Planet · regenerative townships, effortless sustainable living</span><span>7</span></div>
+</section>
+
+<!-- ═══════════ 7 · IMPACT ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag"><b>6</b>Impact</span>
+  <h1>Every side wins, <em>the planet included</em></h1>
+  <div class="row" style="margin-top:18px;gap:14px">
+    <div class="card w-sky" style="flex:1;padding:14px 16px"><span class="ib t-sky"><i data-lucide="users"></i></span><h2 style="margin-top:8px">Public</h2><p class="small muted" style="margin-top:6px">~RM 1.00 DC vs RM 1.20–1.80 · surplus ~RM 0.80 · Saver +50%</p><p class="small"><b>More people switch to EVs</b></p></div>
+    <div class="card w-sun" style="flex:1;padding:14px 16px"><span class="ib t-sun"><i data-lucide="home"></i></span><h2 style="margin-top:8px">SD owners</h2><p class="small muted" style="margin-top:6px">Solar income ~RM 275/month</p><p class="small muted">As credits (+20%) or bill rebate</p></div>
+    <div class="card w-berry" style="flex:1;padding:14px 16px"><span class="ib t-berry"><i data-lucide="landmark"></i></span><h2 style="margin-top:8px">Sime Darby</h2><p class="small muted" style="margin-top:6px">CREAM energy to its commercial sites, data centres</p><p class="small muted">New revenue · ESG: Scope 1&amp;2 −40% by 2030</p></div>
+    <div class="card w-leaf" style="flex:1;padding:14px 16px"><span class="ib t-leaf"><i data-lucide="leaf"></i></span><h2 style="margin-top:8px">Planet</h2><p class="small muted" style="margin-top:6px">~40% of bay energy from on-site solar</p><p class="small muted">Clean charging for everyone</p></div>
+  </div>
+  <div class="card dark" style="margin-top:14px;border:0;background:var(--ink);padding:14px 30px">
+    <div class="row" style="gap:0;justify-content:space-between">
+      <div class="col" style="width:240px"><div class="num" style="font-size:40px;color:var(--sun)">14 <span style="font-size:28px">km</span></div><div class="small" style="color:#CBD5E1">of driving a day from <b style="color:#fff">1 solar panel</b></div></div>
+      <div style="width:1px;background:#334155"></div>
+      <div class="col" style="width:240px"><div class="num" style="font-size:40px;color:var(--sun)">250 <span style="font-size:28px">km</span></div><div class="small" style="color:#CBD5E1">a day from <b style="color:#fff">1 SD roof</b>, ≈ 2× around Earth a year</div></div>
+      <div style="width:1px;background:#334155"></div>
+      <div class="col" style="width:260px"><div class="num" style="font-size:40px;color:var(--leaf)">112k <span style="font-size:28px">km</span></div><div class="small" style="color:#CBD5E1">a day from <b style="color:#fff">450 Elmina homes</b> (112,000 km), ≈ 2.8× around Earth</div></div>
+      <div style="width:1px;background:#334155"></div>
+      <div class="col" style="width:230px"><div class="num" style="font-size:40px;color:var(--sky-bright)">−43%</div><div class="small" style="color:#CBD5E1">energy cost per bay: <b style="color:#fff">RM 95 → RM 54</b> a day</div></div>
+    </div>
+  </div>
+  <div class="row" style="margin-top:14px;gap:12px">
+    <div class="card" style="flex:1;padding:0;overflow:hidden"><div style="height:78px;background:url(visuals/sund-township-plain.png) -339px -504px/1646px auto no-repeat"></div><div style="padding:8px 12px"><b class="small">Kids & parents</b><div class="xs muted">SunD eBike rides</div></div></div>
+    <div class="card" style="flex:1;padding:0;overflow:hidden"><div style="height:78px;background:url(visuals/sund-township-plain.png) -354px -475px/1382px auto no-repeat"></div><div style="padding:8px 12px"><b class="small">Seniors</b><div class="xs muted">Solar SunD Gym</div></div></div>
+    <div class="card" style="flex:1;padding:0;overflow:hidden"><div style="height:78px;background:url(visuals/sund-bay-plain.png) -726px -536px/1382px auto no-repeat"></div><div style="padding:8px 12px"><b class="small">Public drivers</b><div class="xs muted">Cheaper, Saver +50%</div></div></div>
+    <div class="card" style="flex:1;padding:0;overflow:hidden"><div style="height:78px;background:url(visuals/sund-township-plain.png) -272px -390px/1503px auto no-repeat"></div><div style="padding:8px 12px"><b class="small">Families</b><div class="xs muted">Clubhouse + lake park</div></div></div>
+    <div class="card w-sky col" style="flex:1.1;padding:12px 14px;justify-content:center"><b class="small">Reach grows</b><div class="xs muted" style="margin-top:4px;line-height:1.5">Residents → public → other townships → nationwide</div></div>
+  </div>
+  <div class="note">All figures are estimates · 1 panel ≈ 2 kWh/day · 6.8 km/kWh · SD ESG targets from Sime Darby Property.</div>
+  <div class="footer"><span>SunD · Sime Darby Township Hackathon 2026</span><span>8</span></div>
+</section>
+
+<!-- ═══════════ 8 · FEASIBILITY ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag"><b>7</b>Feasibility</span>
+  <h1>Realistic today: <em>SD already owns the hardest pieces</em></h1>
+  <div class="row" style="margin-top:24px;gap:26px">
+    <div style="flex:1.25">
+      <div class="small muted" style="margin-bottom:8px">Fair comparison · same site: 10 lots, 1 DC + 3 AC, ~210 kWh/day demand</div>
+      <div class="card" style="padding:6px 8px">
+        <table class="roomy">
+          <tr><th></th><th>Existing bay</th><th style="color:var(--sky-deep)">SunD Bay</th></tr>
+          <tr><td class="muted">Source</td><td>Grid, ~92% fossil</td><td><b>Canopy 25 kWp + battery</b></td></tr>
+          <tr><td class="muted">Solar share</td><td>0%</td><td><b style="color:var(--leaf-ink)">~40%</b></td></tr>
+          <tr><td class="muted">Price DC / AC</td><td>RM 1.20–1.80 / 0.75–1.15</td><td><b>~RM 1.00 / ~0.70</b></td></tr>
+          <tr><td class="muted">Energy cost / day</td><td>~RM 95</td><td><b style="color:var(--leaf-ink)">~RM 54</b></td></tr>
+          <tr><td class="muted">Peak demand</td><td>Full</td><td><b>Cut by battery</b></td></tr>
+          <tr><td class="muted" style="border:0">Setup cost</td><td style="border:0">RM 70k–105k</td><td style="border:0"><b style="color:var(--coral-ink)">RM 220k–380k</b></td></tr>
+        </table>
+      </div>
+      <div class="card w-sun row center" style="margin-top:12px;gap:12px;padding:12px 16px">
+        <span class="ib sm t-sun"><i data-lucide="scale"></i></span>
+        <p class="small"><b>Honest trade-off:</b> higher upfront cost, matched by ~35% more usage, which SD credit users bring.</p>
+      </div>
+    </div>
+    <div class="col" style="flex:1;gap:12px">
+      <div class="card w-leaf" style="padding:16px 18px">
+        <h3 class="row center" style="gap:8px"><i data-lucide="check-circle-2" style="color:var(--leaf-deep);width:20px"></i>Already in place</h3>
+        <ul class="small" style="margin:8px 0 0 18px;line-height:1.6">
+          <li>CREAM Elmina: 4.5 MW on 450 homes, live since Sep 2025</li>
+          <li><b>CREAM is brand new for Malaysian landed homes</b>, the ideal moment to build SunD into future SD developments</li>
+          <li>SD-owned malls, parks and clubhouses as bay sites</li>
+        </ul>
+      </div>
+      <div class="card w-sky" style="padding:16px 18px">
+        <h3 class="row center" style="gap:8px"><i data-lucide="handshake" style="color:var(--sky-deep);width:20px"></i>Stakeholders</h3>
+        <p class="small" style="margin-top:6px">SD Property (owner) · TNB / GSPARX (CREAM) · charger + battery vendors · residents and public</p>
+      </div>
+      <div class="row" style="gap:12px">
+        <div class="card" style="flex:1;padding:14px;text-align:center"><div class="num" style="font-size:26px">4–6 yrs</div><div class="xs muted">carport payback</div></div>
+        <div class="card" style="flex:1;padding:14px;text-align:center"><div class="num" style="font-size:26px">60%</div><div class="xs muted">GITA tax allowance</div></div>
+        <div class="card" style="flex:1;padding:14px;text-align:center"><div class="num" style="font-size:26px">2–3 mo</div><div class="xs muted">small bay live</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card w-leaf row center" style="margin-top:16px;gap:16px;padding:12px 20px">
+    <span class="row center" style="gap:8px;font-weight:700;color:var(--leaf-ink);white-space:nowrap"><i data-lucide="shield-check" style="width:20px"></i>Demand risk: very low</span>
+    <span class="row center small" style="gap:6px;flex:1"><i data-lucide="users" style="width:16px;color:var(--leaf-deep);flex-shrink:0"></i>Built-in users: credits spend only here</span>
+    <span class="row center small" style="gap:6px;flex:1"><i data-lucide="badge-percent" style="width:16px;color:var(--leaf-deep);flex-shrink:0"></i>Cheapest solar charging nearby</span>
+    <span class="row center small" style="gap:6px;flex:1"><i data-lucide="ticket" style="width:16px;color:var(--leaf-deep);flex-shrink:0"></i>Saver pre-sales = cash upfront</span>
+    <span class="row center small" style="gap:6px;flex:1"><i data-lucide="boxes" style="width:16px;color:var(--leaf-deep);flex-shrink:0"></i>Modular: move quiet canopies</span>
+  </div>
+  <div class="note">Estimates · costs from 2026 Malaysian vendor ranges (carport RM 4–6k/kWp, battery RM 1–2.5k/kWh, DC 60 kW RM 60–80k).</div>
+  <div class="footer"><span>SunD · Sime Darby Township Hackathon 2026</span><span>9</span></div>
+</section>
+
+<!-- ═══════════ 9 · IMPLEMENTATION ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag"><b>8</b>Implementation</span>
+  <h1>From one Elmina pilot to a <em>SunD sub-brand</em></h1>
+  <div style="position:relative;margin-top:24px">
+    <div style="position:absolute;left:0;right:0;top:27px;height:4px;background:linear-gradient(90deg,var(--sun),var(--leaf),var(--sky),var(--berry));border-radius:9px"></div>
+    <div class="row" style="gap:16px;position:relative">
+      <div class="col" style="flex:1;gap:12px">
+        <span class="ib lg" style="background:var(--sun);color:#fff;box-shadow:0 0 0 6px #fff"><i data-lucide="flag"></i></span>
+        <div><div class="xs" style="font-weight:700;color:var(--sun-ink);letter-spacing:.08em">PHASE 1 · 0–6 MONTHS</div><h2>Pilot</h2></div>
+        <div class="card w-sun" style="padding:14px 16px"><p class="small">SunD Wallet for Elmina CREAM homes</p><p class="small" style="margin-top:6px">1 Small + 1 Medium bay · design SunD into new SD launches</p></div>
+      </div>
+      <div class="col" style="flex:1;gap:12px">
+        <span class="ib lg" style="background:var(--leaf);color:#fff;box-shadow:0 0 0 6px #fff"><i data-lucide="map"></i></span>
+        <div><div class="xs" style="font-weight:700;color:var(--leaf-ink);letter-spacing:.08em">PHASE 2 · 6–18 MONTHS</div><h2>Township</h2></div>
+        <div class="card w-leaf" style="padding:14px 16px"><p class="small">Expand bays where usage data says so</p><p class="small" style="margin-top:6px">Open to public · launch Saver Credits</p></div>
+      </div>
+      <div class="col" style="flex:1;gap:12px">
+        <span class="ib lg" style="background:var(--sky);color:#fff;box-shadow:0 0 0 6px #fff"><i data-lucide="rocket"></i></span>
+        <div><div class="xs" style="font-weight:700;color:var(--sky-deep);letter-spacing:.08em">PHASE 3 · 18–36 MONTHS</div><h2>Beyond SD</h2></div>
+        <div class="card w-sky" style="padding:14px 16px"><p class="small">SunD Bay sub-brand: other SD townships, malls, highway stops, petrol stations</p><p class="small" style="margin-top:6px">Same wallet, every location</p></div>
+      </div>
+      <div class="col" style="flex:1;gap:12px">
+        <span class="ib lg" style="background:var(--berry);color:#fff;box-shadow:0 0 0 6px #fff"><i data-lucide="bike"></i></span>
+        <div><div class="xs" style="font-weight:700;color:var(--berry-ink);letter-spacing:.08em">PHASE 4 · 3+ YEARS</div><h2>Platform</h2></div>
+        <div class="card w-berry" style="padding:14px 16px"><p class="small">SunD eBike, gym, clubhouse · EV fleets</p><p class="small" style="margin-top:6px">License SunD to other developers and councils</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px;padding:12px 22px">
+    <div class="row center" style="justify-content:space-between"><h3>Not limited to the township</h3><span class="small muted">One SunD Wallet · every SunD location · every EV driver</span></div>
+    <div class="row" style="margin-top:10px;align-items:flex-end;justify-content:space-between"><div class="col center" style="gap:6px;width:170px;text-align:center"><span class="ib" style="width:34px;height:34px;background:var(--sun);color:#fff"><i data-lucide="flag" style="width:16px;height:16px"></i></span><b class="small">Elmina pilot</b><span class="xs muted">2 bays · 450 homes</span></div><i data-lucide="chevron-right" style="width:22px;color:var(--subtle);margin-bottom:40px;flex-shrink:0"></i><div class="col center" style="gap:6px;width:170px;text-align:center"><span class="ib" style="width:42px;height:42px;background:var(--sun-deep);color:#fff"><i data-lucide="home" style="width:20px;height:20px"></i></span><b class="small">SD townships</b><span class="xs muted">6,000 rooftops</span></div><i data-lucide="chevron-right" style="width:22px;color:var(--subtle);margin-bottom:40px;flex-shrink:0"></i><div class="col center" style="gap:6px;width:170px;text-align:center"><span class="ib" style="width:50px;height:50px;background:var(--leaf-deep);color:#fff"><i data-lucide="building-2" style="width:25px;height:25px"></i></span><b class="small">Malls · offices · campuses</b><span class="xs muted">any site, own canopy</span></div><i data-lucide="chevron-right" style="width:22px;color:var(--subtle);margin-bottom:40px;flex-shrink:0"></i><div class="col center" style="gap:6px;width:170px;text-align:center"><span class="ib" style="width:58px;height:58px;background:var(--sky);color:#fff"><i data-lucide="route" style="width:29px;height:29px"></i></span><b class="small">Highways · petrol stations</b><span class="xs muted">charge on the go</span></div><i data-lucide="chevron-right" style="width:22px;color:var(--subtle);margin-bottom:40px;flex-shrink:0"></i><div class="col center" style="gap:6px;width:170px;text-align:center"><span class="ib" style="width:66px;height:66px;background:var(--berry);color:#fff"><i data-lucide="globe" style="width:33px;height:33px"></i></span><b class="small">Other developers · councils</b><span class="xs muted">license SunD</span></div></div>
+  </div>
+  <div class="card w-sky row center" style="margin-top:12px;gap:0;padding:10px 22px;justify-content:space-between">
+    <span class="small" style="font-weight:700;color:var(--sky-deep)">Pilot success =</span>
+    <span class="row center small" style="gap:8px"><i data-lucide="sun" style="width:18px;color:var(--leaf-deep)"></i><b>≥40%</b> solar share per bay</span>
+    <span class="row center small" style="gap:8px"><i data-lucide="activity" style="width:18px;color:var(--sky-deep)"></i>Utilisation <b>well above ~1%</b> national</span>
+    <span class="row center small" style="gap:8px"><i data-lucide="wallet" style="width:18px;color:var(--sun-deep)"></i><b>Credits redeemed</b> vs issued</span>
+    <span class="row center small" style="gap:8px"><i data-lucide="users" style="width:18px;color:var(--berry-ink)"></i><b>Non-SD buyers</b> citing SunD</span>
+  </div>
+  <div class="footer"><span>SunD · Sime Darby Township Hackathon 2026</span><span>10</span></div>
+</section>
+
+<!-- ═══════════ 10 · VISUAL CONCEPT + WHY WE SHOULD WIN ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <div class="row" style="gap:22px"><span class="tag"><b>9</b>Visual Concept</span><span class="tag" style="color:var(--sun-deep)"><b style="background:var(--sun-deep)">10</b>Why we should win</span></div>
+  <h1>Life in a Sun<span class="d">D</span> township, <em>ready to pilot</em></h1>
+  <div class="row" style="margin-top:22px;gap:24px;align-items:flex-start">
+    <div class="col" style="width:700px;gap:10px;flex-shrink:0">
+      <div style="border-radius:20px;overflow:hidden;border:1px solid var(--outline);box-shadow:0 12px 30px rgba(15,23,42,.12)"><img src="visuals/sund-township.png" style="display:block;width:100%" /></div>
+      <div class="row center small" style="gap:8px;color:var(--muted)"><i data-lucide="smartphone" style="width:16px;color:var(--sky-deep)"></i>Working SunD Wallet prototype: screens in Solution 1 and Appendix A3</div>
+    </div>
+    <div class="card" style="flex:1;padding:22px 24px;background:var(--ink);border:0;color:#fff">
+      <div class="row center" style="gap:10px"><span class="ib sm" style="background:rgba(251,191,36,.18);color:var(--sun)"><i data-lucide="trophy"></i></span><h2 style="color:#fff">Why SunD deserves to win</h2></div>
+      <p style="font-size:15.5px;line-height:1.6;color:#E2E8F0;margin-top:12px">SunD turns Sime Darby's new CREAM rooftops into a closed solar loop that benefits everyone. Owners earn income on every kWh sold and choose credits (+20%) or a bill rebate. The public charges cheaper, with Saver Credits and surplus discounts that turn EV interest into EV ownership. Credits also unlock SunD eBike, Gym and Clubhouse, so demand is built in. Bays run on their own sun, inside and beyond townships. It is feasible on SD's own sites, de-risked by pre-sold credits and modular canopies, and already a working prototype.</p>
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:16px">
+        <span class="pill" style="background:rgba(34,197,94,.16);color:#4ADE80"><i data-lucide="smartphone"></i>Live prototype</span>
+        <span class="pill" style="background:rgba(96,165,250,.16);color:var(--sky-bright)"><i data-lucide="badge-percent"></i>Cheaper for the public</span>
+        <span class="pill" style="background:rgba(251,191,36,.16);color:var(--sun)"><i data-lucide="shield-check"></i>Low demand risk</span>
+        <span class="pill" style="background:rgba(168,85,247,.18);color:#C084FC"><i data-lucide="globe"></i>Beyond SD and beyond charging</span>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span>Concept illustration · statement: 89 words</span><span>11</span></div>
+</section>
+
+<!-- ═══════════ THANK YOU / APPENDIX DIVIDER ═══════════ -->
+<section class="slide dark" style="display:flex;flex-direction:column;justify-content:center;padding:0 72px">
+  <svg width="1280" height="720" style="position:absolute;inset:0" aria-hidden="true"><defs><radialGradient id="g2" cx="85%" cy="50%" r="50%"><stop offset="0" stop-color="#FBBF24" stop-opacity=".22"/><stop offset="1" stop-color="#0F172A" stop-opacity="0"/></radialGradient></defs><rect width="1280" height="720" fill="url(#g2)"/></svg>
+  <div style="position:relative">
+    <div class="num" style="font-size:96px;line-height:1"><span style="color:var(--sun)">Sun</span><span style="color:var(--sky-bright)">D</span></div>
+    <div style="font-family:var(--display);font-weight:700;font-size:40px;line-height:1.2;margin-top:24px">Your roof earns it.<br/>Your car drives it.<br/><span style="color:var(--sun)">Your township lives it.</span></div>
+    <div style="margin-top:44px;font-size:18px;color:#94A3B8">Thank you · Team UrbanByte · Appendix follows →</div>
+  </div>
+  <div style="position:absolute;left:880px;top:90px;width:240px;transform:rotate(-4deg)">
+    <div class="ph" style="border-color:#1E293B;box-shadow:0 30px 60px rgba(0,0,0,.45)"><img src="screenshots/16-receipt.png" /></div>
+  </div>
+</section>
+
+<!-- ═══════════ A1 · SUND BAY CONCEPT ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag" style="color:var(--muted)"><b style="background:var(--muted)">A1</b>Appendix · Concept</span>
+  <h1 style="font-size:32px">Sun<span class="d">D</span> Bay on site: a Medium bay, labelled</h1>
+  <div style="margin:16px auto 0;width:900px;border-radius:22px;overflow:hidden;border:1px solid var(--outline);box-shadow:0 18px 40px rgba(15,23,42,.12)"><img src="visuals/sund-bay.png" style="display:block;width:100%" /></div>
+  <div class="footer"><span>Concept illustration · Medium bay per A5: 30 lots, 75 kWp, 136 panels, 375 m², 8 AC + 1 DC, 100 kWh · estimates</span><span>A1</span></div>
+</section>
+
+<!-- ═══════════ A2 · TOWNSHIP CONCEPT ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag" style="color:var(--muted)"><b style="background:var(--muted)">A2</b>Appendix · Concept</span>
+  <h1 style="font-size:32px">Life in a future Sun<span class="d">D</span> township</h1>
+  <div style="margin:16px auto 0;width:900px;border-radius:22px;overflow:hidden;border:1px solid var(--outline);box-shadow:0 18px 40px rgba(15,23,42,.12)"><img src="visuals/sund-township.png" style="display:block;width:100%" /></div>
+  <div class="footer"><span>Concept illustration · SunD Bay, eBike trail, Gym and Clubhouse all take SunD Credits</span><span>A2</span></div>
+</section>
+
+<!-- ═══════════ A1 · MORE SCREENS ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag" style="color:var(--muted)"><b style="background:var(--muted)">A3</b>Appendix · Prototype</span>
+  <h1 style="font-size:32px">More SunD Wallet screens</h1>
+  <div class="row" style="margin-top:24px;gap:0;justify-content:space-between" id="more"></div>
+  <div class="footer"><span>Public prices drop on green bays · Saver Credits also pay for eBikes</span><span>A3</span></div>
+</section>
+
+<!-- ═══════════ A2 · SOLAR MATH ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag" style="color:var(--muted)"><b style="background:var(--muted)">A4</b>Appendix · Data</span>
+  <h1 style="font-size:32px">Solar math: panels to kilometres, and cost per kWh</h1>
+  <div class="row" style="margin-top:22px;gap:26px">
+    <div class="card" style="flex:1.45;padding:4px 8px">
+      <table>
+        <tr><th>Panels</th><th>Where</th><th>kWh/day</th><th>km/day</th><th>Cars (50 km top-up)</th></tr>
+        <tr><td>1</td><td>Single panel</td><td>2</td><td>14</td><td>¼</td></tr>
+        <tr><td>4</td><td>One commuter</td><td>8</td><td>54</td><td>1</td></tr>
+        <tr><td>19</td><td><b>1 SD roof</b></td><td>37</td><td>250</td><td>5</td></tr>
+        <tr><td>45</td><td>Small bay (10 lots)</td><td>90</td><td>610</td><td>12</td></tr>
+        <tr><td>136</td><td>Medium bay (30 lots)</td><td>270</td><td>1,840</td><td>36</td></tr>
+        <tr><td>455</td><td>Large bay (100 lots)</td><td>900</td><td>6,100</td><td>120</td></tr>
+        <tr><td style="border:0">8,550</td><td style="border:0"><b>450 Elmina homes</b></td><td style="border:0">16,500</td><td style="border:0">112,000</td><td style="border:0">2,200</td></tr>
+      </table>
+    </div>
+    <div class="card" style="flex:1;padding:20px 22px">
+      <h3>Cost per kWh (sen)</h3>
+      <div class="col" style="gap:14px;margin-top:16px" id="cost"></div>
+      <p class="xs muted" style="margin-top:16px">On-site canopy avoids the 9 sen CAC and transmission loss.</p>
+    </div>
+  </div>
+  <div class="note">Estimates: 1 kWp ≈ 110–130 kWh/month · 550 W panel ≈ 2 kWh/day · e.MAS 5 ≈ 6.8 km/kWh · TNB domestic ≈ 44.4 sen/kWh.</div>
+  <div class="footer"><span>SunD · appendix</span><span>A4</span></div>
+</section>
+
+<!-- ═══════════ A3 · BAY SIZES ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag" style="color:var(--muted)"><b style="background:var(--muted)">A5</b>Appendix · <span style="text-transform:none">SunD</span> Bay</span>
+  <h1 style="font-size:32px">SunD Bay sizes, costs and setup time</h1>
+  <div class="row" style="margin-top:26px;gap:16px">
+    <div class="card w-sun" style="flex:1;padding:22px"><div class="row center" style="justify-content:space-between"><h2>Small</h2><span class="pill t-sun">10 lots</span></div><p style="margin-top:12px">25 kWp · 4 AC · 50 kWh</p><div class="num" style="font-size:30px;margin-top:10px">RM 175k–325k</div><p class="small muted">2–3 months · clubhouse, park</p></div>
+    <div class="card w-leaf" style="flex:1;padding:22px"><div class="row center" style="justify-content:space-between"><h2>Medium</h2><span class="pill t-leaf">30 lots</span></div><p style="margin-top:12px">75 kWp · 8 AC + 1 DC · 100 kWh</p><div class="num" style="font-size:30px;margin-top:10px">RM 510k–880k</div><p class="small muted">3–4 months · mall, commercial</p></div>
+    <div class="card w-sky" style="flex:1;padding:22px"><div class="row center" style="justify-content:space-between"><h2>Large</h2><span class="pill t-sky">100 lots</span></div><p style="margin-top:12px">250 kWp · 16 AC + 2 DC · 300 kWh</p><div class="num" style="font-size:30px;margin-top:10px">RM 1.5M–2.6M</div><p class="small muted">4–6 months · highway, flagship</p></div>
+  </div>
+  <div class="card" style="margin-top:18px;padding:16px 20px">
+    <h3>Unit costs</h3>
+    <div class="row" style="margin-top:10px;gap:14px;justify-content:space-between">
+      <span class="small">Carport solar <b>RM 4–6k / kWp</b></span><span class="small">AC charger <b>RM 3–8k</b></span><span class="small">DC 60 kW <b>RM 60–80k</b></span><span class="small">Battery <b>RM 1–2.5k / kWh</b></span><span class="small">DC meter <b>4–12 weeks</b></span>
+    </div>
+  </div>
+  <div class="note">Estimates · trexon.my 2026 ranges · 60% GITA applies to charger installation · carport payback ~4–6 years.</div>
+  <div class="footer"><span>SunD · appendix</span><span>A5</span></div>
+</section>
+
+<!-- ═══════════ A3 · MARKET ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag" style="color:var(--muted)"><b style="background:var(--muted)">A6</b>Appendix · Market</span>
+  <h1 style="font-size:32px">Where SunD prices sit in today's market</h1>
+  <div class="row" style="margin-top:22px;gap:26px">
+    <div class="card" style="flex:1.2;padding:4px 8px">
+      <table>
+        <tr><th>Network</th><th>DC (RM/kWh)</th><th>AC (RM/kWh)</th></tr>
+        <tr><td>Brand Y</td><td>0.85–1.10</td><td>from 0.40</td></tr>
+        <tr><td>Brand J</td><td>1.20–1.40</td><td>from 0.75</td></tr>
+        <tr><td>Brand G</td><td>1.30–1.80</td><td>0.90–1.05</td></tr>
+        <tr><td>Brand D</td><td>1.00–1.50</td><td>–</td></tr>
+        <tr><td>Brand S</td><td>1.20–1.80</td><td>–</td></tr>
+        <tr><td>Brand T (other EVs)</td><td>1.80</td><td>–</td></tr>
+        <tr style="background:var(--leaf-wash)"><td style="border:0"><b>SunD Bay (proposed)</b></td><td style="border:0"><b>~1.00 · or SunD Credits</b></td><td style="border:0"><b>~0.70</b></td></tr>
+      </table>
+    </div>
+    <div class="col" style="flex:1;gap:12px">
+      <div class="card w-sky" style="padding:16px 18px"><h3>Market signals</h3><ul class="small" style="margin:8px 0 0 18px;line-height:1.6"><li>Top 3 networks hold &gt;40% of charge points</li><li>No government price cap (MITI, Jul 2026)</li><li>National utilisation ~1% (peak ~3%)</li><li>Target: 30,000 chargers by 2030</li></ul></div>
+      <div class="card w-sun" style="padding:16px 18px"><h3>Why SunD fills bays</h3><p class="small" style="margin-top:6px">A built-in user base of SD credit holders lifts utilisation from day one, which is the main weakness of today's networks.</p></div>
+    </div>
+  </div>
+  <div class="footer"><span>Rates vary by site (evsifu.com, 2026)</span><span>A6</span></div>
+</section>
+
+<!-- ═══════════ A4 · SOURCES ═══════════ -->
+<section class="slide">
+  <div class="brandmark">Sun<span class="d">D</span></div>
+  <span class="tag" style="color:var(--muted)"><b style="background:var(--muted)">A7</b>Appendix · Sources</span>
+  <h1 style="font-size:32px">Sources</h1>
+  <ol class="small" style="margin:22px 0 0 20px;line-height:1.75;columns:2;column-gap:40px;color:var(--muted)">
+    <li>Sime Darby Property: CREAM residential solar launch (simedarbyproperty.com)</li>
+    <li>IEA-PVPS Malaysia 2025: CREAM 5 km, 9 sen CAC, 6,000 rooftops</li>
+    <li>TNB analyst briefing 4QFY23: 450 homes, 4.5 MW</li>
+    <li>carz.com.my (Sep 2026): EV registrations vs chargers</li>
+    <li>paultan.org / MITI (Jul 2026): 6,416 public chargers, 30,000 by 2030</li>
+    <li>EY Malaysia EV consumer survey (Oct 2024)</li>
+    <li>The Edge / Reuters: Peninsular power mix 2025</li>
+    <li>The Star (Oct 2026): CRESS charges</li>
+    <li>evsifu.com: EV charging network rates 2026</li>
+    <li>S&amp;P Global Mobility: network utilisation</li>
+    <li>trexon.my: solar carport and EV charger installation costs 2026</li>
+    <li>wapcar.my: Proton e.MAS 5 specifications</li>
+  </ol>
+  <div class="footer"><span>All cost and output figures in this deck are estimates unless sourced</span><span>A7</span></div>
+</section>
+
+<script>
+  // 19 cars : 1 charger
+  const cars = document.getElementById('cars');
+  cars.innerHTML = Array.from({ length: 19 }, () => '<i data-lucide="car" style="width:24px;height:24px;color:#B91C1C"></i>').join('') +
+    '<span style="margin:0 6px;color:#94A3B8;font-weight:700">vs</span><span class="ib sm" style="background:#0F172A;color:#fff"><i data-lucide="plug-zap"></i></span>';
+
+  const rows = [
+    ['banknote', 'Reward', 'All cash, leaks out', 'Income: credits +20% or ≤50% bill rebate'],
+    ['route', 'Energy path', 'Shared solar: 5 km cap + grid charges', 'On-site canopy: 0 km, no charges'],
+    ['globe', 'Reach', 'Township-only perks', 'Open to all, scales beyond SD'],
+    ['bike', 'Facilities', 'Charging only', 'Credits pay for eBike, Gym, Clubhouse'],
+    ['sun', 'Midday solar', 'Wasted', 'Stored + Surplus Discount'],
+    ['factory', 'Power', 'Grid bays, ~92% fossil', 'Solar first, grid backup only'],
+    ['boxes', 'Build', 'Fixed sites', 'Modular, demand-based'],
+  ];
+  document.getElementById('compare').innerHTML = rows.map(([icon, k, a, b], i) => `
+    <div class="row center" style="gap:0;border-radius:16px;padding:9px 18px;background:${i < 4 ? '#F3F8FF' : '#F8FAFC'};border:1px solid ${i < 4 ? '#DBEAFE' : '#E2E8F0'}">
+      <span class="row center" style="width:150px;gap:10px;font-weight:700"><span class="ib sm t-slate"><i data-lucide="${icon}"></i></span>${k}</span>
+      <span class="row center small muted" style="flex:1;gap:8px"><i data-lucide="x-circle" style="width:18px;color:#F87171;flex-shrink:0"></i>${a}</span>
+      <i data-lucide="arrow-right" style="width:20px;color:#94A3B8;margin:0 10px"></i>
+      <span class="row center" style="flex:1.15;gap:8px;font-weight:700"><i data-lucide="check-circle-2" style="width:18px;color:#16A34A;flex-shrink:0"></i>${b}</span>
+    </div>`).join('');
+
+  const phone = (src, title, sub, w, n) => `
+    <div class="col center" style="width:${w + 14}px">
+      <div class="ph" style="width:${w + 14}px"><img src="screenshots/${src}.png"/></div>
+      <div class="cap">${n ? `<b style="display:inline-flex;width:22px;height:22px;border-radius:99px;background:#3B82F6;color:#fff;align-items:center;justify-content:center;font-size:12px;margin-right:6px">${n}</b>` : ''}${title}<span>${sub}</span></div>
+    </div>`;
+  const arrow = '<i data-lucide="chevron-right" style="width:22px;height:22px;color:#94A3B8;margin-top:150px;flex-shrink:0"></i>';
+  if (document.getElementById('journey')) document.getElementById('journey').innerHTML = [
+    phone('10-home', 'Earn', 'Solar income → credits', 118, 1),
+    phone('15-charging-live', 'Charge', '100% solar, no cash', 118, 2),
+    phone('16-receipt', 'Reward', 'Bonus + badges', 118, 3),
+  ].join(arrow.replace('margin-top:150px', 'margin-top:120px'));
+  document.getElementById('more').innerHTML = [
+    phone('05-onboarding-mix', 'Reward mix', 'Credits ≥50% · rebate ≤50%', 150),
+    phone('21-solar-detail', 'Solar detail', 'Live output curve', 150),
+    phone('31-public-bay-price', 'Public view', 'Surplus RM 0.80', 150),
+    phone('17-ebike-stations', 'SunD eBike', 'Live dock slots', 150),
+    phone('19-rewards', 'Rewards', 'Level, streak, offers', 150),
+    phone('20-impact-loop', 'Township Impact', 'Energy loop', 150),
+  ].join('');
+
+  const cost = [['On-site canopy solar', 15, '12–18', '#16A34A'], ['CREAM rooftop (incl. 9 sen CAC)', 20, '19–21', '#FBBF24'], ['TNB grid', 44, '~44', '#94A3B8'], ['Public DC charging', 120, '~120', '#F87171']];
+  document.getElementById('cost').innerHTML = cost.map(([l, v, t, c]) => `
+    <div><div class="row small" style="justify-content:space-between"><span>${l}</span><b class="num">${t}</b></div>
+    <div style="height:12px;border-radius:9px;background:#F1F5F9;margin-top:5px"><div style="height:100%;width:${(v / 120) * 100}%;background:${c};border-radius:9px"></div></div></div>`).join('');
+
+  lucide.createIcons();
+  document.body.dataset.ready = '1';
+</script>
+</body>
+</html>
