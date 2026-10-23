@@ -57,7 +57,7 @@ export default function Statement() {
                   </>
                 ) : (
                   <>
-                    <Row label={`Slice value (× ${Math.round((persona.tariff ?? 0) * 100)} sen/kWh, your tariff)`} value={fmtRm(prof.monthKwh * (persona.tariff ?? 0))} />
+                    <Row label="Slice value (× 36 sen/kWh, flat rate)" value={fmtRm(prof.monthKwh * 0.36)} />
                     {prof.monthCredits > 0.005 && <Row label="SunD Credits" value={`+${fmt(prof.monthCredits)} SC`} tone="leaf" />}
                   </>
                 )}

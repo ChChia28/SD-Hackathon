@@ -75,7 +75,7 @@ export default function Profile() {
             <Card tone="leaf" className="divide-y divide-leaf-soft px-5 py-1">
               <Row label="Type" value={persona.systemLabel} />
               <Row label="Size" value="1 kW of the Elmina pool" />
-              <Row label="Credits issued at" value={`${Math.round((persona.tariff ?? 0) * 100)} sen/kWh (your tariff)`} />
+              <Row label="Credits issued at" value="36 sen/kWh (flat slice rate)" />
               <Row label="Status" value={prof.sliceOn ? 'Active' : 'Paused'} tone="leaf" />
               <Row label="Lifetime output" value={`${fmtInt(prof.lifetimeGenKwh)} kWh`} />
             </Card>

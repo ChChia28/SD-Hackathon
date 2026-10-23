@@ -33,7 +33,7 @@ export function RewardMix() {
       <div className="mt-1 text-[14px] text-ink-muted tabular">
         {slice ? (
           <>
-            Slice worth ≈ <b className="text-ink">{fmtRm(income)}</b> / month · {fmtInt(monthKwh)} kWh × RM {(persona.tariff ?? 0).toFixed(2)} (your tariff)
+            Slice worth ≈ <b className="text-ink">{fmtRm(income)}</b> / month · {fmtInt(monthKwh)} kWh × RM 0.36 (flat slice rate)
           </>
         ) : (
           <>
@@ -87,7 +87,7 @@ export function RewardMix() {
         </div>
       </div>
       {slice ? (
-        <div className="mt-2 text-center text-[13px] text-ink-muted">Credits are issued at your own TNB rate, so the saving equals that kWh coming off your bill</div>
+        <div className="mt-2 text-center text-[13px] text-ink-muted">Credits are issued at a flat 36 sen per kWh: about RM 40 off your bill every month</div>
       ) : (
         <>
           <div className="mt-2 text-center text-[13px] text-ink-muted">

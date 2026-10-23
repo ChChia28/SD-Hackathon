@@ -41,7 +41,7 @@ export const PITCH_STEPS: PitchStep[] = [
     slide: 4,
     slideTitle: 'Solution · SHARE',
     title: 'One wallet turns solar into a lower bill',
-    say: '110 kWh a month at her own 36 sen rate is about RM 40 off the bill: no roof, no install, no change of supplier.',
+    say: '110 kWh a month at a flat 36 sen is about RM 40 off the bill: no roof, no install, no change of supplier.',
     run: (c) => {
       as(c, 'condo');
       c.nav('/wallet/slice');
