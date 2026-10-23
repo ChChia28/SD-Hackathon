@@ -102,7 +102,7 @@ export function TownshipMap({ views, home, mode, selected, onSelect, coolOpen = 
             <School x={-7} y={-7} size={14} color="#fff" strokeWidth={2.4} />
           </g>
           <text x={PLACES.transit.x} y={PLACES.transit.y + 24} textAnchor="middle" fontSize="10" fontWeight="700" fill="var(--color-ink-muted)">
-            LRT
+            BUS
           </text>
         </g>
       )}

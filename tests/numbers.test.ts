@@ -27,10 +27,10 @@ describe('deck facts (slides 2–10)', () => {
     near(sliceValueRm(C.TARIFF.low), 38.5, 0.01);
   });
   it('TNB base 27.03 + 4.55 + 12.85 = 44.43 sen', () => near(C.TARIFF.base, 0.2703 + 0.0455 + 0.1285, 1e-9));
-  it('public price RM 1.40 (A9) and market DC RM 1.30–1.80', () => {
+  it('public price RM 1.40 (A14) and market DC RM 0.88–1.80 (EV Sifu)', () => {
     expect(C.PUBLIC_PRICE).toBe(1.4);
-    expect(C.MARKET_DC).toEqual({ low: 1.3, high: 1.8 });
-    expect(C.PUBLIC_SURPLUS_PRICE).toBeLessThan(C.MARKET_DC.low);
+    expect(C.MARKET_DC).toEqual({ low: 0.88, high: 1.8 });
+    expect(C.PUBLIC_SURPLUS_PRICE).toBeLessThan(C.PUBLIC_PRICE);
   });
   it('Saver Credits: pay RM 20, get RM 30', () => expect(C.SAVER_PACKS[0]).toEqual({ pay: 20, get: 30 }));
   it('solar peak 11am–3pm; Level 1 heat ≥35 °C; walk shade −3.1 °C', () => {
@@ -62,11 +62,11 @@ describe('personas (slide 3)', () => {
   });
   it('Daniel earns nothing and pays per kWh', () => expect(splitReward(100, 'public', 0).income).toBe(0));
   it('slice credits are issued at the resident’s own tariff', () => near(splitReward(110, 'condo', 1).rebateRm, 39.6, 1e-9));
-  it('roof host: RM 0.25/kWh, +20% as credits, ≤50% to the bill', () => {
+  it('roof host: RM 0.10/kWh, +20% as credits, ≤50% to the bill', () => {
     const r = splitReward(100, 'landed', 0.5);
-    near(r.income, 25, 1e-9);
-    near(r.rebateRm, 12.5, 1e-9);
-    near(r.credits, 15, 1e-9);
+    near(r.income, 10, 1e-9);
+    near(r.rebateRm, 5, 1e-9);
+    near(r.credits, 6, 1e-9);
   });
 });
 

@@ -101,10 +101,10 @@ export default function Dashboard() {
               <SunD /> pilot dashboard · Sime Darby Property
             </div>
             <div className="text-[14px] text-white/70">
-              Elmina Ridge 1 precinct · {TOWNSHIP.homes} roofs · {TOWNSHIP.mwp} MWp · {fmtDate(simTime)}, {fmtTime(simTime)}
+              Elmina pilot precinct · simulated · {fmtDate(simTime)}, {fmtTime(simTime)}
             </div>
           </div>
-          <span className="rounded-full bg-white/10 px-3 py-1 text-[13px] font-bold">Simulated pilot data · targets from appendix A5</span>
+          <span className="rounded-full bg-white/10 px-3 py-1 text-[13px] font-bold">Simulated pilot data · targets from appendix A17</span>
           <Link to="/" className="btn btn-onnavy !min-h-11">
             <ArrowLeft size={18} /> <Smartphone size={18} /> Back to app
           </Link>
@@ -167,7 +167,7 @@ export default function Dashboard() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[1.1fr_1fr]">
-          <Panel title="What if? Bay business case (appendix A3)" icon={<Calculator size={20} />}>
+          <Panel title="What if? Bay business case (appendix A14)" icon={<Calculator size={20} />}>
             <div className="segmented mb-4" role="group" aria-label="Bay size">
               {(Object.keys(BAY_SIZES) as BaySize[]).map((s) => (
                 <button key={s} type="button" aria-pressed={w.size === s} onClick={() => up({ size: s })}>
@@ -183,7 +183,7 @@ export default function Dashboard() {
             </div>
             <div className="mt-2 flex flex-wrap gap-2 text-[12px]">
               <button type="button" className="chip !min-h-8 !text-[13px]" onClick={() => setW(DEFAULT_WHATIF)}>
-                Reset to appendix A3
+                Reset to appendix A14
               </button>
               <span className="rounded-full bg-sunken px-3 py-1.5 text-ink-muted">Market DC RM {MARKET_DC.low.toFixed(2)}–{MARKET_DC.high.toFixed(2)}</span>
               <span className="rounded-full bg-sunken px-3 py-1.5 text-ink-muted">18 kWh per session · residents pay in credits</span>
@@ -271,7 +271,7 @@ export default function Dashboard() {
 
         <section className="grid gap-4 md:grid-cols-3">
           {[
-            { Icon: Clock3, title: 'Weeks 1–8 · Build', body: 'Wallet MVP + this dashboard · 10-lot pilot bay · one hall as SunD Cool · share of Elmina Ridge 1 output to the credit pool' },
+            { Icon: Clock3, title: 'Weeks 1–8 · Build', body: 'Wallet MVP + this dashboard · 10-lot pilot bay · one hall as SunD Cool · credit pool funded by bay charging profit' },
             { Icon: Leaf, title: 'Months 3–6 · Pilot', body: 'One precinct of condo owners and renters as subscribers · KPIs vs month-1 baselines · go / no-go with SDP' },
             { Icon: TrendingUp, title: 'Months 6–12 · Extend', body: 'First SunD Walk spine · medium bay at the mall · bays open to public drivers, revenue starts' },
           ].map((x) => (

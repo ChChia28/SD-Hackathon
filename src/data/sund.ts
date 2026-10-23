@@ -3,7 +3,7 @@ import { hashRand, dayKey, hourOf } from '../sim/solar';
 
 /** Places the walks and cool rooms connect to (stylised map, not to scale). */
 export const PLACES = {
-  transit: { x: 314, y: 318, name: 'LRT / transit stop' },
+  transit: { x: 314, y: 318, name: 'Bus stop / transit hub' },
   school: { x: 44, y: 330, name: 'SK Elmina (school)' },
   hall: { x: 180, y: 320, name: 'Elmina Community Hall' },
 };
@@ -28,7 +28,7 @@ export const WALKS: Walk[] = [
     id: 'walk-a',
     name: 'SunD Walk A',
     from: 'Residensi Elmina',
-    to: 'LRT / transit stop',
+    to: 'Bus stop / transit hub',
     lengthM: 650,
     rank: 1,
     status: 'next',

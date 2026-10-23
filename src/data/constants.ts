@@ -19,7 +19,7 @@ export const TARIFF = { base: 0.4443, low: 0.35, high: 0.52, aisyah: 0.36 };
  * Roof hosts (CREAM) — Kin Chung's 22 Oct model, kept as SDP-adjustable settings:
  * solar income = kWh × selling rate; credits get a top-up; the bill rebate is capped.
  */
-export const SOLAR_SELL_RATE_RM = 0.25;
+export const SOLAR_SELL_RATE_RM = 0.1;
 export const CREDIT_TOPUP = 1.2;
 export const MAX_CASH_REBATE = 0.5;
 export const DEFAULT_CASH_SHARE = 0.25;
@@ -27,14 +27,14 @@ export const DEFAULT_CASH_SHARE = 0.25;
 /** Slice holders can apply all of their slice to the TNB bill, or keep some as SunD credits for charging. */
 export const SLICE_MAX_BILL_SHARE = 1;
 
-/** Public price: the appendix models RM 1.40/kWh (A3, A9); market DC RM 1.30–1.80 [evsifu]. */
+/** Public price: the appendix models RM 1.40/kWh (A13–A14); market DC RM 0.88–1.80 [evsifu]. */
 export const PUBLIC_PRICE = 1.4;
 /** Solar Surplus Discount for the public — ASSUMPTION (demo value). */
 export const PUBLIC_SURPLUS_PRICE = 1.1;
 /** Residents pay in credits at a member rate — ASSUMPTION (demo values). 1 SC = RM 1. */
-export const RESIDENT_PRICE = 1.0;
+export const RESIDENT_PRICE = 0.9;
 export const RESIDENT_SURPLUS_PRICE = 0.8;
-export const MARKET_DC = { low: 1.3, high: 1.8 };
+export const MARKET_DC = { low: 0.88, high: 1.8 };
 
 /** Bonus credits, as a share of solar kWh charged — ASSUMPTION (demo values). */
 export const SOLAR_BAY_BONUS = 0.05;

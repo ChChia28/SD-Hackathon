@@ -42,7 +42,7 @@ export default function Slice() {
         <section className="card-navy p-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[15px] font-bold text-white/80">
-              <Sun size={18} className="text-sun-bright" /> {t('1 kW of the Elmina solar pool')}
+              <Sun size={18} className="text-sun-bright" /> {t('1 kW of SunD canopy solar')}
             </div>
             {persona.sponsored && <span className="rounded-full bg-sun px-2.5 py-0.5 text-[13px] font-bold">{t('Sponsored')}</span>}
           </div>
@@ -103,7 +103,7 @@ export default function Slice() {
           <Row label={t('Off your bill so far')} value={fmtRm(prof.monthRebateRm)} tone="leaf" />
           <Row label={t('Supplier')} value={t('TNB, unchanged')} />
           <Row label={t('Installation')} value={<span className="flex items-center gap-1"><Wrench size={14} /> {t('None')}</span>} />
-          <Row label={t('Funded by')} value={persona.sponsored ? t('Elmina solar dividend') : t('SDP rebate programme')} />
+          <Row label={t('Funded by')} value={t('SunD Bay charging profit')} />
         </Card>
 
         {!persona.sponsored && (

@@ -300,7 +300,7 @@ export function SponsoredNote() {
     <div className={cx('flex items-center gap-3 rounded-2xl bg-sky-wash p-4')}>
       <HandHeart size={22} className="shrink-0 text-sky-deep" />
       <div className="text-[15px] leading-6 text-ink-muted">
-        {t('Your slice is paid for by the Elmina solar dividend. Worth about {rm} a month on your bill.', { rm: fmtRm(sliceValueRm(persona.tariff ?? 0.35)) })}
+        {t('Your slice is paid for by SunD Bay charging profit. Worth about {rm} a month on your bill.', { rm: fmtRm(sliceValueRm(persona.tariff ?? 0.35)) })}
       </div>
     </div>
   );

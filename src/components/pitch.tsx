@@ -62,7 +62,7 @@ export const PITCH_STEPS: PitchStep[] = [
     slide: 6,
     slideTitle: 'How it works · SunD Bay',
     title: 'Mr Lim keeps his lease and earns credits on top',
-    say: 'A SunD Bay makes and stores its own power: canopy, battery, charger, car. 0 km transmission, grid as backup only.',
+    say: 'A SunD Bay makes and stores its own power: canopy, battery, charger, car. 0 km transmission; the grid tops up the rest.',
     run: (c) => {
       as(c, 'landed');
       const id = c.s().triggerSurplus(PILOT);
@@ -159,7 +159,7 @@ export const PITCH_STEPS: PitchStep[] = [
     slide: 10,
     slideTitle: 'Why our team should win',
     title: 'One sun, one township, one loop',
-    say: 'No new plant, no new licence: it connects what SDP already owns and reports a measured result in a quarter.',
+    say: 'No new plant, no new licence: it connects what SDP already owns with a go/no-go call at month 6.',
     run: (c) => {
       as(c, 'landed');
       c.nav('/home/impact');

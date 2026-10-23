@@ -75,11 +75,11 @@ export function computeKpis(k: KpiInput): Kpi[] {
   const walkers = Math.round(140 + 60 * hashRand(`walkers-${today}`));
 
   return [
-    { n: 1, name: 'RM saved per subscriber', value: `RM ${Math.round(rmSaved)}`, unit: '/ month', baseline: 'RM 0', target: 'RM 40–57', status: rmSaved >= 0.95 * 40 ? 'met' : 'track', note: `1 kW slice × ${Math.round((PERSONAS.condo.tariff ?? 0.36) * 100)} sen ≈ RM ${sliceValue.toFixed(0)} (A4)` },
-    { n: 2, name: 'Bay kWh from on-site solar', value: `${Math.round(share * 100)}%`, baseline: '≈0% (grid 92% fossil)', target: '≥ 60%', status: share >= 0.6 ? 'met' : 'track', note: `Pilot bay · ${PILOT_BAY.canopyKwp} kWp canopy · today’s weather` },
+    { n: 1, name: 'RM saved per subscriber', value: `RM ${Math.round(rmSaved)}`, unit: '/ month', baseline: 'RM 0', target: 'RM 40–57', status: rmSaved >= 0.95 * 40 ? 'met' : 'track', note: `1 kW slice × ${Math.round((PERSONAS.condo.tariff ?? 0.36) * 100)} sen ≈ RM ${sliceValue.toFixed(0)} (A11)` },
+    { n: 2, name: 'Bay kWh from on-site solar', value: `${Math.round(share * 100)}%`, baseline: '≈0% (grid 92% fossil)', target: '25–35%', status: share >= 0.25 ? 'met' : 'track', note: `Pilot bay · ${PILOT_BAY.canopyKwp} kWp canopy · today’s weather` },
     { n: 3, name: 'Bay utilisation', value: `${Math.round(util * 100)}%`, baseline: 'measured from week 1', target: '≥ 40%', status: util >= 0.4 ? 'met' : 'track', note: 'Lot-hours used ÷ available, 8am–10pm' },
     { n: 4, name: 'SunD Cool visits per heat-alert day', value: k.heat ? `${visits}` : '—', baseline: '0', target: 'measured', status: k.heat ? 'met' : 'waiting', note: k.heat ? `${Math.round(PILOT_COHORT.elderlyB40AtCool * 100)}% aged 65+ or B40 · so far today` : 'No heat alert today' },
-    { n: 5, name: 'SunD Walk °C delta · walkers/day', value: '−3.1 °C', baseline: 'route measured 4 weeks pre-build', target: '≥ 3 °C cooler', status: 'waiting', note: `Walk A built in Phase 3 · baseline ~${walkers} walkers/day` },
+    { n: 5, name: 'SunD Walk °C delta · walkers/day', value: '—', baseline: 'route measured 4 weeks pre-build', target: '≥ 3 °C cooler', status: 'waiting', note: `Walk A built in Phase 3 · baseline ~${walkers} walkers/day` },
     { n: 6, name: 'Tonnes CO₂ avoided', value: co2Month.toFixed(1), unit: 't this month', baseline: '0', target: '~2 t / month', status: (co2Month / dom) * 30 >= 1.8 ? 'met' : 'track', note: `≈ ${((co2Month / dom) * 30).toFixed(1)} t projected for the month · × 0.74 kg/kWh` },
     { n: 7, name: 'Wallets opened · share roofless', value: `${wallets}`, unit: `· ${Math.round(PILOT_COHORT.roofless * 100)}% roofless`, baseline: '0', target: '≥ 50% roofless', status: PILOT_COHORT.roofless >= 0.5 ? 'met' : 'track', note: 'One precinct · simulated cohort' },
   ];
