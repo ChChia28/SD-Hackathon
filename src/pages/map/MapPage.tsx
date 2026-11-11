@@ -19,7 +19,6 @@ const FILTERS: { id: string; label: string; test: (v: BayView) => boolean }[] = 
   { id: 'surplus', label: 'Surplus', test: (v) => v.status === 'surplus' },
   { id: 'available', label: 'Free now', test: (v) => v.free > 0 },
   { id: 'dc', label: 'Fast DC', test: (v) => v.bay.connectors.some((c) => c.kind === 'DC') },
-  { id: 'saver', label: 'Saver OK', test: (v) => v.saverOk },
 ];
 const TYPES: { id: BayType; label: string }[] = [
   { id: 'mall', label: 'Mall' },

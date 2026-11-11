@@ -1,7 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 import { BAY_TYPE_LABEL } from '../data/bays';
-import { fmt } from '../lib/format';
-import { bonusRateFor, usesCredits } from '../lib/pricing';
+import { fmt, fmtInt } from '../lib/format';
+import { bonusRateFor, passKwhLeft, usesCredits } from '../lib/pricing';
 import { useProfile, type BayView } from '../store/hooks';
 import { useStore } from '../store/useStore';
 import { STATUS_META } from './status';
@@ -13,6 +13,14 @@ export function PriceTag({ v, align = 'right' }: { v: BayView; align?: 'left' | 
   const prof = useProfile();
   const bonus = bonusRateFor(persona, v.status, v.solarPct);
   const cls = align === 'right' ? 'text-right' : '';
+  const passLeft = passKwhLeft(prof);
+  if (passLeft >= 0.5)
+    return (
+      <div className={cls}>
+        <div className="font-bold leading-6 text-leaf-ink">In your SunD Pass</div>
+        <div className="text-[14px] text-ink-muted tabular">{fmtInt(passLeft)} kWh left this month</div>
+      </div>
+    );
   if (usesCredits(persona) && prof.sc >= v.rate)
     return (
       <div className={cls}>
@@ -25,10 +33,8 @@ export function PriceTag({ v, align = 'right' }: { v: BayView; align?: 'left' | 
       <div className="font-bold leading-6 tabular">RM {v.rate.toFixed(2)}/kWh</div>
       {v.discount > 0 ? (
         <div className="text-[14px] font-bold text-leaf-ink">{v.discount}% off{v.status === 'surplus' ? ' · surplus' : ''}</div>
-      ) : v.saverOk ? (
-        <div className="text-[14px] text-ink-muted">Saver Credits OK</div>
       ) : (
-        <div className="text-[14px] text-ink-muted">Standard rate</div>
+        <div className="text-[14px] text-ink-muted">Standard rate · Saver Credits OK</div>
       )}
     </div>
   );
@@ -39,6 +45,14 @@ function PriceLine({ v }: { v: BayView }) {
   const persona = useStore((s) => s.persona);
   const prof = useProfile();
   const bonus = bonusRateFor(persona, v.status, v.solarPct);
+  const passLeft = passKwhLeft(prof);
+  if (passLeft >= 0.5)
+    return (
+      <div className="truncate text-[14px]">
+        <span className="font-bold text-leaf-ink">SunD Pass</span>
+        <span className="text-ink-muted tabular"> · {fmtInt(passLeft)} kWh left</span>
+      </div>
+    );
   if (usesCredits(persona) && prof.sc >= v.rate)
     return (
       <div className="truncate text-[14px]">
@@ -49,7 +63,7 @@ function PriceLine({ v }: { v: BayView }) {
   return (
     <div className="truncate text-[14px]">
       <span className="font-bold tabular">RM {v.rate.toFixed(2)}/kWh</span>
-      {v.discount > 0 ? <span className="font-bold text-leaf-ink"> · {v.discount}% off</span> : v.saverOk && <span className="text-ink-muted"> · Saver OK</span>}
+      {v.discount > 0 && <span className="font-bold text-leaf-ink"> · {v.discount}% off</span>}
     </div>
   );
 }

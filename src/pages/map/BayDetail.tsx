@@ -78,7 +78,7 @@ export default function BayDetail() {
                     Usually <s className="ml-1">RM {PUBLIC_PRICE.toFixed(2)}</s>
                   </Pill>
                 )}
-                {v.saverOk && <Pill tone="leaf">Saver OK</Pill>}
+                <Pill tone="leaf">Saver & SunD Pass OK</Pill>
                 <Pill tone="slate">Market DC RM {MARKET_DC.low.toFixed(2)}–{MARKET_DC.high.toFixed(2)}</Pill>
               </>
             )}

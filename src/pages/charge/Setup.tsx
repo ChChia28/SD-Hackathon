@@ -5,7 +5,7 @@ import { StatusPill } from '../../components/status';
 import { Button, Card, PageHeader, ProgressBar, Row } from '../../components/ui';
 import { EV, KM_PER_KWH } from '../../data/constants';
 import { cx, fmt, fmtInt, fmtRm } from '../../lib/format';
-import { bonusRateFor, estimatePayment, usesCredits } from '../../lib/pricing';
+import { bonusRateFor, estimatePayment, passKwhLeft, usesCredits } from '../../lib/pricing';
 import { useBayView, useProfile } from '../../store/hooks';
 import { useStore } from '../../store/useStore';
 
@@ -33,7 +33,7 @@ export default function Setup() {
   };
   const kwh = targets[target].kwh;
   const conn = v.bay.connectors.find((c) => c.id === connId) ?? v.bay.connectors[0];
-  const pay = estimatePayment(kwh, prof, v.rate, usesCredits(persona), v.saverOk);
+  const pay = estimatePayment(kwh, { sc: prof.sc, saver: prof.saver, passKwh: passKwhLeft(prof) }, v.rate, usesCredits(persona));
   const bonus = bonusRateFor(persona, v.status, v.solarPct);
   const bonusSc = (kwh * v.solarPct * bonus) / 100;
   const minutes = Math.max(1, Math.round((kwh / conn.kw) * 60 * 1.1));
@@ -101,6 +101,7 @@ export default function Setup() {
           <Row label="Energy" value={`${fmt(kwh)} kWh`} />
           <Row label="Adds about" value={`${fmtInt(kwh * KM_PER_KWH)} km`} />
           <Row label="Takes about" value={`${minutes} min`} />
+          {pay.pass > 0.005 && <Row label="SunD Pass" value={`−${fmt(pay.pass)} kWh`} tone="leaf" />}
           {pay.sc > 0 && <Row label="SunD Credits" value={`−${fmt(pay.sc)} SC`} />}
           {pay.saver > 0 && <Row label="Saver Credits" value={`−${fmtRm(pay.saver)}`} />}
           {pay.rm > 0.005 && <Row label={`Card (RM ${v.rate.toFixed(2)}/kWh)`} value={fmtRm(pay.rm)} />}
@@ -116,7 +117,10 @@ export default function Setup() {
             </div>
           </div>
         )}
-        {usesCredits(persona) && pay.rm > 0.005 && <p className="-mt-3 text-[15px] text-ink-muted">Credits run out · rest on card</p>}
+        {pay.pass > 0.005 && <p className="-mt-3 text-[15px] text-ink-muted">{fmt(passKwhLeft(prof) - pay.pass)} kWh left on your SunD Pass after this</p>}
+        {pay.rm > 0.005 && (pay.pass > 0.005 || usesCredits(persona)) && (
+          <p className="-mt-3 text-[15px] text-ink-muted">{pay.pass > 0.005 ? (usesCredits(persona) ? 'Pass and credits run out' : 'Pass runs out') : 'Credits run out'} · rest on card</p>
+        )}
 
         <Button size="lg" onClick={go} disabled={kwh < 0.5 || busyNow}>
           <Zap size={22} fill="currentColor" /> Start charging

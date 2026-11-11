@@ -14,6 +14,7 @@ Sub-themes touched: Energy efficiency, Green transport, Circular economy, Climat
 - Casing is always **SunD** (capital S, capital D).
 
 ## Changelog
+- **10 Nov 2026, SunD Pass and Saver update (app only; the submitted deck, PDF and video still show the old Saver offer):** **Saver Credits** start at **RM 50 → RM 60 (+20%)** and grow with the top-up (**RM 100 → 125, +25%; RM 200 → 260, +30%**), a smaller bonus on a higher minimum than the deck's, spendable **anywhere in SunD**: charging at every bay (no ≥60% battery gate), SunD eBike, mall parking, the clubhouse (residents) and mall shops. New **SunD Pass**: a monthly bundle of **100 kWh** at any SunD Bay (≈ RM 90 at the resident rate) + **unlimited SunD eBike** + **unlimited mall parking**. Residents **RM 79 a month on a 12-month plan or RM 89 month to month**; public **RM 129**. Pass kWh are used first and reset monthly. Payment order: Pass kWh → SunD Credits → Saver Credits → card. **Balance:** Saver is capped at +30% so the Pass stays the better deal for regulars; a typical Pass month (100 kWh + 8 eBike rides + 8 parking entries) is worth RM 180 public (+40%) / RM 130 residents (+46–65%). For someone who only charges, Saver is cheaper per kWh (Pass charging alone is +9% public); the Pass wins on the bundle.
 - **23 Oct 2026, v2 app (final deck):** the app now follows the submitted deck and appendix: Elmina Ridge 1 (228 homes, 1 MWp), four personas (Aisyah condo renter with a 1 kW slice, Mr Lim roof host, Daniel public driver, Uncle Tan B40 with a sponsored slice), SunD Walk, SunD Cool, SunD Balcony (2027), solar-peak nudges, heat alerts, an SDP pilot dashboard with the 7 KPIs and the A3 what-if model, public price RM 1.40 and 0.74 kg CO₂/kWh. Where this file and the deck differ, the deck wins.
 - **22 Oct 2026, income model:** the "10% of output" reward (an example from the original concept) is replaced. Owners earn **solar income = kWh sold × the normal selling rate (RM 0.25/kWh)**, then redeem it: SunD Credits get a **+20% top-up** (RM 1 → RM 1.20), the bill rebate is RM for RM, capped at 50%. **The rate, top-up and cap are all settings Sime Darby can customise later.**
 - **22 Oct 2026, reward mix:** landed owners split their reward between SunD Credits and a cash rebate on their electricity bill. Credits are unlimited; cash is capped at 50%. The cap is a policy setting SD can change later. Previously the reward was credits only.
@@ -83,7 +84,8 @@ Credits earned from roofs are spent at SunD Bays, so the value loops back into s
 - Locations by demand: SD malls, commercial areas, parks, clubhouses. Later: beyond the township and at petrol stations.
 - SunD Wallet users pay with credits (no cash). The public pays at cheaper rates (proposed ~RM 1.00/kWh DC).
 - **Solar Surplus Discount:** a bay with high stored solar lowers its price to avoid waste.
-- **Saver Credits:** pay RM20 to get RM30 in credits, usable only at high-solar bays.
+- **Saver Credits:** top up more, get more: RM 50 → 60 (+20%), RM 100 → 125 (+25%), RM 200 → 260 (+30%), usable anywhere in SunD: charging, eBikes, mall parking, the clubhouse and mall shops (was RM 20 → 30 at high-solar bays only; see changelog, 10 Nov 2026).
+- **SunD Pass:** monthly bundle of 100 kWh charging + unlimited SunD eBike + unlimited mall parking. Residents RM 79 (12-month plan) or RM 89; public RM 129.
 - **Bonus credits** for charging at SunD instead of non-renewable bays.
 
 ### Circular ecosystem
@@ -105,7 +107,7 @@ Slogans:
 | Township-only perks | Open to every EV driver; brand extends beyond SD |
 
 ## 5. Impact (every side wins)
-- **Public:** cheaper charging (~RM 1.00 DC vs RM 1.20–1.80; surplus price ~RM 0.80; Saver Credits +50%), more bays. Sustainable charging for everyone, not only SD residents.
+- **Public:** cheaper charging (~RM 1.00 DC vs RM 1.20–1.80; surplus price ~RM 0.80; Saver Credits +20–30% to spend anywhere; SunD Pass RM 129 a month, worth about RM 180), more bays. Sustainable charging for everyone, not only SD residents.
 - **SD owners:** solar income as credits (+20%) or a bill rebate, charging without cash, beyond home.
 - **SD:** new revenue stream, more control over its solar, a property selling point, and support for its ESG targets (Scope 1 and 2 emissions down 40% by 2030; net zero by 2050).
 - **Planet:** fossil charging replaced with solar.
@@ -113,7 +115,7 @@ Slogans:
 ## 5b. Why demand risk is very low
 1. **Built-in demand:** SD credit holders can only spend credits at SunD, so every bay starts with users (450 Elmina homes ≈ RM 125k solar income/month, of which at least half, ≈ 75k–150k SC, must be spent at SunD).
 2. **Cheapest solar charging nearby:** prices below the main networks attract the public.
-3. **Saver Credits:** pre-sold, so SD gets cash upfront before the energy is used.
+3. **Saver Credits and SunD Pass:** pre-sold credits and monthly subscriptions, so SD gets cash upfront before the energy is used.
 4. **Modular:** an under-used canopy can be moved to a busier site.
 5. **Many uses:** cars, eBikes and the clubhouse all draw on the same credits.
 

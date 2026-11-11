@@ -1,11 +1,22 @@
-import { Bike, Dumbbell, Flower2, School, Snowflake, TrainFront, Trophy, Users, Waves, type LucideIcon } from 'lucide-react';
+import { Bike, Coffee, Dumbbell, Flower2, School, ShoppingBasket, Snowflake, SquareParking, TrainFront, Trophy, Users, Utensils, Waves, type LucideIcon } from 'lucide-react';
 import { COOL_ROOMS, PLACES, WALKS } from '../data/sund';
 import type { KeyboardEvent } from 'react';
 import { FACILITIES, type Facility } from '../data/rewards';
 import type { BayView } from '../store/hooks';
 import { STATUS_META } from './status';
 
-const FACILITY_ICON: Record<Facility['icon'], LucideIcon> = { dumbbell: Dumbbell, waves: Waves, users: Users, trophy: Trophy, flower: Flower2, bike: Bike };
+const FACILITY_ICON: Record<Facility['icon'], LucideIcon> = {
+  dumbbell: Dumbbell,
+  waves: Waves,
+  users: Users,
+  trophy: Trophy,
+  flower: Flower2,
+  bike: Bike,
+  parking: SquareParking,
+  utensils: Utensils,
+  coffee: Coffee,
+  basket: ShoppingBasket,
+};
 
 export type MapMode = 'bays' | 'walk' | 'cool' | 'ebike' | 'facilities';
 

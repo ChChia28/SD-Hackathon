@@ -3,7 +3,7 @@ import { FacilityRow } from '../../components/facility';
 import { TabHeader } from '../../components/shell';
 import { Card, Pill, ProgressBar, SectionTitle, SeeAll, StarBadge } from '../../components/ui';
 import { KM_PER_KWH } from '../../data/constants';
-import { ACHIEVEMENTS, CLUBHOUSE, EBIKES, LEADERBOARD, OFFERS, levelFor } from '../../data/rewards';
+import { ACHIEVEMENTS, CLUBHOUSE, EBIKES, LEADERBOARD, MALL_SPOTS, OFFERS, levelFor } from '../../data/rewards';
 import { cx, fmtInt } from '../../lib/format';
 import { usesCredits } from '../../lib/pricing';
 import { usePersona, useProfile } from '../../store/hooks';
@@ -82,6 +82,16 @@ export default function Rewards() {
               <FacilityRow key={f.id} f={f} />
             ))}
           </div>
+        </section>
+
+        <section>
+          <SectionTitle action={<SeeAll to="/wallet/saver">Top up</SeeAll>}>Elmina Central Mall</SectionTitle>
+          <div className="flex flex-col gap-2">
+            {MALL_SPOTS.map((f) => (
+              <FacilityRow key={f.id} f={f} />
+            ))}
+          </div>
+          <div className="mt-2 text-[14px] text-ink-muted">Parking and shops take Saver Credits · parking is free with SunD Pass</div>
         </section>
 
         <section>

@@ -7,10 +7,11 @@ import { TabHeader } from '../../components/shell';
 import { Card, IconBubble, LinkButton, Pill, ProgressBar, SectionTitle, SeeAll, Stat } from '../../components/ui';
 import { CO2_KG_PER_KWH, TOWNSHIP } from '../../data/constants';
 import { BalconyTeaser, CoolRoomCard, HeatAlertCard, PeakNudgeCard, SliceCard, SponsoredNote, WalkTeaser } from '../../components/sund';
+import { PassCard } from '../../components/pass';
 import { useT } from '../../lib/i18n';
 import { getBay } from '../../data/bays';
 import { fmt, fmtInt, fmtRm } from '../../lib/format';
-import { scToKm, usesCredits } from '../../lib/pricing';
+import { SAVER_MAX_PCT, scToKm, usesCredits } from '../../lib/pricing';
 import { hourOf, isDaylight, solarKw } from '../../sim/solar';
 import { useBayViews, usePersona, useProfile } from '../../store/hooks';
 import { useStore } from '../../store/useStore';
@@ -38,6 +39,7 @@ export default function Home() {
         {persona.reward === 'cream' && <LiveSolarCard />}
         {persona.reward === 'slice' && <SliceCard />}
         {persona.reward === 'none' && <SaverCard />}
+        {persona.reward === 'none' && <PassCard />}
         <SponsoredNote />
         <PeakNudgeCard />
         {resident && persona.drivesEv && <CreditCard />}
@@ -175,6 +177,7 @@ function CreditCard() {
         </span>
         {prof.monthRebateRm > 0 && <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 font-bold tabular">+{fmtRm(prof.monthRebateRm)} bill rebate</span>}
         {prof.saver > 0 && <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 font-bold tabular">Saver {fmtRm(prof.saver)}</span>}
+        {prof.pass && <span className="inline-flex items-center rounded-full bg-white/10 px-3 py-1 font-bold tabular">Pass {fmtInt(prof.pass.kwhLeft)} kWh left</span>}
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         <LinkButton to="/charge" variant="red">
@@ -200,7 +203,7 @@ function SaverCard() {
       <div className="mt-3 rounded-2xl bg-page p-4">
         <div className="text-[14px] text-ink-muted">Saver Credits</div>
         <div className="font-display text-[32px] font-bold tabular">{fmtRm(prof.saver)}</div>
-        <Pill tone="leaf">60%+ solar bays</Pill>
+        <Pill tone="leaf">Up to +{SAVER_MAX_PCT}% · spend anywhere</Pill>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         <LinkButton to="/wallet/saver">Buy Saver</LinkButton>

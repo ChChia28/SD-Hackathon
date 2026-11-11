@@ -58,5 +58,9 @@ export const ASSUMPTIONS = [
   'Walkway roof carries one 1.2 m row of panels (~0.21 kWp per m²)',
   'Nudge savings per appliance (washer 1 kWh, pre-cool 1.5 kWh)',
   'Household use: Aisyah ≈490 kWh/month, bill ≈RM 162 (A11); slice credits at a flat 36 sen/kWh; Uncle Tan 200 kWh/month',
+  'Saver Credits +20% at RM 50, +25% at RM 100, +30% at RM 200, spendable anywhere in SunD (team update, 10 Nov 2026; the deck shows RM 20 → 30 at high-solar bays)',
+  'SunD Pass: 100 kWh + unlimited eBike and mall parking; residents RM 79 (12-month) or RM 89 a month, public RM 129 (team proposal, 10 Nov 2026)',
+  'Mall parking RM 3 an entry; mall shop vouchers RM 10–30 (demo values)',
+  'A typical Pass month: all 100 kWh + 8 eBike rides + 8 mall parking entries (worth RM 180 public, RM 130 residents); Saver is capped at +30% to stay below it',
   'Cool-room visits, walkers, wallet counts and bay demand are simulated',
 ];

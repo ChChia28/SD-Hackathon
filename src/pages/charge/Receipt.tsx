@@ -92,6 +92,7 @@ export default function Receipt() {
         <Card tone="leaf" className="divide-y divide-leaf-soft px-5 py-1">
           <Row label="Energy" value={`${fmt(tx.kwh ?? 0)} kWh`} />
           <Row label="Solar share" value={`${tx.solarPct}%`} tone="leaf" />
+          {!!tx.passKwh && <Row label="Covered by SunD Pass" value={`${fmt(tx.passKwh)} kWh`} tone="leaf" />}
           {!!tx.sc && <Row label="Paid with SunD Credits" value={`${fmt(Math.abs(tx.sc), 2)} SC`} />}
           {!!tx.saver && <Row label="Paid with Saver Credits" value={fmtRm(tx.saver)} />}
           {!!tx.rm && <Row label="Card payment" value={fmtRm(tx.rm)} />}

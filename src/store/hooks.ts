@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, type MouseEvent } from 'react';
 import { BAYS, type Bay } from '../data/bays';
 import { KM_PER_UNIT } from '../data/constants';
 import { PERSONAS, type Persona } from '../data/personas';
-import { discountPct, rateFor, saverEligible } from '../lib/pricing';
+import { discountPct, rateFor } from '../lib/pricing';
 import { bayStatus, baySolarPct, baySource, freePorts, totalPorts } from '../sim/bays';
 import { hourOf } from '../sim/solar';
 import type { BayLive, BayStatus, PersonaId, Profile, Weather } from './types';
@@ -20,7 +20,6 @@ export interface BayView {
   distanceKm: number;
   rate: number;
   discount: number;
-  saverOk: boolean;
   free: number;
   total: number;
 }
@@ -38,7 +37,6 @@ export function bayView(bay: Bay, live: BayLive, hour: number, weather: Weather,
     distanceKm: Math.hypot(bay.x - home.x, bay.y - home.y) * KM_PER_UNIT,
     rate,
     discount: discountPct(rate),
-    saverOk: saverEligible(live),
     free: freePorts(bay, live),
     total: totalPorts(bay),
   };

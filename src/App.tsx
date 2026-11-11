@@ -18,6 +18,7 @@ import Achievements from './pages/rewards/Achievements';
 import Redeem from './pages/rewards/Redeem';
 import Rewards from './pages/rewards/Rewards';
 import BuySaver from './pages/wallet/BuySaver';
+import PassPage from './pages/wallet/Pass';
 import CreditRules from './pages/wallet/CreditRules';
 import Statement from './pages/wallet/Statement';
 import TxDetail from './pages/wallet/TxDetail';
@@ -50,6 +51,7 @@ function AppRoutes() {
         <Route path="wallet/tx/:id" element={<TxDetail />} />
         <Route path="wallet/statement" element={<Statement />} />
         <Route path="wallet/saver" element={<BuySaver />} />
+        <Route path="wallet/pass" element={<PassPage />} />
         <Route path="wallet/rules" element={<CreditRules />} />
         <Route path="wallet/slice" element={<Slice />} />
         <Route path="wallet/balcony" element={<Balcony />} />
@@ -81,7 +83,8 @@ function Stage() {
     );
   return (
     <div className="stage">
-      <div className="flex flex-col items-center gap-3">
+      {/* Full width on phones so the screen never shrinks to (or grows with) its content; the framed phone is 390 px from sm up. */}
+      <div className="flex w-full flex-col items-center gap-3 sm:w-auto">
         <PitchTag />
         <div className={cx('phone', large && 'large-text')}>
           <StatusBar />

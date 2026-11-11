@@ -1,17 +1,17 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { BAYS, getBay } from '../data/bays';
-import { CHARGE_TIMELAPSE, CO2_KG_PER_KWH, EV, HEAT_LEVEL1_C, KM_PER_KWH, PEAK, SAVER_PACKS } from '../data/constants';
+import { CHARGE_TIMELAPSE, CO2_KG_PER_KWH, EV, HEAT_LEVEL1_C, KM_PER_KWH, PASS_DAYS, PASS_KWH, PASS_PLANS, PEAK, SAVER_PACKS } from '../data/constants';
 import { PERSONAS, PERSONA_IDS } from '../data/personas';
 import { awardAchievements, getAchievement, getFacility } from '../data/rewards';
 import { fmt, uid } from '../lib/format';
-import { bonusRateFor, maxBillShare, rateFor, saverEligible, splitReward, usesCredits } from '../lib/pricing';
+import { bonusRateFor, facilityPayment, maxBillShare, rateFor, splitReward, usesCredits } from '../lib/pricing';
 import { NUDGES } from '../data/nudges';
 import { translate } from '../lib/translate';
 import { bayStatus, baySolarPct, freePorts, hourKeyOf, occupancy, stepBay } from '../sim/bays';
 import { dayKey, hourOf, solarKw } from '../sim/solar';
 import { seedBays, seedNotices, seedProfile, startTime } from './seed';
-import type { BayLive, Lang, Notice, PersonaId, Profile, Session, Toast, Tx, Weather } from './types';
+import type { BayLive, Lang, Notice, Pass, PersonaId, Profile, Session, Toast, Tx, Weather } from './types';
 
 const STEP_MS = 15 * 60_000;
 const DAY = 86_400_000;
@@ -58,6 +58,8 @@ interface Actions {
   stopSession: () => void;
   clearSession: () => void;
   buySaver: (packIndex: number, method: string) => string;
+  buyPass: (planId: string, method: string) => string;
+  setPassAutoRenew: (on: boolean) => void;
   redeem: (facilityId: string) => string | null;
   toast: (t: Omit<Toast, 'id'>) => void;
   dismissToast: (id: string) => void;
@@ -127,6 +129,14 @@ function closeDay(p: Profile, endOfDay: number, next: number): Profile {
   return { ...p, txs, todayKwh: 0, todayCredits: 0, todayRebateRm: 0, ...(newMonth ? { monthKwh: 0, monthCredits: 0, monthRebateRm: 0 } : {}) };
 }
 
+/** Starts the next month of a SunD Pass (auto-renew: new 100 kWh, charged again), or ends it if auto-renew is off. */
+function rollPass(p: Profile): { profile: Profile; renewed: boolean } {
+  const pass = p.pass!;
+  if (!pass.autoRenew) return { profile: { ...p, pass: null }, renewed: false };
+  const tx: Tx = { id: uid('tx'), type: 'pass', at: pass.renewsAt, title: 'SunD Pass renewed', rm: -pass.price, kwh: PASS_KWH, method: 'Auto-renew' };
+  return { profile: { ...p, pass: { ...pass, renewsAt: pass.renewsAt + PASS_DAYS * DAY, kwhLeft: PASS_KWH, rides: 0, parks: 0 }, txs: [tx, ...p.txs] }, renewed: true };
+}
+
 /** Runs the township forward from s.simTime to t1: generation, credits, bay batteries, events. */
 function advance(s: State, t1: number): Partial<State> {
   let t = s.simTime;
@@ -134,6 +144,7 @@ function advance(s: State, t1: number): Partial<State> {
   const bays = { ...s.bays };
   const before = Object.fromEntries(BAYS.map((b) => [b.id, bayStatus(b, s.bays[b.id])]));
   const genBefore = profiles[s.persona].todayKwh;
+  const passEvents: Omit<Toast, 'id'>[] = [];
 
   while (t < t1) {
     const tn = Math.min(t1, t + STEP_MS);
@@ -168,6 +179,19 @@ function advance(s: State, t1: number): Partial<State> {
       bays[b.id] = live;
     }
 
+    for (const id of PERSONA_IDS) {
+      const pass = profiles[id].pass;
+      if (!pass || tn < pass.renewsAt) continue;
+      const { profile, renewed } = rollPass(profiles[id]);
+      profiles[id] = profile;
+      if (id === s.persona)
+        passEvents.push(
+          renewed
+            ? { icon: 'gift', to: '/wallet/pass', title: 'SunD Pass renewed', body: `${PASS_KWH} kWh ready · RM ${pass.price} charged` }
+            : { icon: 'alert', to: '/wallet/pass', title: 'SunD Pass ended', body: 'Saver Credits and card still work at every bay' },
+        );
+    }
+
     if (dayKey(tn) !== dayKey(t)) {
       for (const id of PERSONA_IDS) profiles[id] = { ...closeDay(profiles[id], t, tn), nudgesDone: [] };
     }
@@ -175,7 +199,7 @@ function advance(s: State, t1: number): Partial<State> {
   }
   const crossedPeak = hourOf(s.simTime) < PEAK.from && hourOf(t1) >= PEAK.from && t1 - s.simTime < DAY;
 
-  const events: Omit<Toast, 'id'>[] = [];
+  const events: Omit<Toast, 'id'>[] = [...passEvents];
   const now = Date.now();
   let lastEventToast = s.lastEventToast;
   if (s.surplusAlerts && now - s.lastEventToast > EVENT_TOAST_GAP_MS) {
@@ -242,6 +266,7 @@ function finalize(s: State): Partial<State> {
     sc: -ses.scUsed,
     bonusSc: bonus,
     saver: -ses.saverUsed,
+    passKwh: ses.passKwh > 0.005 ? ses.passKwh : undefined,
     rm: -ses.rm,
     kwh: ses.delivered,
     solarPct,
@@ -278,7 +303,7 @@ function finalize(s: State): Partial<State> {
   };
 }
 
-/** Delivers energy for one real-time slice and pays for it: credits, then Saver Credits, then card. */
+/** Delivers energy for one real-time slice and pays for it: SunD Pass kWh, then credits, then Saver Credits, then card. */
 function chargeStep(s: State, realDt: number): Partial<State> {
   const ses = s.session!;
   const prof = s.profiles[s.persona];
@@ -289,15 +314,23 @@ function chargeStep(s: State, realDt: number): Partial<State> {
   let rem = dk;
   let sc = prof.sc;
   let saver = prof.saver;
+  let pass = prof.pass;
+  let passKwh = 0;
   let scUsed = 0;
   let saverUsed = 0;
+  // Pass kWh go first: they reset each month, credits don't.
+  if (pass && pass.kwhLeft > 1e-9) {
+    passKwh = Math.min(rem, pass.kwhLeft);
+    pass = { ...pass, kwhLeft: pass.kwhLeft - passKwh };
+    rem -= passKwh;
+  }
   // 1 SC = RM 1, so credits pay the bay's RM rate per kWh.
   if (ses.useCredits && sc > 0) {
     scUsed = Math.min(rem * ses.rate, sc);
     sc -= scUsed;
     rem -= scUsed / ses.rate;
   }
-  if (rem > 0 && ses.saverOk && saver > 0) {
+  if (rem > 1e-9 && saver > 0) {
     saverUsed = Math.min(rem * ses.rate, saver);
     saver -= saverUsed;
     rem -= saverUsed / ses.rate;
@@ -308,12 +341,13 @@ function chargeStep(s: State, realDt: number): Partial<State> {
     ...ses,
     delivered: ses.delivered + dk,
     solarKwh: ses.solarKwh + (dk * ses.solarPct) / 100,
+    passKwh: ses.passKwh + passKwh,
     scUsed: ses.scUsed + scUsed,
     saverUsed: ses.saverUsed + saverUsed,
     rm: ses.rm + rmPaid,
     elapsedSec: ses.elapsedSec + realDt / 1000,
   };
-  const profiles = { ...s.profiles, [s.persona]: { ...prof, sc, saver, evSoc: Math.min(100, prof.evSoc + (dk / EV.batteryKwh) * 100) } };
+  const profiles = { ...s.profiles, [s.persona]: { ...prof, sc, saver, pass, evSoc: Math.min(100, prof.evSoc + (dk / EV.batteryKwh) * 100) } };
   const next = { ...s, session, profiles };
   const done = session.delivered >= session.targetKwh - 1e-6 || room - dk <= 1e-6;
   return done ? { session, profiles, ...finalize(next) } : { session, profiles };
@@ -401,12 +435,12 @@ export const useStore = create<State>()(
             delivered: 0,
             solarKwh: 0,
             solarPct,
+            passKwh: 0,
             scUsed: 0,
             saverUsed: 0,
             rm: 0,
             rate: rateFor(s.persona, status),
             useCredits: usesCredits(s.persona),
-            saverOk: saverEligible(live),
             surplus: status === 'surplus',
             bonusRate: bonusRateFor(s.persona, status, solarPct),
             startSoc: s.profiles[s.persona].evSoc,
@@ -433,18 +467,51 @@ export const useStore = create<State>()(
         return tx.id;
       },
 
+      buyPass: (planId, method) => {
+        const s = get();
+        const plan = PASS_PLANS.find((p) => p.id === planId);
+        const prof = s.profiles[s.persona];
+        if (!plan || prof.pass) return '';
+        const tx: Tx = { id: uid('tx'), type: 'pass', at: s.simTime, title: 'SunD Pass', rm: -plan.price, kwh: PASS_KWH, method };
+        const pass: Pass = {
+          planId: plan.id,
+          price: plan.price,
+          startedAt: s.simTime,
+          renewsAt: s.simTime + PASS_DAYS * DAY,
+          commitUntil: plan.months > 1 ? s.simTime + plan.months * PASS_DAYS * DAY : undefined,
+          autoRenew: true,
+          kwhLeft: PASS_KWH,
+          rides: 0,
+          parks: 0,
+        };
+        set({ profiles: { ...s.profiles, [s.persona]: { ...prof, pass, txs: [tx, ...prof.txs] } } });
+        return tx.id;
+      },
+
+      // A 12-month plan can't stop renewing before its minimum term ends.
+      setPassAutoRenew: (on) =>
+        set((s) => {
+          const prof = s.profiles[s.persona];
+          if (!prof.pass || (!on && prof.pass.commitUntil && s.simTime < prof.pass.commitUntil)) return {};
+          return { profiles: { ...s.profiles, [s.persona]: { ...prof, pass: { ...prof.pass, autoRenew: on } } } };
+        }),
+
       redeem: (facilityId) => {
         const s = get();
         const f = getFacility(facilityId);
         const prof = s.profiles[s.persona];
-        // Credits first; eBikes also take Saver Credits, so the public can ride.
-        const withSc = usesCredits(s.persona) && prof.sc >= f.cost;
-        const withSaver = !withSc && f.saverRm !== undefined && prof.saver >= f.saverRm;
-        if (!withSc && !withSaver) return null;
-        const prefix = f.kind === 'ebike' ? 'BIKE' : 'CLUB';
+        // SunD Pass covers eBikes and parking; then credits (solar facilities), then Saver Credits (anywhere).
+        const pay = facilityPayment(f, s.persona, prof);
+        if (pay.via === 'locked' || (pay.via !== 'pass' && !pay.enough)) return null;
+        const prefix = { ebike: 'BIKE', clubhouse: 'CLUB', parking: 'PARK', shop: 'SHOP' }[f.kind];
         const voucher = { id: uid('v'), facilityId, code: `${prefix}-${Math.random().toString(36).slice(2, 6).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`, at: s.simTime };
-        const tx: Tx = { id: uid('tx'), type: 'redeem', at: s.simTime, title: f.item, place: f.name, facilityId, ...(withSc ? { sc: -f.cost } : { saver: -(f.saverRm ?? 0) }) };
-        const paid = withSc ? { sc: prof.sc - f.cost } : { saver: prof.saver - (f.saverRm ?? 0) };
+        const tx: Tx = { id: uid('tx'), type: 'redeem', at: s.simTime, title: f.item, place: f.name, facilityId, ...(pay.via === 'pass' ? { viaPass: true } : pay.via === 'sc' ? { sc: -pay.price } : { saver: -pay.price }) };
+        const paid: Partial<Profile> =
+          pay.via === 'pass'
+            ? { pass: { ...prof.pass!, rides: prof.pass!.rides + (f.kind === 'ebike' ? 1 : 0), parks: prof.pass!.parks + (f.kind === 'parking' ? 1 : 0) } }
+            : pay.via === 'sc'
+              ? { sc: prof.sc - pay.price }
+              : { saver: prof.saver - pay.price };
         const { profile, unlocked } = awardAchievements({ ...prof, ...paid, txs: [tx, ...prof.txs], vouchers: [voucher, ...prof.vouchers] });
         tx.unlocked = unlocked;
         set({ profiles: { ...s.profiles, [s.persona]: profile }, ...withToasts(s, badgeToasts(unlocked)) });
@@ -519,7 +586,7 @@ export const useStore = create<State>()(
       patch: (p) => set(p),
     }),
     {
-      name: 'sund-wallet-demo-v3',
+      name: 'sund-wallet-demo-v4',
       version: 1,
       storage: createJSONStorage(() => localStorage),
       partialize: (s) => ({

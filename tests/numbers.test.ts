@@ -6,7 +6,9 @@ import { PERSONAS } from '../src/data/personas';
 import { SOURCES } from '../src/data/sources';
 import { DICT } from '../src/lib/dict';
 import { BAY_SIZES, DEFAULT_WHATIF, bayEconomics } from '../src/lib/economics';
-import { sliceValueRm, splitReward } from '../src/lib/pricing';
+import { FACILITIES, getFacility } from '../src/data/rewards';
+import { estimatePayment, facilityPayment, passMonthValue, passPlansFor, SAVER_MAX_PCT, SAVER_MIN_PCT, saverBonusPct, sliceValueRm, splitReward } from '../src/lib/pricing';
+import type { Pass } from '../src/store/types';
 
 const near = (a: number, b: number, tol: number) => expect(Math.abs(a - b)).toBeLessThanOrEqual(tol);
 
@@ -32,7 +34,6 @@ describe('deck facts (slides 2–10)', () => {
     expect(C.MARKET_DC).toEqual({ low: 0.88, high: 1.8 });
     expect(C.PUBLIC_SURPLUS_PRICE).toBeLessThan(C.PUBLIC_PRICE);
   });
-  it('Saver Credits: pay RM 20, get RM 30', () => expect(C.SAVER_PACKS[0]).toEqual({ pay: 20, get: 30 }));
   it('solar peak 11am–3pm; Level 1 heat ≥35 °C; walk shade −3.1 °C', () => {
     expect(C.PEAK).toEqual({ from: 11, to: 15 });
     expect(C.HEAT_LEVEL1_C).toBe(35);
@@ -68,6 +69,60 @@ describe('personas (slide 3)', () => {
     near(r.income, 10, 1e-9);
     near(r.rebateRm, 5, 1e-9);
     near(r.credits, 6, 1e-9);
+  });
+});
+
+describe('SunD Pass and Saver Credits (team update, 10 Nov 2026)', () => {
+  it('Saver Credits: from RM 50 → 60; the more you top up, the bigger the bonus (+20%, +25%, +30%)', () => {
+    expect(C.SAVER_PACKS).toEqual([
+      { pay: 50, get: 60 },
+      { pay: 100, get: 125 },
+      { pay: 200, get: 260 },
+    ]);
+    expect(C.SAVER_PACKS.map(saverBonusPct)).toEqual([20, 25, 30]);
+    for (let i = 1; i < C.SAVER_PACKS.length; i++) {
+      expect(C.SAVER_PACKS[i].pay).toBeGreaterThan(C.SAVER_PACKS[i - 1].pay);
+      expect(saverBonusPct(C.SAVER_PACKS[i])).toBeGreaterThan(saverBonusPct(C.SAVER_PACKS[i - 1]));
+    }
+    expect([SAVER_MIN_PCT, SAVER_MAX_PCT]).toEqual([20, 30]);
+  });
+  it('a typical Pass month is worth RM 180 (public) / RM 130 (residents)', () => {
+    expect(passMonthValue('public')).toBe(180);
+    expect(passMonthValue('resident')).toBe(130);
+  });
+  it('the Pass stays the better deal for regulars: every plan beats the top Saver bonus in a typical month', () => {
+    for (const p of C.PASS_PLANS) expect((passMonthValue(p.who) / p.price - 1) * 100, p.id).toBeGreaterThan(SAVER_MAX_PCT);
+    // Public +40% vs Saver +30%: keep at least a 5-point gap so the Pass reads as clearly better.
+    const pub = C.PASS_PLANS.find((p) => p.who === 'public')!;
+    expect(Math.round((passMonthValue('public') / pub.price - 1) * 100) - SAVER_MAX_PCT).toBeGreaterThanOrEqual(5);
+  });
+  it('SunD Pass: 100 kWh; residents RM 79 (12-month) or RM 89, public RM 129', () => {
+    expect(C.PASS_KWH).toBe(100);
+    expect(passPlansFor('condo').map((p) => p.price)).toEqual([79, 89]);
+    expect(passPlansFor('landed').map((p) => p.price)).toEqual([79, 89]);
+    expect(passPlansFor('public').map((p) => p.price)).toEqual([129]);
+  });
+  it('100 kWh is worth RM 90 to a resident and RM 140 to the public; every plan costs less than its charging alone', () => {
+    near(C.PASS_KWH * C.RESIDENT_PRICE, 90, 1e-9);
+    near(C.PASS_KWH * C.PUBLIC_PRICE, 140, 1e-9);
+    for (const p of C.PASS_PLANS) expect(p.price).toBeLessThan(C.PASS_KWH * (p.who === 'resident' ? C.RESIDENT_PRICE : C.PUBLIC_PRICE));
+  });
+  it('a charge is paid Pass kWh → SunD Credits → Saver → card', () => {
+    const pay = estimatePayment(30, { sc: 9, saver: 5, passKwh: 10 }, 1, true);
+    expect(pay).toEqual({ pass: 10, sc: 9, saver: 5, rm: 6 });
+    // The public skips credits; Saver works at any bay.
+    expect(estimatePayment(10, { sc: 50, saver: 7, passKwh: 0 }, 1.4, false)).toEqual({ pass: 0, sc: 0, saver: 7, rm: 14 - 7 });
+  });
+  it('Saver pays anywhere; the Pass covers eBikes and mall parking; SunD Credits stay on solar facilities', () => {
+    const pass: Pass = { planId: 'public-1', price: 129, startedAt: 0, renewsAt: 1, autoRenew: true, kwhLeft: 100, rides: 0, parks: 0 };
+    const daniel = { sc: 0, saver: 60, pass: null };
+    for (const kind of ['ebike', 'parking', 'shop'] as const) expect(facilityPayment(FACILITIES.find((f) => f.kind === kind)!, 'public', daniel).via).toBe('saver');
+    expect(facilityPayment(getFacility('gym'), 'public', daniel).via).toBe('locked');
+    expect(facilityPayment(getFacility('gym'), 'condo', { sc: 0, saver: 60, pass: null }).via).toBe('saver');
+    expect(facilityPayment(getFacility('mall-parking'), 'public', { ...daniel, pass }).via).toBe('pass');
+    expect(facilityPayment(getFacility('ebike-park'), 'condo', { sc: 50, saver: 0, pass }).via).toBe('pass');
+    expect(facilityPayment(getFacility('shop-cafe'), 'condo', { sc: 500, saver: 0, pass })).toEqual({ via: 'saver', price: 15, enough: false });
+    expect(getFacility('mall-parking').saverRm).toBe(C.MALL_PARKING_RM);
   });
 });
 

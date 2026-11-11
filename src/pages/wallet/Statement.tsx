@@ -4,7 +4,7 @@ import { Button, Card, PageHeader, Row, SectionTitle } from '../../components/ui
 import { CREDIT_TOPUP, DEMO_LEASE_RM, KM_PER_KWH, SOLAR_SELL_RATE_RM } from '../../data/constants';
 import { fmt, fmtInt, fmtRm, monthName } from '../../lib/format';
 import { usesCredits } from '../../lib/pricing';
-import { isEbikeTx } from '../../data/rewards';
+import { isClubTx, isEbikeTx, isMallTx } from '../../data/rewards';
 import { pastDailyKwh } from '../../sim/solar';
 import { usePersona, useProfile } from '../../store/hooks';
 import { useStore } from '../../store/useStore';
@@ -24,9 +24,13 @@ export default function Statement() {
   const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
   const scCharging = -sum(charges.map((t) => t.sc ?? 0));
   const bonus = sum(charges.map((t) => t.bonusSc ?? 0));
-  const facilities = -sum(inMonth.filter((t) => t.type === 'redeem' && !isEbikeTx(t)).map((t) => t.sc ?? 0));
+  const facilities = -sum(inMonth.filter(isClubTx).map((t) => t.sc ?? 0));
   const rides = inMonth.filter(isEbikeTx);
+  const mall = inMonth.filter(isMallTx);
+  const mallSaver = -sum(mall.map((t) => t.saver ?? 0));
   const saverTopups = sum(inMonth.filter((t) => t.type === 'topup').map((t) => t.saver ?? 0));
+  const passPaid = -sum(inMonth.filter((t) => t.type === 'pass').map((t) => t.rm ?? 0));
+  const passKwh = sum(charges.map((t) => t.passKwh ?? 0));
   const kwhCharged = sum(charges.map((t) => t.kwh ?? 0));
   const solarKm = sum(charges.map((t) => ((t.kwh ?? 0) * (t.solarPct ?? 0)) / 100)) * KM_PER_KWH;
   const daily = Array.from({ length: dom }, (_, i) => (i === dom - 1 ? prof.todayKwh : pastDailyKwh(persona.kWp, simTime - (dom - 1 - i) * DAY)));
@@ -78,7 +82,9 @@ export default function Statement() {
               </>
             )}
             <Row label="eBike rides" value={`${rides.length} rides`} />
+            {mall.length > 0 && <Row label="Mall parking & shops" value={mallSaver > 0 ? `−${fmtRm(mallSaver)} Saver` : `${mall.length} visits`} />}
             <Row label="Saver Credits bought" value={`+${fmtRm(saverTopups)}`} />
+            {(passPaid > 0 || prof.pass) && <Row label="SunD Pass" value={passPaid > 0 ? `${fmtRm(passPaid)} paid · ${fmt(passKwh)} kWh used` : `${fmt(passKwh)} kWh used`} />}
             <Row label="Energy charged" value={`${fmt(kwhCharged)} kWh`} />
             <Row label="Driven on solar" value={`${fmtInt(solarKm)} km`} tone="leaf" />
             {usesCredits(persona.id) && <Row label="SunD Credit balance" value={`${fmt(prof.sc)} SC`} strong />}

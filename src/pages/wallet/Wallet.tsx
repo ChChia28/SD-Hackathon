@@ -1,4 +1,5 @@
 import { Banknote, Car, Coins, FileText, Home as HomeIcon, ReceiptText, Sun, Ticket } from 'lucide-react';
+import { PassCard } from '../../components/pass';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { TabHeader } from '../../components/shell';
@@ -8,9 +9,9 @@ import { BalconyTeaser, SliceCard } from '../../components/sund';
 import { RewardMix } from '../../components/RewardMix';
 import { FlowRow, WhyCredits } from '../../components/visual';
 import { CREDIT_TOPUP, SOLAR_SELL_RATE_RM } from '../../data/constants';
-import { isEbikeTx } from '../../data/rewards';
+import { isClubTx, isEbikeTx, isMallTx, isPassTx } from '../../data/rewards';
 import { fmt, fmtInt, fmtRm } from '../../lib/format';
-import { scToKm, usesCredits } from '../../lib/pricing';
+import { SAVER_MAX_PCT, scToKm, usesCredits } from '../../lib/pricing';
 import { usePersona, useProfile } from '../../store/hooks';
 import type { Tx } from '../../store/types';
 
@@ -19,7 +20,9 @@ const FILTERS: { id: string; label: string; test: (t: Tx) => boolean; resident?:
   { id: 'earn', label: 'Earned', test: (t) => t.type === 'earn', resident: true },
   { id: 'charge', label: 'Charging', test: (t) => t.type === 'charge' },
   { id: 'ebike', label: 'eBike', test: isEbikeTx },
-  { id: 'facility', label: 'Clubhouse', test: (t) => t.type === 'redeem' && !isEbikeTx(t), resident: true },
+  { id: 'facility', label: 'Clubhouse', test: isClubTx, resident: true },
+  { id: 'mall', label: 'Mall', test: isMallTx },
+  { id: 'pass', label: 'Pass', test: isPassTx },
   { id: 'topup', label: 'Top-ups', test: (t) => t.type === 'topup' },
 ];
 
@@ -59,9 +62,10 @@ export default function Wallet() {
               <Ticket size={16} /> Saver Credits
             </div>
             <div className="mt-1 font-display text-[30px] font-bold leading-9 tabular">{fmtRm(prof.saver)}</div>
-            <div className="text-[14px] text-ink-muted">60%+ solar bays · eBikes</div>
+            <div className="text-[14px] text-ink-muted">Up to +{SAVER_MAX_PCT}% · spend anywhere</div>
           </div>
         </div>}
+        {persona.drivesEv && <PassCard />}
 
         {persona.reward === 'slice' && <SliceCard />}
         {persona.reward === 'cream' && (

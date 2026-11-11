@@ -1,4 +1,4 @@
-import { Building2, Coins, Gift, Home as HomeIcon, MapPin, PiggyBank, ReceiptText, Sun, Ticket, type LucideIcon } from 'lucide-react';
+import { ArrowDownWideNarrow, BadgeCheck, Building2, Coins, Gift, Home as HomeIcon, MapPin, PiggyBank, ReceiptText, Sun, Ticket, type LucideIcon } from 'lucide-react';
 import { IconBubble, PageHeader } from '../../components/ui';
 import { WhyCredits } from '../../components/visual';
 
@@ -10,7 +10,9 @@ const RULES: { Icon: LucideIcon; tone: Tone; title: string; fact: string; note: 
   { Icon: Coins, tone: 'sun', title: 'Credit top-up', fact: '+20%', note: 'roof hosts: RM 1 → RM 1.20 in credits' },
   { Icon: Sun, tone: 'sky', title: '1 credit', fact: 'RM 1', note: 'at SunD Bays, SunD Cool, eBikes, clubhouse' },
   { Icon: Gift, tone: 'berry', title: 'Bonus', fact: '+5–10%', note: 'solar bay · surplus bay' },
-  { Icon: Ticket, tone: 'leaf', title: 'Saver', fact: '+50%', note: 'RM 20 → 30 · 60%+ solar bays' },
+  { Icon: Ticket, tone: 'leaf', title: 'Saver', fact: '+20–30%', note: 'RM 50 → 60, RM 100 → 125, RM 200 → 260 · anywhere in SunD' },
+  { Icon: BadgeCheck, tone: 'leaf', title: 'SunD Pass', fact: 'RM 79–129', note: 'a month · 100 kWh + unlimited eBike & parking · worth +40% or more' },
+  { Icon: ArrowDownWideNarrow, tone: 'sky', title: 'Pay order', fact: 'Pass → SC', note: 'then Saver, then card' },
   { Icon: MapPin, tone: 'slate', title: 'Cash-out', fact: 'Never', note: 'credits are SDP rebates, not electricity sales' },
 ];
 
@@ -47,7 +49,7 @@ export default function CreditRules() {
           </IconBubble>
           <div>
             <div className="font-bold">Funded by</div>
-            <div className="text-[14px] text-ink-muted">Share of the CREAM lease value · public charging margin · Saver pre-sales</div>
+            <div className="text-[14px] text-ink-muted">Share of the CREAM lease value · public charging margin · Saver pre-sales · SunD Pass subscriptions</div>
           </div>
         </div>
       </div>

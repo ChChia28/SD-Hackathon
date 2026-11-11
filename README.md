@@ -29,8 +29,23 @@ On Windows, run these in Command Prompt (not PowerShell) inside this folder.
 |---|---|---|
 | **Aisyah**, 29 | Condo renter, no roof | 1 kW solar slice ≈ 110 kWh/month ≈ RM 40 off her bill at her own 36 sen rate |
 | **Mr Lim**, 48 | Landed CREAM roof host (4.4 kWp = 1 MWp ÷ 228 roofs) | Credits on top of his lease; charges his e.MAS 5 with them |
-| **Daniel**, 35 | Public EV driver | Pays per kWh (RM 1.40, surplus RM 1.10), Saver Credits RM 20 → 30 |
+| **Daniel**, 35 | Public EV driver | Pays per kWh (RM 1.40, surplus RM 1.10), Saver Credits +20–30%, SunD Pass RM 129 a month |
 | **Uncle Tan**, 72 | B40, lives alone | Sponsored slice, 中文 + large text, heat alert → nearest SunD Cool in one tap |
+
+## SunD Pass and Saver Credits
+
+Added after the deck (10 Nov 2026), so the deck, PDF and video still show the old Saver offer (RM 20 → 30 at high-solar bays).
+
+| | What you get | Price |
+|---|---|---|
+| **SunD Pass** (Wallet → SunD Pass) | 100 kWh at any SunD Bay (≈ RM 90 at the resident rate, RM 140 public) + unlimited SunD eBike + unlimited mall parking, every month | Residents RM 79 (12-month plan) or RM 89 month to month · public RM 129 |
+| **Saver Credits** (Wallet → Buy Saver) | Top up more, get more, spendable anywhere in SunD: charging at every bay, eBikes, mall parking, the clubhouse (residents) and mall shops | RM 50 → 60 (+20%) · RM 100 → 125 (+25%) · RM 200 → 260 (+30%) |
+
+- **Why the Pass stays the better deal:** a typical Pass month (all 100 kWh + 8 eBike rides + 8 parking entries) is worth RM 180 for the public (+40% on RM 129) and RM 130 for residents (+46% on RM 89, +65% on RM 79). Saver is capped at +30%, and a test fails the build if the top Saver bonus ever catches up. The Saver screen shows each pack in kWh and points regular chargers to the Pass; the Pass screen shows its typical-month value against Saver's best.
+- **Pay order at a bay:** Pass kWh first (they reset monthly), then SunD Credits, then Saver Credits, then card.
+- **Where each one works:** SunD Credits stay on solar-powered facilities (bays, eBikes, clubhouse, SunD Cool). Saver Credits work everywhere. The Pass covers charging, eBikes and mall parking.
+- **Elmina Central Mall** (Rewards tab): mall parking (RM 3 an entry, free with the Pass) and shop vouchers, paid with Saver Credits.
+- The Pass screen shows kWh left, rides and parking used, the value used against the price, and auto-renew (locked on for the 12-month term). Prices and plans live in `src/data/constants.ts` (`PASS_PLANS`, `SAVER_PACKS`).
 
 ## Pitch mode (deck order)
 
@@ -72,7 +87,7 @@ Open the presenter controls (beside the phone on a laptop; long-press the sun lo
 
 ## Numbers and sources
 
-All constants live in `src/data/constants.ts`, each tagged with its source or marked ASSUMPTION. The in-app **Sources** screen (Profile → Sources) lists the same links as the deck and appendix, plus the assumptions register. `tests/numbers.test.ts` (24 checks) fails the build if any figure drifts from the deck: Elmina Ridge 1 (228 homes, 1 MWp), 0.74 kg CO₂/kWh, slice value RM 40–57, A2 bay sizes and CO₂, A3 payback table, balcony figures, and translation placeholders.
+All constants live in `src/data/constants.ts`, each tagged with its source or marked ASSUMPTION. The in-app **Sources** screen (Profile → Sources) lists the same links as the deck and appendix, plus the assumptions register. `tests/numbers.test.ts` (28 checks) fails the build if any figure drifts from the deck: Elmina Ridge 1 (228 homes, 1 MWp), 0.74 kg CO₂/kWh, slice value RM 40–57, A2 bay sizes and CO₂, A3 payback table, balcony figures, and translation placeholders. It also checks the SunD Pass and Saver prices, the payment order and where each balance can be spent.
 
 ## Built to survive the stage
 
@@ -93,7 +108,7 @@ src/
   store/       Zustand store (simulation, wallet, heat alert, pitch mode), seed data, hooks
   lib/         pricing, A3 economics, i18n (EN/BM/中文), formatting
   components/  phone shell, UI kit, SunD cards, map, pitch mode, presenter controls, QR, crash guard
-  pages/       onboarding, home, wallet (slice, balcony), map (bays/walk/cool/eBike), cool, charge, rewards, sources, sdp dashboard
+  pages/       onboarding, home, wallet (slice, balcony, Saver, SunD Pass), map (bays/walk/cool/eBike), cool, charge, rewards (eBike, mall, clubhouse), sources, sdp dashboard
 tests/         numbers.test.ts
 pitch/         deck source, screenshots and concept visuals from v1
 ```

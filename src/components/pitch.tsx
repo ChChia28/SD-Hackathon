@@ -86,7 +86,7 @@ export const PITCH_STEPS: PitchStep[] = [
     slide: 5,
     slideTitle: 'Innovation',
     title: 'Daniel pays less than the market at the same bay',
-    say: 'Public drivers pay per kWh, catch the Solar Surplus Discount, or pre-buy Saver Credits: pay RM 20, get RM 30. That revenue funds the next bay.',
+    say: 'Public drivers pay per kWh, catch the Solar Surplus Discount, top up Saver Credits (+20% from RM 50, up to +30% at RM 200, spend anywhere) or, if they charge every week, take a SunD Pass: 100 kWh plus unlimited eBike and mall parking for RM 129, worth about RM 180 a month. That revenue funds the next bay.',
     run: (c) => {
       as(c, 'public');
       if (c.s().bays[PILOT].soc < 80) c.s().triggerSurplus(PILOT);

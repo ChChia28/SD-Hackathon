@@ -42,7 +42,6 @@ export const SURPLUS_BONUS = 0.1;
 
 /** Bay battery thresholds, % state of charge. */
 export const SURPLUS_SOC = 80;
-export const SAVER_MIN_SOC = 60;
 export const GRID_BACKUP_SOC = 15;
 
 /** Charging sessions are shown as a time-lapse so a demo charge takes ~20 s. */
@@ -51,12 +50,38 @@ export const CHARGE_TIMELAPSE = 180;
 /** Proton e.MAS 5 Premium: 40.16 kWh [emas]. */
 export const EV = { name: 'Proton e.MAS 5', batteryKwh: 40, startSoc: 34 };
 
-/** Saver Credits: pay RM 20, get RM 30 (deck). Larger packs are demo values. */
+/**
+ * Saver Credits (team update, 10 Nov 2026 — replaces the deck's RM 20 → 30 at high-solar bays only):
+ * top up at least RM 50, spendable anywhere in SunD — charging at every bay, eBikes, mall parking,
+ * the clubhouse (residents) and mall shops. The more you top up, the bigger the bonus: +20%, +25%, +30%.
+ * Capped at +30% so the SunD Pass stays the better deal for regulars: a typical Pass month is worth +40% or more
+ * (PASS_TYPICAL_MONTH). tests/numbers.test.ts enforces that gap.
+ */
 export const SAVER_PACKS = [
-  { pay: 20, get: 30 },
-  { pay: 50, get: 80 },
-  { pay: 100, get: 170 },
+  { pay: 50, get: 60 },
+  { pay: 100, get: 125 },
+  { pay: 200, get: 260 },
 ];
+
+/**
+ * SunD Pass (team proposal, 10 Nov 2026; prices are ASSUMPTIONS for the pilot to test): a monthly bundle of
+ * 100 kWh at any SunD Bay + unlimited SunD eBike rides + unlimited mall parking.
+ * 100 kWh is worth RM 90 at the resident rate and RM 140 at the public rate, so every plan costs less than its charging alone.
+ */
+export const PASS_KWH = 100;
+export const PASS_DAYS = 30;
+export type PassAudience = 'resident' | 'public';
+export const PASS_PLANS: { id: string; who: PassAudience; price: number; label: string; note: string; months: number }[] = [
+  { id: 'resident-12', who: 'resident', price: 79, label: '12-month plan', note: 'Billed monthly · 12-month minimum', months: 12 },
+  { id: 'resident-1', who: 'resident', price: 89, label: 'Month to month', note: 'Stop anytime', months: 1 },
+  { id: 'public-1', who: 'public', price: 129, label: 'Month to month', note: 'Stop anytime', months: 1 },
+];
+/** A typical Pass month, used to show what the Pass is worth: all 100 kWh plus eBike and mall parking twice a week — ASSUMPTION. */
+export const PASS_TYPICAL_MONTH = { rides: 8, parks: 8 };
+/** Elmina Central Mall parking, per entry — ASSUMPTION (demo value). Free with a SunD Pass. */
+export const MALL_PARKING_RM = 3;
+/** SunD eBike, per 30-minute ride (RM, or SC for residents). Free with a SunD Pass. */
+export const EBIKE_RIDE_RM = 2;
 
 /** Elmina Ridge 1: 228 homes, 1 MWp of SDP-installed solar [sdp-sr24]; ~3.7 MWh a day (team estimate). */
 export const TOWNSHIP = { name: 'Elmina', homes: 228, mwp: 1, homesPlanned: 36_600, mwhPerDay: 3.7 };

@@ -1,28 +1,38 @@
+import { EBIKE_RIDE_RM, MALL_PARKING_RM } from './constants';
 import { dayKey, hashRand, hourOf } from '../sim/solar';
 import type { Profile, Tx } from '../store/types';
 
+export type FacilityKind = 'ebike' | 'clubhouse' | 'parking' | 'shop';
+
 export interface Facility {
   id: string;
-  kind: 'ebike' | 'clubhouse';
+  kind: FacilityKind;
   name: string;
   item: string;
-  cost: number; // SC
-  /** eBikes can also be paid with Saver Credits, so the public can ride. */
+  /** Price in SunD Credits. Absent where credits aren't accepted (mall parking and shops are not solar facilities). */
+  cost?: number;
+  /** Price in Saver Credits, RM. Saver Credits work anywhere in SunD. */
   saverRm?: number;
-  icon: 'dumbbell' | 'waves' | 'users' | 'trophy' | 'flower' | 'bike';
+  icon: 'dumbbell' | 'waves' | 'users' | 'trophy' | 'flower' | 'bike' | 'parking' | 'utensils' | 'coffee' | 'basket';
   x: number;
   y: number;
   note: string;
   docks?: number;
 }
 
+/** Clubhouse: SunD Credits first, Saver Credits also accepted (1 SC = RM 1). Residents only. */
+const club = (f: Omit<Facility, 'kind' | 'saverRm'> & { cost: number }): Facility => ({ ...f, kind: 'clubhouse', saverRm: f.cost });
+
+/** Elmina Central Mall, home of the Phase 3 mall bay: parking and shops take Saver Credits. */
+const MALL = { x: 196, y: 176 };
+
 const ebike = (id: string, area: string, x: number, y: number, docks: number): Facility => ({
   id: `ebike-${id}`,
   kind: 'ebike',
   name: `SunD eBike · ${area}`,
   item: 'eBike ride · 30 min',
-  cost: 2,
-  saverRm: 2,
+  cost: EBIKE_RIDE_RM,
+  saverRm: EBIKE_RIDE_RM,
   icon: 'bike',
   x,
   y,
@@ -36,19 +46,30 @@ export const FACILITIES: Facility[] = [
   ebike('innovation', 'Innovation Park', 266, 150, 10),
   ebike('lakeside', 'Lakeside', 262, 286, 8),
   ebike('west', 'Elmina West', 92, 300, 8),
-  { id: 'gym', kind: 'clubhouse', name: 'Elmina Clubhouse Gym', item: 'Gym day pass', cost: 8, icon: 'dumbbell', x: 64, y: 196, note: 'Clubhouse rooftop solar' },
-  { id: 'pool', kind: 'clubhouse', name: 'Clubhouse Pool', item: 'Pool + sauna', cost: 5, icon: 'waves', x: 84, y: 232, note: 'Solar water heating' },
-  { id: 'court', kind: 'clubhouse', name: 'Badminton Hall', item: 'Court · 1 hour', cost: 6, icon: 'trophy', x: 52, y: 228, note: 'Solar lighting' },
-  { id: 'hall', kind: 'clubhouse', name: 'Clubhouse Function Room', item: 'Function room · 2 h', cost: 25, icon: 'users', x: 96, y: 200, note: 'Solar-cooled' },
-  { id: 'yoga', kind: 'clubhouse', name: 'Central Park Pavilion', item: 'Sunrise yoga', cost: 3, icon: 'flower', x: 128, y: 104, note: 'Sat · 7 am' },
+  club({ id: 'gym', name: 'Elmina Clubhouse Gym', item: 'Gym day pass', cost: 8, icon: 'dumbbell', x: 64, y: 196, note: 'Clubhouse rooftop solar' }),
+  club({ id: 'pool', name: 'Clubhouse Pool', item: 'Pool + sauna', cost: 5, icon: 'waves', x: 84, y: 232, note: 'Solar water heating' }),
+  club({ id: 'court', name: 'Badminton Hall', item: 'Court · 1 hour', cost: 6, icon: 'trophy', x: 52, y: 228, note: 'Solar lighting' }),
+  club({ id: 'hall', name: 'Clubhouse Function Room', item: 'Function room · 2 h', cost: 25, icon: 'users', x: 96, y: 200, note: 'Solar-cooled' }),
+  club({ id: 'yoga', name: 'Central Park Pavilion', item: 'Sunrise yoga', cost: 3, icon: 'flower', x: 128, y: 104, note: 'Sat · 7 am' }),
+  { id: 'mall-parking', kind: 'parking', name: 'Elmina Central Mall', item: 'Mall parking · 1 entry', saverRm: MALL_PARKING_RM, icon: 'parking', ...MALL, note: 'Free with SunD Pass' },
+  { id: 'shop-foodcourt', kind: 'shop', name: 'Elmina Central Mall', item: 'Food court voucher', saverRm: 10, icon: 'utensils', ...MALL, note: 'Any stall' },
+  { id: 'shop-cafe', kind: 'shop', name: 'Elmina Central Mall', item: 'Café voucher', saverRm: 15, icon: 'coffee', ...MALL, note: 'Ground floor' },
+  { id: 'shop-grocer', kind: 'shop', name: 'Elmina Central Mall', item: 'Grocery voucher', saverRm: 30, icon: 'basket', ...MALL, note: 'Lower ground' },
 ];
 
 export const EBIKES = FACILITIES.filter((f) => f.kind === 'ebike');
 export const CLUBHOUSE = FACILITIES.filter((f) => f.kind === 'clubhouse');
+export const MALL_SPOTS = FACILITIES.filter((f) => f.kind === 'parking' || f.kind === 'shop');
 
 export const getFacility = (id: string) => FACILITIES.find((f) => f.id === id) ?? FACILITIES[0];
 
-export const isEbikeTx = (t: Tx) => t.type === 'redeem' && !!t.facilityId?.startsWith('ebike');
+/** What kind of place a redeem transaction was spent at. */
+export const txFacilityKind = (t: Tx): FacilityKind | undefined => (t.type === 'redeem' ? FACILITIES.find((f) => f.id === t.facilityId)?.kind : undefined);
+export const isEbikeTx = (t: Tx) => txFacilityKind(t) === 'ebike';
+export const isClubTx = (t: Tx) => txFacilityKind(t) === 'clubhouse';
+export const isMallTx = (t: Tx) => txFacilityKind(t) === 'parking' || txFacilityKind(t) === 'shop';
+/** Anything the SunD Pass paid for: the pass itself, charging from its kWh, rides and parking. */
+export const isPassTx = (t: Tx) => t.type === 'pass' || !!t.viaPass || !!t.passKwh;
 
 /** Bikes docked right now: stable within the hour. */
 export function bikesAvailable(f: Facility, simTime: number): number {
@@ -72,7 +93,7 @@ export const ACHIEVEMENTS: Achievement[] = [
   { id: 'pedal3', title: 'Pedal power', desc: '3 eBike rides', test: (p) => p.txs.filter(isEbikeTx).length >= 3 },
   { id: 'mwh', title: '1 MWh club', desc: '1,000 kWh generated', test: (p) => p.lifetimeGenKwh >= 1000 },
   { id: 'saver', title: 'Early supporter', desc: 'First Saver top-up', test: (p) => p.txs.some((t) => t.type === 'topup') },
-  { id: 'facility', title: 'Green living', desc: 'Clubhouse visit on credits', test: (p) => p.txs.some((t) => t.type === 'redeem' && !isEbikeTx(t)) },
+  { id: 'facility', title: 'Green living', desc: 'Clubhouse visit on credits', test: (p) => p.txs.some(isClubTx) },
 ];
 
 export const getAchievement = (id: string) => ACHIEVEMENTS.find((a) => a.id === id);
@@ -106,7 +127,8 @@ export const OFFERS = [
   { id: 'noon', title: 'Solar noon 2×', body: '11 am–3 pm · green bays', tag: 'Bonus', to: '/map', resident: true },
   { id: 'ebike', title: 'Ride while you charge', body: 'eBike dock at every SunD Bay', tag: 'eBike', to: '/map?tab=ebike', resident: false },
   { id: 'park', title: 'Weekend park +5%', body: 'Central Park · Sat & Sun', tag: 'Weekend', to: '/map', resident: true },
-  { id: 'saver', title: 'Saver +50%', body: 'Pay RM 20 → get RM 30', tag: 'Everyone', to: '/wallet/saver', resident: false },
+  { id: 'pass', title: 'SunD Pass', body: '100 kWh + unlimited eBike & mall parking', tag: 'Monthly', to: '/wallet/pass', resident: false },
+  { id: 'saver', title: 'Saver up to +30%', body: 'RM 50 → 60 · RM 100 → 125 · RM 200 → 260', tag: 'Everyone', to: '/wallet/saver', resident: false },
 ];
 
 export const LEADERBOARD = [

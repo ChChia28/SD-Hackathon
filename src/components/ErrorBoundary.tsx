@@ -14,7 +14,7 @@ export class ErrorBoundary extends Component<{ children: ReactNode }, { error: E
 
   reset = () => {
     try {
-      localStorage.removeItem('sund-wallet-demo-v3');
+      localStorage.removeItem('sund-wallet-demo-v4');
     } catch {
       /* storage may be blocked; a reload still recovers */
     }

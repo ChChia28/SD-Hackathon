@@ -61,9 +61,11 @@ export default function Session() {
         </Card>
 
         <Card className="divide-y divide-outline px-5 py-1">
+          {(session.passKwh > 0 || !!prof.pass) && <Row label="SunD Pass used" value={`${fmt(session.passKwh)} kWh`} />}
           {session.useCredits && <Row label="SunD Credits used" value={`${fmt(session.scUsed, 2)} SC`} />}
-          {session.saverOk && session.saverUsed > 0 && <Row label="Saver Credits used" value={fmtRm(session.saverUsed)} />}
+          {session.saverUsed > 0 && <Row label="Saver Credits used" value={fmtRm(session.saverUsed)} />}
           <Row label="Card so far" value={fmtRm(session.rm)} />
+          {prof.pass && <Row label="Pass left" value={`${fmt(prof.pass.kwhLeft)} kWh`} strong />}
           {session.useCredits && <Row label="Credits left" value={`${fmt(prof.sc, 2)} SC`} strong />}
         </Card>
 

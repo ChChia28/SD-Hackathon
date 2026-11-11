@@ -31,13 +31,16 @@ export default function TxDetail() {
         </div>
         <Card className="divide-y divide-outline px-5 py-1">
           {tx.place && <Row label="Location" value={tx.bayId ? <Link className="text-sky-deep underline" to={`/map/bay/${tx.bayId}`}>{getBay(tx.bayId).name}</Link> : tx.place} />}
-          {tx.kwh !== undefined && <Row label={tx.type === 'earn' ? 'Generated' : 'Energy'} value={`${fmt(tx.kwh)} kWh`} />}
+          {tx.kwh !== undefined && <Row label={tx.type === 'earn' ? 'Generated' : tx.type === 'pass' ? 'Charging included' : 'Energy'} value={`${fmt(tx.kwh)} kWh`} />}
+          {tx.type === 'pass' && <Row label="Also included" value="Unlimited eBike & mall parking" />}
+          {!!tx.passKwh && <Row label="SunD Pass" value={`${fmt(tx.passKwh)} kWh`} tone="leaf" />}
+          {tx.viaPass && <Row label="Paid with" value="SunD Pass" tone="leaf" />}
           {tx.solarPct !== undefined && <Row label="Solar share" value={`${tx.solarPct}%`} tone="leaf" />}
           {!!tx.sc && <Row label="SunD Credits" value={`${signed(tx.sc, 2)} SC`} />}
           {!!tx.rebateRm && <Row label="Bill rebate" value={`+${fmtRm(tx.rebateRm)}`} />}
           {!!tx.bonusSc && <Row label="Bonus credits" value={`+${fmt(tx.bonusSc, 2)} SC`} tone="berry" />}
           {!!tx.saver && <Row label="Saver Credits" value={`${tx.saver < 0 ? '−' : '+'}${fmtRm(tx.saver)}`} />}
-          {!!tx.rm && <Row label={tx.type === 'topup' ? 'You paid' : 'Card payment'} value={fmtRm(tx.rm)} />}
+          {!!tx.rm && <Row label={tx.type === 'topup' || tx.type === 'pass' ? 'You paid' : 'Card payment'} value={fmtRm(tx.rm)} />}
           {tx.method && <Row label="Payment method" value={tx.method} />}
           {tx.km !== undefined && <Row label="Driving added" value={`${fmtInt(tx.km)} km`} />}
           {tx.co2 !== undefined && <Row label="CO₂ avoided" value={`${fmt(tx.co2)} kg`} tone="leaf" />}

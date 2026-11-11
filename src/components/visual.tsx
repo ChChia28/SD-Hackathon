@@ -1,6 +1,6 @@
 import { ArrowRight, Coins, Leaf, Scale } from 'lucide-react';
 import { Fragment, type ReactNode } from 'react';
-import { GRID_BACKUP_SOC, SAVER_MIN_SOC, SURPLUS_SOC } from '../data/constants';
+import { GRID_BACKUP_SOC, SURPLUS_SOC } from '../data/constants';
 import { cx } from '../lib/format';
 import { IconBubble } from './ui';
 
@@ -67,8 +67,7 @@ export const WhyCredits = () => (
 
 const ZONES = [
   { from: 0, to: GRID_BACKUP_SOC, label: 'Grid', bar: 'bg-ink-faint', text: 'text-ink-muted' },
-  { from: GRID_BACKUP_SOC, to: SAVER_MIN_SOC, label: 'Normal', bar: 'bg-sky-soft', text: 'text-sky-deep' },
-  { from: SAVER_MIN_SOC, to: SURPLUS_SOC, label: 'Saver', bar: 'bg-leaf-soft', text: 'text-leaf-ink' },
+  { from: GRID_BACKUP_SOC, to: SURPLUS_SOC, label: 'Normal', bar: 'bg-sky-soft', text: 'text-sky-deep' },
   { from: SURPLUS_SOC, to: 100, label: 'Surplus', bar: 'bg-leaf', text: 'text-leaf-ink' },
 ];
 

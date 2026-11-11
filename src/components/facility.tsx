@@ -1,7 +1,7 @@
 import { ChevronRight, Lock } from 'lucide-react';
 import { bikesAvailable, type Facility } from '../data/rewards';
 import { cx, fmt } from '../lib/format';
-import { usesCredits } from '../lib/pricing';
+import { facilityPayment } from '../lib/pricing';
 import { useProfile } from '../store/hooks';
 import { useStore } from '../store/useStore';
 import { FACILITY_ICON } from './TownshipMap';
@@ -18,20 +18,22 @@ export function DockSlots({ bikes, docks }: { bikes: number; docks: number }) {
   );
 }
 
+const KIND_TINT = { ebike: 'bg-leaf-soft text-leaf-deep', clubhouse: 'bg-berry-soft text-berry-ink', parking: 'bg-sky-soft text-sky-deep', shop: 'bg-sky-soft text-sky-deep' };
+
 export function FacilityRow({ f, active }: { f: Facility; active?: boolean }) {
   const persona = useStore((s) => s.persona);
   const simTime = useStore((s) => s.simTime);
   const prof = useProfile();
   const Icon = FACILITY_ICON[f.icon];
   const ebike = f.kind === 'ebike';
-  const resident = usesCredits(persona);
-  const locked = !resident && !ebike;
+  const pay = facilityPayment(f, persona, prof);
+  const locked = pay.via === 'locked';
   const bikes = ebike ? bikesAvailable(f, simTime) : 0;
-  const short = resident && !ebike ? f.cost - prof.sc : 0;
+  const short = pay.via === 'sc' && !pay.enough ? pay.price - prof.sc : 0;
 
   return (
     <Card to={`/rewards/redeem/${f.id}`} className={cx('flex items-center gap-3 p-3.5', active && 'card-active', locked && 'opacity-60')}>
-      <span className={cx('flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl', ebike ? 'bg-leaf-soft text-leaf-deep' : 'bg-berry-soft text-berry-ink')}>
+      <span className={cx('flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl', KIND_TINT[f.kind])}>
         <Icon size={22} />
       </span>
       <div className="min-w-0 flex-1">
@@ -46,7 +48,15 @@ export function FacilityRow({ f, active }: { f: Facility; active?: boolean }) {
         )}
       </div>
       <span className="shrink-0 text-right font-bold tabular">
-        {locked ? <Lock size={18} className="text-sun-deep" /> : resident ? <span className="text-sun-ink">{f.cost} SC</span> : `RM ${(f.saverRm ?? 0).toFixed(0)}`}
+        {pay.via === 'locked' ? (
+          <Lock size={18} className="text-sun-deep" />
+        ) : pay.via === 'pass' ? (
+          <span className="text-leaf-ink">Pass</span>
+        ) : pay.via === 'sc' ? (
+          <span className="text-sun-ink">{pay.price} SC</span>
+        ) : (
+          `RM ${pay.price.toFixed(0)}`
+        )}
       </span>
       <ChevronRight size={18} className="shrink-0 text-ink-subtle" />
     </Card>

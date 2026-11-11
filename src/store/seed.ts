@@ -70,7 +70,7 @@ const SEEDS: Record<PersonaId, { carry: number; saver: number; charged: number; 
   },
   public: {
     carry: 0,
-    saver: 6.4,
+    saver: 36,
     charged: 28,
     greenCharges: 2,
     surplusCharges: 1,
@@ -82,7 +82,7 @@ const SEEDS: Record<PersonaId, { carry: number; saver: number; charged: number; 
       { daysAgo: 8, hour: 16.1, bayId: 'lakeside', kwh: 8, solarPct: 92, pay: 'rm', rate: 1.4 },
     ],
     rides: [{ daysAgo: 3, hour: 13, facilityId: 'ebike-central', pay: 'saver' }],
-    topup: { daysAgo: 9, pay: 20, get: 30 },
+    topup: { daysAgo: 9, pay: 50, get: 60 },
   },
   elder: {
     carry: 0,
@@ -156,8 +156,8 @@ export function seedProfile(id: PersonaId, now: number, weather: Weather): Profi
   }
   seed.rides?.forEach((r, i) => {
     const f = getFacility(r.facilityId);
-    txs.push({ id: `seed-ride-${id}-${i}`, type: 'redeem', at: dayStart - r.daysAgo * DAY + r.hour * HOUR, title: f.item, place: f.name, facilityId: f.id, ...(r.pay === 'sc' ? { sc: -f.cost } : { saver: -(f.saverRm ?? 2) }) });
-    if (r.pay === 'sc') sc -= f.cost;
+    txs.push({ id: `seed-ride-${id}-${i}`, type: 'redeem', at: dayStart - r.daysAgo * DAY + r.hour * HOUR, title: f.item, place: f.name, facilityId: f.id, ...(r.pay === 'sc' ? { sc: -(f.cost ?? 0) } : { saver: -(f.saverRm ?? 0) }) });
+    if (r.pay === 'sc') sc -= f.cost ?? 0;
   });
   seed.coolDaysAgo?.forEach((d, i) => {
     txs.push({ id: `seed-cool-${id}-${i}`, type: 'checkin', at: dayStart - d * DAY + 13.5 * HOUR, title: 'SunD Cool check-in', place: 'Elmina Community Hall' });
@@ -170,6 +170,7 @@ export function seedProfile(id: PersonaId, now: number, weather: Weather): Profi
   const profile: Profile = {
     sc: p.reward === 'none' ? 0 : Math.max(sc, p.reward === 'slice' ? 6 : 18),
     saver,
+    pass: null,
     cashShare,
     todayKwh,
     todayCredits: today.credits,

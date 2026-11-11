@@ -3,7 +3,7 @@ export type Lang = 'en' | 'ms' | 'zh';
 export type Weather = 'sunny' | 'cloudy' | 'rainy';
 export type BayType = 'mall' | 'office' | 'park' | 'clubhouse' | 'commercial' | 'condo' | 'petrol';
 export type BayStatus = 'surplus' | 'normal' | 'busy' | 'grid';
-export type TxType = 'earn' | 'charge' | 'redeem' | 'topup' | 'checkin';
+export type TxType = 'earn' | 'charge' | 'redeem' | 'topup' | 'checkin' | 'pass';
 export type ToastIcon = 'sun' | 'leaf' | 'bolt' | 'gift' | 'star' | 'moon' | 'alert' | 'heat' | 'snow';
 
 export interface Tx {
@@ -16,6 +16,8 @@ export interface Tx {
   rebateRm?: number; // electricity bill rebate earned (roof hosts and slice holders)
   bonusSc?: number;
   saver?: number; // Saver Credit delta, RM
+  passKwh?: number; // charging kWh covered by the SunD Pass
+  viaPass?: boolean; // eBike ride or mall parking covered by the SunD Pass
   rm?: number; // card / FPX payment, RM (negative = paid)
   kwh?: number;
   solarPct?: number;
@@ -35,9 +37,26 @@ export interface Voucher {
   at: number;
 }
 
+/** An active SunD Pass: a monthly allowance of charging plus unlimited eBike rides and mall parking. */
+export interface Pass {
+  planId: string;
+  price: number;
+  startedAt: number; // sim time the pass was bought
+  renewsAt: number; // end of the current month of the pass
+  /** End of a 12-month plan's minimum term (absent for month to month). */
+  commitUntil?: number;
+  autoRenew: boolean;
+  kwhLeft: number;
+  /** eBike rides and parking entries this pass month (unlimited; counted to show the value). */
+  rides: number;
+  parks: number;
+}
+
 export interface Profile {
   sc: number;
   saver: number;
+  /** SunD Pass, if this person has one. */
+  pass?: Pass | null;
   /** Share of the reward taken as a bill rebate (0 … MAX_CASH_REBATE). The rest is SunD Credits. */
   cashShare: number;
   todayKwh: number;
@@ -86,12 +105,12 @@ export interface Session {
   delivered: number;
   solarKwh: number;
   solarPct: number;
+  passKwh: number; // kWh covered by the SunD Pass so far
   scUsed: number;
   saverUsed: number;
   rm: number;
   rate: number; // RM/kWh for anything not covered by credits
   useCredits: boolean;
-  saverOk: boolean;
   surplus: boolean;
   bonusRate: number;
   startSoc: number;

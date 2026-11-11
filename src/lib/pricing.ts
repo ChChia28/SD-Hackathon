@@ -5,7 +5,13 @@ import {
   PUBLIC_SURPLUS_PRICE,
   RESIDENT_PRICE,
   RESIDENT_SURPLUS_PRICE,
-  SAVER_MIN_SOC,
+  EBIKE_RIDE_RM,
+  MALL_PARKING_RM,
+  PASS_KWH,
+  PASS_PLANS,
+  PASS_TYPICAL_MONTH,
+  SAVER_PACKS,
+  type PassAudience,
   SOLAR_BAY_BONUS,
   SOLAR_SELL_RATE_RM,
   SURPLUS_BONUS,
@@ -13,7 +19,8 @@ import {
   SLICE_MAX_BILL_SHARE,
 } from '../data/constants';
 import { PERSONAS } from '../data/personas';
-import type { BayLive, BayStatus, PersonaId } from '../store/types';
+import type { Facility } from '../data/rewards';
+import type { BayStatus, PersonaId, Profile } from '../store/types';
 
 /**
  * Splits newly generated solar into SunD Credits and a bill rebate, by the person's reward model.
@@ -55,30 +62,71 @@ export function rateFor(persona: PersonaId, status: BayStatus): number {
 export const discountPct = (rate: number, persona: PersonaId = 'public') =>
   Math.round((1 - rate / (usesCredits(persona) ? RESIDENT_PRICE : PUBLIC_PRICE)) * 100);
 
-/** Saver Credits only work where the bay has plenty of stored solar. */
-export const saverEligible = (live: BayLive) => live.soc >= SAVER_MIN_SOC;
-
 export function bonusRateFor(persona: PersonaId, status: BayStatus, solarPct: number): number {
   if (!usesCredits(persona)) return 0;
   if (status === 'surplus') return SURPLUS_BONUS;
   return solarPct >= 50 ? SOLAR_BAY_BONUS : 0;
 }
 
-/** How a charge of `kwh` would be paid: SunD Credits first, then Saver Credits, then card. */
-export function estimatePayment(
-  kwh: number,
-  balance: { sc: number; saver: number },
-  rate: number,
-  useCredits: boolean,
-  saverOk: boolean,
-) {
+/**
+ * How a charge of `kwh` would be paid: SunD Pass kWh first (they reset monthly), then SunD Credits,
+ * then Saver Credits (any bay), then card. `pass` is in kWh; the rest in RM / SC.
+ */
+export function estimatePayment(kwh: number, balance: { sc: number; saver: number; passKwh: number }, rate: number, useCredits: boolean) {
   let rem = kwh;
+  const pass = Math.min(rem, Math.max(0, balance.passKwh));
+  rem -= pass;
   const sc = useCredits ? Math.min(rem * rate, Math.max(0, balance.sc)) : 0;
   rem -= sc / rate;
-  const saver = saverOk ? Math.min(rem * rate, Math.max(0, balance.saver)) : 0;
+  const saver = Math.min(rem * rate, Math.max(0, balance.saver));
   rem -= saver / rate;
   const rm = Math.max(0, rem * rate);
-  return { sc, saver, rm };
+  return { pass, sc, saver, rm };
+}
+
+/** Bonus on a Saver pack, whole %: RM 50 → 60 is 20. */
+export const saverBonusPct = (p: { pay: number; get: number }) => Math.round((p.get / p.pay - 1) * 100);
+/** The biggest Saver bonus on offer, whole % (the top pack). */
+export const SAVER_MAX_PCT = Math.max(...SAVER_PACKS.map(saverBonusPct));
+export const SAVER_MIN_PCT = Math.min(...SAVER_PACKS.map(saverBonusPct));
+
+/** Standard charging rate for a Pass audience: RM 0.90 for residents (paid in credits), RM 1.40 for the public. */
+export const standardRate = (who: PassAudience) => (who === 'resident' ? RESIDENT_PRICE : PUBLIC_PRICE);
+export const audienceOf = (persona: PersonaId): PassAudience => (usesCredits(persona) ? 'resident' : 'public');
+
+/**
+ * What a SunD Pass month is worth at the standard rate: all 100 kWh plus a month of eBike rides and mall parking.
+ * Public: RM 140 + 8 × RM 2 + 8 × RM 3 = RM 180. Residents: RM 90 + RM 40 = RM 130.
+ */
+export const passMonthValue = (who: PassAudience, use = PASS_TYPICAL_MONTH) => PASS_KWH * standardRate(who) + use.rides * EBIKE_RIDE_RM + use.parks * MALL_PARKING_RM;
+
+/** SunD Pass plans this person can buy: resident plans for SD residents, the public plan for everyone else. */
+export const passPlansFor = (persona: PersonaId) => PASS_PLANS.filter((p) => p.who === audienceOf(persona));
+
+/** Charging kWh left on this person's SunD Pass (0 without one). */
+export const passKwhLeft = (prof: Pick<Profile, 'pass'>) => prof.pass?.kwhLeft ?? 0;
+
+export type FacilityPay =
+  | { via: 'locked' }
+  | { via: 'pass' }
+  | { via: 'sc' | 'saver'; price: number; enough: boolean };
+
+/**
+ * How this person pays for a facility right now.
+ * - SunD Pass: eBikes and mall parking are included.
+ * - SunD Credits (residents): solar-powered facilities only, i.e. eBikes and the clubhouse.
+ * - Saver Credits: anywhere in SunD, including mall parking and shops. The clubhouse stays residents-only.
+ * Credits are tried first, then Saver; if neither covers it, the person's main option is returned with enough = false.
+ */
+export function facilityPayment(f: Facility, persona: PersonaId, prof: Pick<Profile, 'sc' | 'saver' | 'pass'>): FacilityPay {
+  const resident = usesCredits(persona);
+  if (f.kind === 'clubhouse' && !resident) return { via: 'locked' };
+  if (prof.pass && (f.kind === 'ebike' || f.kind === 'parking')) return { via: 'pass' };
+  const sc = resident && f.cost !== undefined ? { via: 'sc' as const, price: f.cost, enough: prof.sc >= f.cost } : null;
+  const saver = f.saverRm !== undefined ? { via: 'saver' as const, price: f.saverRm, enough: prof.saver >= f.saverRm } : null;
+  if (sc?.enough) return sc;
+  if (saver?.enough) return saver;
+  return sc ?? saver ?? { via: 'locked' };
 }
 
 /** Slice credits use one flat SunD rate for every household (A11). */
