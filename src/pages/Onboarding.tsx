@@ -1,4 +1,4 @@
-import { Building2, Check, CircleUser, Coins, Footprints, HeartHandshake, Home as HomeIcon, KeyRound, Loader2, MapPin, ReceiptText, Snowflake, Sun, Zap } from 'lucide-react';
+import { BadgeCheck, Building2, Check, CircleUser, Coins, Footprints, HeartHandshake, Home as HomeIcon, KeyRound, Loader2, MapPin, ReceiptText, Snowflake, Sun, Zap } from 'lucide-react';
 import { SLICE_KWH_PER_MONTH, SOLAR_SELL_RATE_RM, YIELD_KWH_PER_KWP_DAY } from '../data/constants';
 import { useEffect, useState, type ReactNode } from 'react';
 import { SunMark } from '../components/shell';
@@ -62,11 +62,12 @@ const SLIDES: { title: string; caption: string; visual: ReactNode }[] = [
   },
 ];
 
-const PERSONA_ICON = { landed: HomeIcon, condo: Building2, public: CircleUser, elder: HeartHandshake };
+const PERSONA_ICON = { landed: HomeIcon, condo: Building2, public: CircleUser, member: BadgeCheck, elder: HeartHandshake };
 const PERSONA_TAGS: Record<PersonaId, string[]> = {
   landed: ['CREAM roof host', 'Credits on top of lease'],
   condo: ['No roof', '1 kW solar slice'],
   public: ['Pay per kWh', 'Saver deals'],
+  member: ['SunD Pass · RM 129/month', '100 kWh + eBike + parking'],
   elder: ['Sponsored slice', 'Heat alerts'],
 };
 
@@ -76,18 +77,24 @@ const TOWNSHIPS = [
   { name: 'Serenia City', live: false },
 ];
 
-type Step = 'splash' | 'intro' | 'persona' | 'link' | 'detect' | 'found' | 'mix';
+export type OnboardingStep = 'splash' | 'intro' | 'persona' | 'link' | 'detect' | 'found' | 'mix';
+type Step = OnboardingStep;
 
-export default function Onboarding() {
+/**
+ * First-run flow. Pitch mode opens it at a fixed step (`start`) and `hold`s it there, so the splash
+ * doesn't move on by itself while the presenter talks.
+ */
+export default function Onboarding({ start = 'splash', hold = false }: { start?: Step; hold?: boolean }) {
   const complete = useStore((s) => s.completeOnboarding);
   const setActivePersona = useStore((s) => s.setPersona);
-  const [step, setStep] = useState<Step>('splash');
+  const [step, setStep] = useState<Step>(start);
   const [slide, setSlide] = useState(0);
   const [persona, setPersona] = useState<PersonaId>('condo');
-  const [unit, setUnit] = useState('');
+  const [unit, setUnit] = useState(start === 'link' ? PERSONAS.condo.address : '');
   const p = PERSONAS[persona];
 
   useEffect(() => {
+    if (hold) return;
     if (step === 'splash') {
       const id = window.setTimeout(() => setStep('intro'), 1800);
       return () => window.clearTimeout(id);
@@ -96,19 +103,21 @@ export default function Onboarding() {
       const id = window.setTimeout(() => setStep('found'), 1400);
       return () => window.clearTimeout(id);
     }
-  }, [step]);
+  }, [step, hold]);
 
   if (step === 'splash')
     return (
-      <button type="button" onClick={() => setStep('intro')} className="relative flex flex-1 flex-col items-center justify-center gap-5 bg-sky px-8 text-center text-white">
-        <span className="star-pop">
+      <button type="button" onClick={() => !hold && setStep('intro')} className="relative flex flex-1 flex-col items-center justify-center gap-5 bg-sky px-8 text-center text-white">
+        <span className="star-pop" data-pitch="splash-logo">
           <SunMark size={96} />
         </span>
         <div>
-          <div className="font-display text-[44px] font-bold leading-[48px]">
+          <div className="font-display text-[44px] font-bold leading-[48px]" data-pitch="splash-title">
             Sun<span className="text-sun-bright">D</span> Wallet
           </div>
-          <div className="mt-2 text-[20px] leading-8 text-sky-soft">The sun is already on our roofs.</div>
+          <div className="mt-2 text-[20px] leading-8 text-sky-soft" data-pitch="splash-tagline">
+            The sun is already on our roofs.
+          </div>
         </div>
         <div className="absolute bottom-10 text-[14px] text-sky-soft">by Sime Darby Property · demo</div>
       </button>
@@ -175,7 +184,8 @@ export default function Onboarding() {
           size="lg"
           className="mt-8 w-full"
           onClick={() => {
-            if (persona === 'public') return complete('public');
+            // No home to link for drivers from outside SD (Daniel pays per kWh, Farah is on the SunD Pass).
+            if (p.reward === 'none') return complete(persona);
             setUnit(p.address);
             setStep('link');
           }}
@@ -191,8 +201,8 @@ export default function Onboarding() {
         <h1 className="text-[32px] font-bold leading-10">Link your home</h1>
         <div className="mt-6 text-[15px] font-bold text-ink-muted">Township</div>
         <div className="mt-2 flex flex-col gap-2">
-          {TOWNSHIPS.map((t) => (
-            <div key={t.name} className={cx('card flex min-h-14 items-center gap-3 px-4', t.live ? 'card-active' : 'opacity-60')}>
+          {TOWNSHIPS.map((t, i) => (
+            <div key={t.name} data-pitch={t.live ? 'town-live' : i === 1 ? 'town-soon' : undefined} className={cx('card flex min-h-14 items-center gap-3 px-4', t.live ? 'card-active' : 'opacity-60')}>
               <MapPin size={20} className={t.live ? 'text-sky-deep' : 'text-ink-subtle'} />
               <span className="flex-1 font-bold">{t.name}</span>
               {t.live ? <Check size={20} className="text-sky-deep" /> : <Pill tone="slate">Soon</Pill>}
@@ -209,7 +219,7 @@ export default function Onboarding() {
           className="mt-2 w-full rounded-[12px] border border-outline bg-surface px-5 py-4 text-[18px] outline-none focus:border-sky focus:ring-4 focus:ring-sky-soft"
         />
         <Button size="lg" className="mt-8 w-full" onClick={() => setStep('detect')}>
-          {PERSONAS[persona].reward === 'cream' ? 'Find my solar' : 'Find my slice'}
+          {hold ? 'Continue' : PERSONAS[persona].reward === 'cream' ? 'Find my solar' : 'Find my slice'}
         </Button>
       </div>
     );

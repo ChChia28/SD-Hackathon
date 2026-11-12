@@ -2,8 +2,9 @@ import { BadgeCheck, Bike, Check, Loader2, SquareParking, Zap, type LucideIcon }
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Ring } from '../../components/charts';
+import { passBenefits } from '../../components/pass';
 import { PayMethodPicker, PAY_METHODS } from '../../components/payment';
-import { Button, Card, IconBubble, LinkButton, PageHeader, Pill, Row, Stat, Toggle } from '../../components/ui';
+import { Button, Card, IconBubble, LinkButton, PageHeader, Pill, Row, SectionTitle, Toggle } from '../../components/ui';
 import { EBIKE_RIDE_RM, MALL_PARKING_RM, PASS_KWH, PASS_PLANS, PASS_TYPICAL_MONTH, PUBLIC_PRICE, RESIDENT_PRICE } from '../../data/constants';
 import { cx, fmt, fmtDate, fmtInt, fmtRm } from '../../lib/format';
 import { audienceOf, passMonthValue, passPlansFor, SAVER_MAX_PCT, usesCredits } from '../../lib/pricing';
@@ -70,9 +71,9 @@ export default function PassPage() {
             </Pill>
           </div>
           <div className="mt-8 grid w-full gap-3">
-            <LinkButton to="/map" size="lg">
-              Find a SunD Bay
-            </LinkButton>
+            <Button size="lg" onClick={() => setStage('choose')}>
+              Open my Pass
+            </Button>
             <Button variant="secondary" onClick={() => nav('/wallet')}>
               Back to wallet
             </Button>
@@ -81,7 +82,7 @@ export default function PassPage() {
       </>
     );
 
-  if (prof.pass) return <ActivePass pass={prof.pass} resident={resident} />;
+  if (prof.pass) return <ActivePass pass={prof.pass} resident={resident} home={persona.home} />;
 
   return (
     <>
@@ -150,12 +151,13 @@ export default function PassPage() {
   );
 }
 
-function ActivePass({ pass, resident }: { pass: Pass; resident: boolean }) {
+function ActivePass({ pass, resident, home }: { pass: Pass; resident: boolean; home: { x: number; y: number } }) {
   const simTime = useStore((s) => s.simTime);
   const setAutoRenew = useStore((s) => s.setPassAutoRenew);
   const plan = PASS_PLANS.find((p) => p.id === pass.planId);
+  const rate = kwhRate(resident);
   const usedKwh = PASS_KWH - pass.kwhLeft;
-  const chargeRm = usedKwh * kwhRate(resident);
+  const chargeRm = usedKwh * rate;
   const ridesRm = pass.rides * EBIKE_RIDE_RM;
   const parksRm = pass.parks * MALL_PARKING_RM;
   const value = chargeRm + ridesRm + parksRm;
@@ -164,7 +166,7 @@ function ActivePass({ pass, resident }: { pass: Pass; resident: boolean }) {
   return (
     <>
       <PageHeader title="SunD Pass" back="/wallet" />
-      <div className="flex flex-col gap-5 px-5 pb-10 pt-5">
+      <div className="flex flex-col gap-6 px-5 pb-10 pt-5">
         <div className="flex flex-col items-center text-center">
           <Ring value={pass.kwhLeft / PASS_KWH} size={200} stroke={16}>
             <span className="font-display text-[48px] font-bold leading-[48px] tabular">{fmtInt(pass.kwhLeft)}</span>
@@ -180,21 +182,40 @@ function ActivePass({ pass, resident }: { pass: Pass; resident: boolean }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <Stat tone="leaf" icon={<Bike size={16} />} label="eBike rides" value={pass.rides} unit="· unlimited" />
-          <Stat tone="leaf" icon={<SquareParking size={16} />} label="Mall parking" value={pass.parks} unit="· unlimited" />
-        </div>
+        <section>
+          <SectionTitle>What your Pass covers</SectionTitle>
+          <Card tone="leaf" className="divide-y divide-leaf-soft">
+            {passBenefits(pass, home).map((b) => (
+              <div key={b.id} className="flex min-h-[76px] items-center gap-3 px-4 py-3">
+                <IconBubble tone="leaf">
+                  <b.Icon size={22} />
+                </IconBubble>
+                <div className="min-w-0 flex-1">
+                  <div className="font-bold leading-6">{b.title}</div>
+                  <div className="text-[14px] leading-5 text-ink-muted">{b.sub}</div>
+                </div>
+                <LinkButton to={b.to} variant="secondary" className="!min-h-11 shrink-0 !px-3 text-[15px]">
+                  {b.cta}
+                </LinkButton>
+              </div>
+            ))}
+          </Card>
+        </section>
 
-        <Card tone="sky" className="divide-y divide-sky-soft px-5 py-1">
-          <Row label={`Charging · ${fmt(usedKwh)} kWh`} value={fmtRm(chargeRm)} />
-          <Row label={`eBike · ${pass.rides} × RM ${EBIKE_RIDE_RM}`} value={fmtRm(ridesRm)} />
-          <Row label={`Parking · ${pass.parks} × RM ${MALL_PARKING_RM}`} value={fmtRm(parksRm)} />
-          <Row label="Value used this month" value={fmtRm(value)} strong />
-          <Row label="You pay" value={`${fmtRm(pass.price)}/month`} />
-        </Card>
-        <p className={cx('-mt-2 text-center text-[15px] font-bold', value >= pass.price ? 'text-leaf-ink' : 'text-ink-muted')}>
-          {value >= pass.price ? `${fmtRm(value - pass.price)} ahead this month` : `${fmtRm(pass.price - value)} more use to break even`}
-        </p>
+        <section>
+          <SectionTitle>Value this month</SectionTitle>
+          <Card tone="sky" className="divide-y divide-sky-soft px-5 py-1">
+            <Row label={`Charging · ${fmt(usedKwh, 0)} kWh × ${fmtRm(rate)}`} value={fmtRm(chargeRm)} />
+            <Row label={`eBike · ${pass.rides} × ${fmtRm(EBIKE_RIDE_RM)}`} value={fmtRm(ridesRm)} />
+            <Row label={`Parking · ${pass.parks} × ${fmtRm(MALL_PARKING_RM)}`} value={fmtRm(parksRm)} />
+            <Row label="Value used" value={fmtRm(value)} strong />
+            <Row label="You pay" value={`${fmtRm(pass.price)}/month`} />
+          </Card>
+          <p className={cx('mt-2 text-center text-[15px] font-bold', value >= pass.price ? 'text-leaf-ink' : 'text-ink-muted')}>
+            {value >= pass.price ? `Paid for itself · ${fmtRm(value - pass.price)} ahead` : `${fmtRm(pass.price - value)} more use to break even`}
+          </p>
+          <p className="mt-1 text-center text-[13px] text-ink-muted">At normal prices, without the Pass</p>
+        </section>
 
         <Card className="divide-y divide-outline px-5 py-1">
           <Row label="Plan" value={plan?.label ?? 'SunD Pass'} />
@@ -208,19 +229,9 @@ function ActivePass({ pass, resident }: { pass: Pass; resident: boolean }) {
             {!locked && <Toggle on={pass.autoRenew} onChange={setAutoRenew} label="Auto-renew SunD Pass" />}
           </div>
         </Card>
-
-        <div className="grid grid-cols-3 gap-2">
-          <LinkButton to="/map" variant="secondary" className="!px-2">
-            <Zap size={18} /> Charge
-          </LinkButton>
-          <LinkButton to="/map?tab=ebike" variant="secondary" className="!px-2">
-            <Bike size={18} /> Ride
-          </LinkButton>
-          <LinkButton to="/rewards/redeem/mall-parking" variant="secondary" className="!px-2">
-            <SquareParking size={18} /> Park
-          </LinkButton>
-        </div>
-        <p className="-mt-2 text-center text-[14px] text-ink-muted">Pass kWh are used first · {PASS_KWH} kWh reset every month</p>
+        <p className="-mt-2 text-center text-[14px] leading-5 text-ink-muted">
+          Pass kWh are used first at every SunD Bay. Past {PASS_KWH} kWh you pay as usual. Unused kWh don’t roll over.
+        </p>
       </div>
     </>
   );

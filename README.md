@@ -8,6 +8,13 @@ Live demo for **SunD**, Team UrbanByte's township solar ecosystem for the Sime D
 
 **Live demo:** https://chchia28.github.io/SD-Hackathon/ (works offline after the first visit and can be installed to a phone's home screen)
 
+The link opens a **home page** with two buttons:
+
+- **Pitch mode:** the 10-slide walkthrough, one annotated app screen per slide (below).
+- **Live prototype:** the full, clickable app.
+
+Both have a **Home** button in the top corner to come back and switch. Links straight into the app still work, for example `#/pitch` (slide 1), `#/pitch/4` (slide 4) or `#/map`.
+
 Built on Chan Kin Chung's original SunD Wallet prototype. v2 keeps its layout and components, recolours it to the Sime Darby palette (navy `#1A1F3A`, red `#ED1B24`, Inter), and adds the features from the final deck.
 
 ## Run it
@@ -23,13 +30,14 @@ npm run build      # type-check + tests + static site in dist/
 
 On Windows, run these in Command Prompt (not PowerShell) inside this folder.
 
-## Four residents, one roof (deck slide 3)
+## Five people, one township (deck slide 3, plus a SunD Pass member)
 
 | Person | Who | How SunD reaches them |
 |---|---|---|
 | **Aisyah**, 29 | Condo renter, no roof | 1 kW solar slice ≈ 110 kWh/month ≈ RM 40 off her bill at her own 36 sen rate |
 | **Mr Lim**, 48 | Landed CREAM roof host (4.4 kWp = 1 MWp ÷ 228 roofs) | Credits on top of his lease; charges his e.MAS 5 with them |
-| **Daniel**, 35 | Public EV driver | Pays per kWh (RM 1.40, surplus RM 1.10), Saver Credits +20–30%, SunD Pass RM 129 a month |
+| **Daniel**, 35 | Public EV driver | Pays per kWh (RM 1.40, surplus RM 1.10), Saver Credits +10–30% (RM 1.08 a kWh after a RM 500 top-up), SunD Pass RM 129 a month |
+| **Farah**, 31 | SunD Pass member, drives in to work at Elmina Central Mall | Public Pass, RM 129 a month: 100 kWh of charging, unlimited eBike rides and unlimited mall parking, each one tap from Home |
 | **Uncle Tan**, 72 | B40, lives alone | Sponsored slice, 中文 + large text, heat alert → nearest SunD Cool in one tap |
 
 ## SunD Pass and Saver Credits
@@ -39,33 +47,44 @@ Added after the deck (10 Nov 2026), so the deck, PDF and video still show the ol
 | | What you get | Price |
 |---|---|---|
 | **SunD Pass** (Wallet → SunD Pass) | 100 kWh at any SunD Bay (≈ RM 90 at the resident rate, RM 140 public) + unlimited SunD eBike + unlimited mall parking, every month | Residents RM 79 (12-month plan) or RM 89 month to month · public RM 129 |
-| **Saver Credits** (Wallet → Buy Saver) | Top up more, get more, spendable anywhere in SunD: charging at every bay, eBikes, mall parking, the clubhouse (residents) and mall shops | RM 50 → 60 (+20%) · RM 100 → 125 (+25%) · RM 200 → 260 (+30%) |
+| **Saver Credits** (Wallet → Buy Saver) | Top up more, get more, spendable anywhere in SunD: charging at every bay, eBikes, mall parking, the clubhouse (residents) and mall shops | RM 50 → 55 (+10%) · RM 100 → 115 (+15%) · RM 200 → 240 (+20%) · RM 300 → 375 (+25%) · RM 500 → 650 (+30%), the Sheet's and the v12 deck's tiers |
 
 - **Why the Pass stays the better deal:** a typical Pass month (all 100 kWh + 8 eBike rides + 8 parking entries) is worth RM 180 for the public (+40% on RM 129) and RM 130 for residents (+46% on RM 89, +65% on RM 79). Saver is capped at +30%, and a test fails the build if the top Saver bonus ever catches up. The Saver screen shows each pack in kWh and points regular chargers to the Pass; the Pass screen shows its typical-month value against Saver's best.
 - **Pay order at a bay:** Pass kWh first (they reset monthly), then SunD Credits, then Saver Credits, then card.
 - **Where each one works:** SunD Credits stay on solar-powered facilities (bays, eBikes, clubhouse, SunD Cool). Saver Credits work everywhere. The Pass covers charging, eBikes and mall parking.
 - **Elmina Central Mall** (Rewards tab): mall parking (RM 3 an entry, free with the Pass) and shop vouchers, paid with Saver Credits.
-- The Pass screen shows kWh left, rides and parking used, the value used against the price, and auto-renew (locked on for the 12-month term). Prices and plans live in `src/data/constants.ts` (`PASS_PLANS`, `SAVER_PACKS`).
+- **After buying:** Home and Wallet show a SunD Pass card with kWh left and three tiles: **Charge** (Scan to charge), **eBike** (unlocks the nearest dock) and **Parking** (car park exit code). eBike and parking cost RM 0 on the Pass.
+- The Pass screen lists what the Pass covers, each line with its own button, then the value used with its working (e.g. 66 kWh × RM 1.40 + 6 × RM 2 + 10 × RM 3 = RM 134.40 against RM 129) and auto-renew (locked on for the 12-month term). Prices and plans live in `src/data/constants.ts` (`PASS_PLANS`, `SAVER_PACKS`).
+- **Farah** opens on day 14 of her public Pass: 34 of 100 kWh left, 6 rides and 10 parking entries used (seeded in `src/store/seed.ts`; a test checks the numbers).
 
-## Pitch mode (deck order)
+## Pitch mode (follows SunD_Pitch_v12_10slides.pdf)
 
-Open the presenter controls (beside the phone on a laptop; long-press the sun logo on a phone) and press **Start pitch mode**. Each step sets the person, time and screen, and shows the matching slide number above the phone. Use **← →**, a presentation clicker (Page Up/Down) or the arrows on the slide tag. **Esc** exits.
+Every step goes with one page of the 10-slide deck and sets the person, the clock and one app screen.
 
-| # | Slide | What the audience sees |
-|---|---|---|
-| 1 | 3 · Target user | Aisyah's Home: her 1 kW slice |
-| 2 | 4 · Solution | Bill today vs with her slice |
-| 3 | 6 · How it works | 11 am solar-peak nudges (washer, pre-cool, charge) |
-| 4 | 6 · How it works | Mr Lim at the 10-lot pilot bay in solar surplus |
-| 5 | 6 · How it works | Charging, paid in credits |
-| 6 | 5 · Innovation | Daniel's public price at the same bay vs market RM 1.30–1.80 |
-| 7 | 6 · Hybrid | Night: bays on stored solar, grid only as backup |
-| 8 | 7 · Visual concept | SunD Walk routes ranked by a heat map, −3.1 °C |
-| 9 | 3 · People | Uncle Tan's heat alert in 中文, read aloud |
-| 10 | 6 · How it works | SunD Cool check-in |
-| 11 | 6 · 2027 extension | SunD Balcony waitlist |
-| 12 | 9 · Feasibility | SDP dashboard: 7 KPIs + what-if calculator |
-| 13 | 10 · Why win | One loop for Elmina |
+- **For the audience (phones):** scan the QR code, open the home page and tap **Pitch mode**. Each step shows a slide bar on top (slide, headline, and on slide 4 the time and moment), the app in the middle with numbered red rings, and a caption card underneath saying what each number means, with **Back / Next** and a dot per slide. Swiping left or right on the slide bar, the captions or a picture page also moves through it. The last step's button is **Explore the app**, and **Home** (top left) returns to the home page.
+- **For the presenter (laptop, 1200 px wide or more):** the slide on the left with the QR code on slides 1, 9 and 10, the app in the middle, and up to three labels on the right, each with a straight line to the part of the app it explains. Start it from the home page, the presenter controls or `#/pitch`. Use **← →**, a clicker (Page Up/Down), the slide numbers 1–10 or the moment list on slide 4. **Home** (top of the slide panel) or **Esc** goes back to the home page.
+- **Held still:** the clock is paused, a charge holds at its value and pop-ups stay hidden.
+- **Three picture pages** replace the phone: slide 1 (the township picture with its six SunD facilities and the solar loop: make, use, spend, grow), slide 2 (who pays, who feels it) and slide 7 (bear, base and bull cases).
+
+| # | Slide | Screen | Labels |
+|---|---|---|---|
+| 1 | 1 · SunD | Picture: the deck's township illustration (1 mall roof, 2 SunD Bay, 3 home solar, 4 balcony, 5 Walk, 6 Cool; Phase 1 and 2) and the solar loop | |
+| 2 | 2 · The problem | Picture: who pays to build (100% Sime Darby → top-ups 53%) and what a resident feels (almost nothing → +30%) | |
+| 3 | 3 · The solution | Map | Phase 1: mall roof + SunD Bay · green pin = spare solar · Phase 2: Walk and Cool |
+| 4 | 4 · Her day, 7:00 AM | SunD Balcony | 800 W kit ≈ 47 kWh a month · Phase 2, 2027 sandbox |
+| 5 | 4 · Her day, 8:10 AM | Top-up, RM 500 chosen | RM 500 in, RM 650 to spend · spend anywhere in Sime Darby |
+| 6 | 4 · Her day, 8:30 AM | SunD Walk A | Solar roof over the hottest route · 3.1 °C cooler in its shade |
+| 7 | 4 · Her day, 8:45 AM | Charging at the mall bay, held at 72% | At the mall's SunD Bay · solar from this canopy · RM 0 cash |
+| 8 | 4 · Her day, 2:00 PM | SunD Cool on a heat-alert day | Level 1, 36 °C · nearest cool room · cooled by solar |
+| 9 | 4 · Her day, 8:00 PM | Wallet activity | Coffee and mall parking on credits · this morning's solar charge |
+| 10 | 5 · Why SunD | Daniel at the mall bay | Made on site · RM 1.40 ÷ 1.30 = RM 1.08 a kWh with a RM 500 top-up |
+| 11 | 6 · Business model | Rewards: eBikes and the mall | eBikes on Sime Darby's solar · spent in Sime Darby's own mall |
+| 12 | 7 · The numbers | Picture: NPV RM 2.26M, IRR 12.0%, payback 9.0 years; bear / base / bull NPV RM 0.69M / 2.26M / 4.82M | |
+| 13 | 8 · Impact | Receipt of the 8:45 charge | Sime Darby: its sun, its bay · residents: RM 0 cash · planet: CO₂ avoided |
+| 14 | 9 · Feasibility | Sign-up, township list (QR on the slide) | One Elmina precinct first · next townships once proven |
+| 15 | 10 · The ask | Home (QR on the slide) | Charge at SunD Bay, on sunshine · enjoy solar-driven facilities |
+
+The steps live in `src/components/pitch.tsx` (`PITCH_STEPS`); each label points at an element tagged `data-pitch="…"`. The SDP dashboard is no longer a pitch step: it still uses the older appendix figures (payback 4.7–6.8 years, a month-6 decision), which differ from the v12 deck.
 
 ## Presenter controls
 
@@ -73,7 +92,7 @@ Open the presenter controls (beside the phone on a laptop; long-press the sun lo
 |---|---|
 | Pitch mode | Guided demo in deck order (above) |
 | Speed / fast-forward / weather | Simulated township clock and solar output |
-| Viewing as | Aisyah, Mr Lim, Daniel, Uncle Tan; language EN / BM / 中文 and large text per person |
+| Viewing as | Aisyah, Mr Lim, Daniel, Farah, Uncle Tan; language EN / BM / 中文 and large text per person |
 | Heat alert · 36 °C | MetMalaysia Level 1 alert: banner, SunD Cool open, read-aloud |
 | Solar peak nudge | Jumps to 11 am to show the nudges |
 | SDP pilot dashboard | Full-width dashboard for Sime Darby |

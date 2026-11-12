@@ -305,9 +305,25 @@ h1, h2, h3, .font-display {
 .phone.large-text .screen { zoom: 1.04; }
 .phone.large-text .stack-lg { grid-template-columns: 1fr; }
 
-/* Pitch mode: make room for the slide tag above the phone. */
-.stage > div:has(.pitch-tag) { gap: 8px; }
-.stage > div:has(.pitch-tag) .phone { height: calc(100dvh - 48px); }
+/* The phone column. A bar sits on top (Home + mode in the live prototype, the slide in pitch mode) and the app fills
+   the rest. Phones: the whole screen. From 640 px: a framed 390 px phone, as tall as the window allows. */
+.app-col { height: 100dvh; gap: 0; }
+.app-col .phone { flex: 1 1 0; min-height: 0; height: auto; }
+.pitch-visual { height: min(844px, calc(100dvh - 48px)); }
+.app-col .pitch-visual { flex: 1 1 0; min-height: 0; height: auto; width: 100%; }
+@media (max-width: 639px) {
+  .app-col .pitch-visual { border: 0; border-radius: 0; box-shadow: none; }
+}
 @media (min-width: 640px) {
-  .stage > div:has(.pitch-tag) .phone { height: min(844px, calc(100dvh - 100px)); }
+  .app-col { height: min(896px, calc(100dvh - 48px)); width: 390px; gap: 8px; }
+}
+@media (max-width: 1199px) {
+  /* The pitch tour moves with Back / Next, so the app's own tab bar steps aside. */
+  .pitch-col nav[aria-label="Main"] { display: none; }
+}
+/* Laptops in pitch mode: slide panel, phone or picture, labels. No bars; everything as tall as the phone. */
+@media (min-width: 1200px) {
+  .pitch-col { height: auto; width: auto; }
+  .pitch-col .phone { flex: none; height: min(844px, calc(100dvh - 48px)); }
+  .pitch-col .pitch-visual { flex: none; height: min(844px, calc(100dvh - 48px)); width: min(820px, 100%); }
 }

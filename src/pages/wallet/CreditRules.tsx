@@ -10,7 +10,7 @@ const RULES: { Icon: LucideIcon; tone: Tone; title: string; fact: string; note: 
   { Icon: Coins, tone: 'sun', title: 'Credit top-up', fact: '+20%', note: 'roof hosts: RM 1 → RM 1.20 in credits' },
   { Icon: Sun, tone: 'sky', title: '1 credit', fact: 'RM 1', note: 'at SunD Bays, SunD Cool, eBikes, clubhouse' },
   { Icon: Gift, tone: 'berry', title: 'Bonus', fact: '+5–10%', note: 'solar bay · surplus bay' },
-  { Icon: Ticket, tone: 'leaf', title: 'Saver', fact: '+20–30%', note: 'RM 50 → 60, RM 100 → 125, RM 200 → 260 · anywhere in SunD' },
+  { Icon: Ticket, tone: 'leaf', title: 'Saver', fact: '+10–30%', note: 'RM 50 → 55 up to RM 500 → 650 · anywhere in SunD' },
   { Icon: BadgeCheck, tone: 'leaf', title: 'SunD Pass', fact: 'RM 79–129', note: 'a month · 100 kWh + unlimited eBike & parking · worth +40% or more' },
   { Icon: ArrowDownWideNarrow, tone: 'sky', title: 'Pay order', fact: 'Pass → SC', note: 'then Saver, then card' },
   { Icon: MapPin, tone: 'slate', title: 'Cash-out', fact: 'Never', note: 'credits are SDP rebates, not electricity sales' },

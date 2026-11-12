@@ -27,8 +27,8 @@ const onKey = (fn: () => void) => (e: KeyboardEvent) => {
   }
 };
 
-/** Stylised map of the township: zones, roads, the CREAM 5 km zone, bay pins. */
-export function TownshipMap({ views, home, mode, selected, onSelect, coolOpen = {} }: { views: BayView[]; home: { x: number; y: number }; mode: MapMode; selected?: string; onSelect: (id: string) => void; coolOpen?: Record<string, boolean> }) {
+/** Stylised map of the township: zones, roads, bay pins, and the CREAM 5 km zone for CREAM roof hosts. */
+export function TownshipMap({ views, home, mode, selected, onSelect, coolOpen = {}, cream = false }: { views: BayView[]; home: { x: number; y: number }; mode: MapMode; selected?: string; onSelect: (id: string) => void; coolOpen?: Record<string, boolean>; cream?: boolean }) {
   return (
     <svg viewBox="0 0 360 430" className="h-full w-full" role="group" aria-label="Map of Elmina township">
       <rect width="360" height="430" fill="var(--color-surface)" />
@@ -49,11 +49,15 @@ export function TownshipMap({ views, home, mode, selected, onSelect, coolOpen = 
         ))}
       </g>
 
-      {/* CREAM radius */}
-      <circle cx="190" cy="214" r="172" fill="none" stroke="var(--color-leaf-deep)" strokeWidth="1.5" strokeDasharray="6 6" opacity="0.6" />
-      <text x="190" y="36" textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--color-leaf-ink)">
-        CREAM 5 km zone
-      </text>
+      {/* CREAM radius: only relevant to CREAM roof hosts */}
+      {cream && (
+        <>
+          <circle cx="190" cy="214" r="172" fill="none" stroke="var(--color-leaf-deep)" strokeWidth="1.5" strokeDasharray="6 6" opacity="0.6" />
+          <text x="190" y="36" textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--color-leaf-ink)">
+            CREAM 5 km zone
+          </text>
+        </>
+      )}
       <text x="300" y="22" textAnchor="middle" fontSize="10" fill="var(--color-ink-muted)">
         Expressway
       </text>
@@ -94,7 +98,7 @@ export function TownshipMap({ views, home, mode, selected, onSelect, coolOpen = 
         WALKS.map((w) => {
           const isSel = selected === w.id;
           return (
-            <g key={w.id} role="button" tabIndex={0} aria-label={`${w.name}: ${w.from} to ${w.to}`} onClick={() => onSelect(w.id)} onKeyDown={onKey(() => onSelect(w.id))} style={{ cursor: 'pointer' }}>
+            <g key={w.id} data-pitch={`walk-${w.id}`} role="button" tabIndex={0} aria-label={`${w.name}: ${w.from} to ${w.to}`} onClick={() => onSelect(w.id)} onKeyDown={onKey(() => onSelect(w.id))} style={{ cursor: 'pointer' }}>
               <path d={w.d} fill="none" stroke="transparent" strokeWidth="22" />
               <path d={w.d} fill="none" stroke={w.status === 'next' ? 'var(--color-sky)' : 'var(--color-outline-strong)'} strokeWidth={isSel ? 9 : 7} strokeLinecap="round" />
               <path d={w.d} fill="none" stroke={w.status === 'next' ? 'var(--color-sun-bright)' : '#fff'} strokeWidth="2" strokeDasharray="3 5" strokeLinecap="round" />
@@ -146,6 +150,7 @@ export function TownshipMap({ views, home, mode, selected, onSelect, coolOpen = 
           return (
             <g
               key={v.bay.id}
+              data-pitch={`bay-${v.bay.id}`}
               transform={`translate(${v.bay.x} ${v.bay.y}) scale(${isSel ? 1.3 : 1})`}
               role="button"
               tabIndex={0}

@@ -54,6 +54,9 @@ function ToastItem({ t }: { t: Toast }) {
 
 export function Toasts() {
   const toasts = useStore((s) => s.toasts);
+  // Pitch mode keeps the screen still: nothing slides over what the labels point at.
+  const pitching = useStore((s) => s.pitch.on);
+  if (pitching) return null;
   return (
     <div className="pointer-events-none absolute inset-x-3 top-2 z-40 flex flex-col gap-2" aria-live="polite">
       {toasts.map((t) => (

@@ -7,7 +7,8 @@ import { SOURCES } from '../src/data/sources';
 import { DICT } from '../src/lib/dict';
 import { BAY_SIZES, DEFAULT_WHATIF, bayEconomics } from '../src/lib/economics';
 import { FACILITIES, getFacility } from '../src/data/rewards';
-import { estimatePayment, facilityPayment, passMonthValue, passPlansFor, SAVER_MAX_PCT, SAVER_MIN_PCT, saverBonusPct, sliceValueRm, splitReward } from '../src/lib/pricing';
+import { estimatePayment, facilityPayment, passMonthValue, passPlansFor, SAVER_MAX_PCT, SAVER_MIN_PCT, saverBonusPct, sliceValueRm, splitReward, TOP_UP, withTopUp } from '../src/lib/pricing';
+import { seedProfile } from '../src/store/seed';
 import type { Pass } from '../src/store/types';
 
 const near = (a: number, b: number, tol: number) => expect(Math.abs(a - b)).toBeLessThanOrEqual(tol);
@@ -73,18 +74,24 @@ describe('personas (slide 3)', () => {
 });
 
 describe('SunD Pass and Saver Credits (team update, 10 Nov 2026)', () => {
-  it('Saver Credits: from RM 50 → 60; the more you top up, the bigger the bonus (+20%, +25%, +30%)', () => {
+  it('Saver top-up (Sheet + deck): RM 50 → 55 … RM 500 → 650; the more you top up, the bigger the bonus (+10% to +30%)', () => {
     expect(C.SAVER_PACKS).toEqual([
-      { pay: 50, get: 60 },
-      { pay: 100, get: 125 },
-      { pay: 200, get: 260 },
+      { pay: 50, get: 55 },
+      { pay: 100, get: 115 },
+      { pay: 200, get: 240 },
+      { pay: 300, get: 375 },
+      { pay: 500, get: 650 },
     ]);
-    expect(C.SAVER_PACKS.map(saverBonusPct)).toEqual([20, 25, 30]);
+    expect(C.SAVER_PACKS.map(saverBonusPct)).toEqual([10, 15, 20, 25, 30]);
     for (let i = 1; i < C.SAVER_PACKS.length; i++) {
       expect(C.SAVER_PACKS[i].pay).toBeGreaterThan(C.SAVER_PACKS[i - 1].pay);
       expect(saverBonusPct(C.SAVER_PACKS[i])).toBeGreaterThan(saverBonusPct(C.SAVER_PACKS[i - 1]));
     }
-    expect([SAVER_MIN_PCT, SAVER_MAX_PCT]).toEqual([20, 30]);
+    expect([SAVER_MIN_PCT, SAVER_MAX_PCT]).toEqual([10, 30]);
+  });
+  it('deck slide 5: a RM 500 top-up makes public charging RM 1.40 ÷ 1.30 ≈ RM 1.08 a kWh', () => {
+    expect(withTopUp(C.PUBLIC_PRICE).toFixed(2)).toBe('1.08');
+    expect(TOP_UP.pay).toBe(500);
   });
   it('a typical Pass month is worth RM 180 (public) / RM 130 (residents)', () => {
     expect(passMonthValue('public')).toBe(180);
@@ -123,6 +130,30 @@ describe('SunD Pass and Saver Credits (team update, 10 Nov 2026)', () => {
     expect(facilityPayment(getFacility('ebike-park'), 'condo', { sc: 50, saver: 0, pass }).via).toBe('pass');
     expect(facilityPayment(getFacility('shop-cafe'), 'condo', { sc: 500, saver: 0, pass })).toEqual({ via: 'saver', price: 15, enough: false });
     expect(getFacility('mall-parking').saverRm).toBe(C.MALL_PARKING_RM);
+  });
+});
+
+describe('Farah, the SunD Pass member demo', () => {
+  const farah = seedProfile('member', new Date(2026, 10, 12, 10, 30).getTime(), 'sunny');
+  const pass = farah.pass!;
+  it('is a public driver on the RM 129 plan, with an active Pass', () => {
+    expect(PERSONAS.member.reward).toBe('none');
+    expect(passPlansFor('member').map((p) => p.price)).toEqual([129]);
+    expect([pass.planId, pass.price, pass.autoRenew]).toEqual(['public-1', 129, true]);
+    expect(pass.renewsAt - pass.startedAt).toBe(C.PASS_DAYS * 86_400_000);
+  });
+  it('day 14: 66 of 100 kWh used, 6 eBike rides, 10 parking entries, all covered by the Pass', () => {
+    expect(pass.kwhLeft).toBe(34);
+    expect(farah.txs.reduce((a, t) => a + (t.passKwh ?? 0), 0)).toBe(C.PASS_KWH - pass.kwhLeft);
+    expect([pass.rides, pass.parks]).toEqual([6, 10]);
+    expect(farah.txs.filter((t) => t.viaPass)).toHaveLength(pass.rides + pass.parks);
+    expect(farah.txs.filter((t) => t.type === 'charge').every((t) => !t.rm && !t.saver && !t.sc)).toBe(true);
+    expect(farah.txs.filter((t) => t.type === 'pass').map((t) => t.rm)).toEqual([-129]);
+  });
+  it('value used so far: 66 × RM 1.40 + 6 × RM 2 + 10 × RM 3 = RM 134.40, more than the RM 129 she paid', () => {
+    const value = (C.PASS_KWH - pass.kwhLeft) * C.PUBLIC_PRICE + pass.rides * C.EBIKE_RIDE_RM + pass.parks * C.MALL_PARKING_RM;
+    near(value, 134.4, 1e-9);
+    expect(value).toBeGreaterThan(pass.price);
   });
 });
 

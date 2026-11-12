@@ -1,10 +1,10 @@
 import { Bell, BookOpen, Building, Car, CreditCard, Globe, Info, PlayCircle, Type as TypeIcon } from 'lucide-react';
 import { LANGS } from '../lib/i18n';
 import { Link, useNavigate } from 'react-router-dom';
-import { Avatar, Button, Card, PageHeader, Pill, ProgressBar, Row, SectionTitle, Toggle } from '../components/ui';
-import { EV, KM_PER_KWH, SOLAR_SELL_RATE_RM } from '../data/constants';
+import { Avatar, Button, Card, PageHeader, Pill, ProgressBar, Row, SectionTitle, SeeAll, Toggle } from '../components/ui';
+import { EV, KM_PER_KWH, PASS_KWH, PASS_PLANS, SOLAR_SELL_RATE_RM } from '../data/constants';
 import { PERSONAS, PERSONA_IDS } from '../data/personas';
-import { fmtInt } from '../lib/format';
+import { cx, fmtDate, fmtInt, fmtRm } from '../lib/format';
 import { usePersona, useProfile } from '../store/hooks';
 import { useStore } from '../store/useStore';
 
@@ -35,10 +35,17 @@ export default function Profile() {
 
         <section>
           <SectionTitle>Viewing as</SectionTitle>
-          <div className="segmented">
+          <div className="grid grid-cols-2 gap-2">
             {PERSONA_IDS.map((p) => (
-              <button key={p} type="button" aria-pressed={persona.id === p} onClick={() => setPersona(p)}>
-                {PERSONAS[p].short}
+              <button
+                key={p}
+                type="button"
+                aria-pressed={persona.id === p}
+                onClick={() => setPersona(p)}
+                className={cx('flex min-h-14 flex-col items-start justify-center rounded-xl border px-3 text-left', persona.id === p ? 'border-sky bg-sky text-white' : 'border-outline bg-page hover:border-sky-bright')}
+              >
+                <span className="text-[15px] font-bold leading-5">{PERSONAS[p].short}</span>
+                <span className={cx('text-[12px] leading-4', persona.id === p ? 'text-white/70' : 'text-ink-muted')}>{PERSONAS[p].label}</span>
               </button>
             ))}
           </div>
@@ -78,6 +85,18 @@ export default function Profile() {
               <Row label="Credits issued at" value="36 sen/kWh (flat slice rate)" />
               <Row label="Status" value={prof.sliceOn ? 'Active' : 'Paused'} tone="leaf" />
               <Row label="Lifetime output" value={`${fmtInt(prof.lifetimeGenKwh)} kWh`} />
+            </Card>
+          </section>
+        )}
+
+        {prof.pass && (
+          <section>
+            <SectionTitle action={<SeeAll to="/wallet/pass">Open</SeeAll>}>My SunD Pass</SectionTitle>
+            <Card tone="leaf" className="divide-y divide-leaf-soft px-5 py-1">
+              <Row label="Plan" value={`${PASS_PLANS.find((x) => x.id === prof.pass!.planId)?.label ?? 'SunD Pass'} · ${fmtRm(prof.pass.price)}/month`} />
+              <Row label="Charging left" value={`${fmtInt(prof.pass.kwhLeft)} of ${PASS_KWH} kWh`} />
+              <Row label="eBike & mall parking" value="Unlimited" tone="leaf" />
+              <Row label={prof.pass.autoRenew ? 'Renews' : 'Ends'} value={fmtDate(prof.pass.renewsAt)} />
             </Card>
           </section>
         )}

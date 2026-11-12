@@ -11,7 +11,7 @@ import { EBIKES } from '../../data/rewards';
 import { BAY_TYPE_LABEL } from '../../data/bays';
 import { MARKET_DC, PUBLIC_PRICE } from '../../data/constants';
 import { fmt } from '../../lib/format';
-import { bonusRateFor, usesCredits } from '../../lib/pricing';
+import { bonusRateFor, TOP_UP, usesCredits, withTopUp } from '../../lib/pricing';
 import { demandFactor } from '../../sim/bays';
 import { hourOf, isDaylight } from '../../sim/solar';
 import { useBayView, useBayViews } from '../../store/hooks';
@@ -56,14 +56,16 @@ export default function BayDetail() {
             <span className="font-display text-[24px] font-bold tabular">{Math.round(v.live.soc)}%</span>
           </div>
           <SocGauge soc={v.live.soc} />
-          <div className="mt-5 mb-2 flex items-center justify-between">
-            <span className="font-bold">Energy now</span>
-            <span className="text-[14px] text-ink-muted">{v.source}</span>
+          <div data-pitch="bay-energy">
+            <div className="mt-5 mb-2 flex items-center justify-between">
+              <span className="font-bold">Energy now</span>
+              <span className="text-[14px] text-ink-muted">{v.source}</span>
+            </div>
+            <MixBar solarPct={v.solarPct} />
           </div>
-          <MixBar solarPct={v.solarPct} />
         </Card>
 
-        <Card tone="sky" className="p-5">
+        <Card tone="sky" className="p-5" pitch="bay-price">
           <div className="mb-2 font-bold">Price for you</div>
           <PriceTag v={v} align="left" />
           <div className="mt-3 flex flex-wrap gap-2">
@@ -78,7 +80,11 @@ export default function BayDetail() {
                     Usually <s className="ml-1">RM {PUBLIC_PRICE.toFixed(2)}</s>
                   </Pill>
                 )}
-                <Pill tone="leaf">Saver & SunD Pass OK</Pill>
+                <span data-pitch="bay-topup">
+                  <Pill tone="leaf">
+                    RM {withTopUp(v.rate).toFixed(2)}/kWh with a RM {TOP_UP.pay} top-up
+                  </Pill>
+                </span>
                 <Pill tone="slate">Market DC RM {MARKET_DC.low.toFixed(2)}–{MARKET_DC.high.toFixed(2)}</Pill>
               </>
             )}

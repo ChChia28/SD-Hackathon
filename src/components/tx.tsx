@@ -53,7 +53,7 @@ export function TxRow({ tx }: { tx: Tx }) {
   const { Icon, cls } = txMeta(tx);
   const s = txSummary(tx);
   return (
-    <Card to={`/wallet/tx/${tx.id}`} className="flex items-center gap-3 p-3.5">
+    <Card to={`/wallet/tx/${tx.id}`} className="flex items-center gap-3 p-3.5" pitch={`tx-${txFacilityKind(tx) ?? tx.type}`}>
       <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${cls}`}>
         <Icon size={20} />
       </span>

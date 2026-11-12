@@ -39,7 +39,7 @@ export default function Session() {
           </Pill>
         </div>
 
-        <div className="flex justify-center">
+        <div className="flex justify-center" data-pitch="session-ring">
           <Ring value={prof.evSoc / 100} size={230} stroke={18} pulse>
             <span className="font-display text-[56px] font-bold leading-[56px] tabular">{Math.round(prof.evSoc)}%</span>
             <span className="mt-1 text-ink-muted">{EV.name}</span>
@@ -55,7 +55,7 @@ export default function Session() {
         </div>
         {taper && <p className="-mt-2 text-center text-[14px] text-ink-muted">Slower above 80% · battery care</p>}
 
-        <Card tone="leaf" className="p-5">
+        <Card tone="leaf" className="p-5" pitch="session-source">
           <div className="mb-2 font-bold">Energy source</div>
           <MixBar solarPct={session.solarPct} />
         </Card>
@@ -64,7 +64,7 @@ export default function Session() {
           {(session.passKwh > 0 || !!prof.pass) && <Row label="SunD Pass used" value={`${fmt(session.passKwh)} kWh`} />}
           {session.useCredits && <Row label="SunD Credits used" value={`${fmt(session.scUsed, 2)} SC`} />}
           {session.saverUsed > 0 && <Row label="Saver Credits used" value={fmtRm(session.saverUsed)} />}
-          <Row label="Card so far" value={fmtRm(session.rm)} />
+          <Row label="Card so far" value={fmtRm(session.rm)} pitch="session-cash" />
           {prof.pass && <Row label="Pass left" value={`${fmt(prof.pass.kwhLeft)} kWh`} strong />}
           {session.useCredits && <Row label="Credits left" value={`${fmt(prof.sc, 2)} SC`} strong />}
         </Card>

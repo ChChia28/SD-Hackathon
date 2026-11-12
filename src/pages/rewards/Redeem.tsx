@@ -60,7 +60,8 @@ export default function Redeem() {
   const [shake, setShake] = useState(false);
   const Icon = FACILITY_ICON[f.icon];
   const k = KIND[f.kind];
-  const voucher = prof.vouchers.find((v) => v.id === voucherId);
+  // Match the facility too: the screen stays mounted when moving between two facilities.
+  const voucher = prof.vouchers.find((v) => v.id === voucherId && v.facilityId === f.id);
   const ebike = f.kind === 'ebike';
   const simTime = useStore((s) => s.simTime);
   const bikes = ebike ? bikesAvailable(f, simTime) : 0;
@@ -68,6 +69,8 @@ export default function Redeem() {
   const enough = pay.via === 'pass' || (pay.via !== 'locked' && pay.enough);
   const priceLabel = pay.via === 'pass' ? 'SunD Pass' : pay.via === 'sc' ? `${pay.price} SC` : pay.via === 'saver' ? fmtRm(pay.price) : '';
   const shortBy = pay.via === 'sc' ? `${fmt(pay.price - prof.sc)} SC short` : 'Top up Saver Credits first';
+  // eBikes and parking on a SunD Pass lead back to the Pass, where the person started.
+  const onPass = !!prof.pass && (ebike || f.kind === 'parking');
 
   const onRedeem = () => {
     const vid = redeem(f.id);
@@ -82,7 +85,7 @@ export default function Redeem() {
   if (voucher)
     return (
       <>
-        <PageHeader title={k.done} back="/rewards" />
+        <PageHeader title={k.done} back={onPass ? '/wallet/pass' : '/rewards'} />
         <div className="rise-in flex flex-col items-center gap-5 px-5 pb-10 pt-6 text-center">
           <span className="flex h-16 w-16 items-center justify-center rounded-full bg-leaf-soft text-leaf-deep">
             {ebike ? <Bike size={32} /> : <Check size={32} strokeWidth={3} />}
@@ -99,8 +102,9 @@ export default function Redeem() {
             </div>
           </Card>
           <p className="text-ink-muted">{k.how}</p>
-          <LinkButton to="/rewards" variant="secondary" className="w-full">
-            Back to rewards
+          {onPass && <p className="-mt-3 text-[15px] font-bold text-leaf-ink">Included in your SunD Pass · RM 0</p>}
+          <LinkButton to={onPass ? '/wallet/pass' : '/rewards'} variant="secondary" className="w-full">
+            {onPass ? 'Back to my Pass' : 'Back to rewards'}
           </LinkButton>
         </div>
       </>
@@ -127,8 +131,9 @@ export default function Redeem() {
 
         {pay.via === 'pass' ? (
           <Card tone="leaf" className="divide-y divide-outline px-5 py-1">
-            <Row label="Cost" value="Included" tone="leaf" />
+            <Row label="Cost" value="Included · RM 0" tone="leaf" />
             <Row label="SunD Pass" value={`Unlimited ${ebike ? 'rides' : 'parking'}`} />
+            {prof.pass && <Row label="Used this month" value={ebike ? `${prof.pass.rides} ${prof.pass.rides === 1 ? 'ride' : 'rides'}` : `${prof.pass.parks} ${prof.pass.parks === 1 ? 'entry' : 'entries'}`} />}
           </Card>
         ) : pay.via !== 'locked' ? (
           <Card tone={k.card} className="divide-y divide-outline px-5 py-1">

@@ -1,4 +1,4 @@
-export type PersonaId = 'landed' | 'condo' | 'public' | 'elder';
+export type PersonaId = 'landed' | 'condo' | 'public' | 'member' | 'elder';
 export type Lang = 'en' | 'ms' | 'zh';
 export type Weather = 'sunny' | 'cloudy' | 'rainy';
 export type BayType = 'mall' | 'office' | 'park' | 'clubhouse' | 'commercial' | 'condo' | 'petrol';

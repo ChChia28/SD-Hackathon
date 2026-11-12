@@ -14,7 +14,7 @@ function WalkRow({ w, active, onSelect }: { w: Walk; active: boolean; onSelect: 
   const road = feelsLikeC(simTime, heat);
   const under = underWalkC(simTime, heat);
   return (
-    <Card onClick={onSelect} className={cx('p-4', active && 'card-active')}>
+    <Card onClick={onSelect} className={cx('p-4', active && 'card-active')} pitch={`walkcard-${w.id}`}>
       <div className="flex items-start gap-3">
         <IconBubble tone={w.status === 'next' ? 'sky' : 'slate'}>
           <Footprints size={22} />
@@ -42,7 +42,7 @@ function WalkRow({ w, active, onSelect }: { w: Walk; active: boolean; onSelect: 
               <div className="font-display text-[24px] font-bold tabular">{fmt(road, 0)} °C</div>
               <div className="text-[12px] text-ink-muted">{t('feels-like')}</div>
             </div>
-            <div className="rounded-2xl bg-sky-wash p-3">
+            <div className="rounded-2xl bg-sky-wash p-3" data-pitch="walk-under">
               <div className="flex items-center gap-1 text-[13px] font-bold text-sky-deep">
                 <Footprints size={14} /> {t('Under SunD Walk')}
               </div>

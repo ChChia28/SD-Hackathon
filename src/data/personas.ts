@@ -96,6 +96,25 @@ export const PERSONAS: Record<PersonaId, Persona> = {
     home: { x: 196, y: 196 },
     blurb: 'Pays per kWh, catches Solar Surplus Discounts and pre-buys Saver Credits.',
   },
+  member: {
+    id: 'member',
+    label: 'SunD Pass member',
+    short: 'Farah',
+    name: 'Farah Aziz',
+    tagline: 'Drives in to work at the mall, 31',
+    initials: 'FA',
+    address: 'Works at Elmina Central Mall · lives in Subang Jaya',
+    reward: 'none',
+    kWp: 0,
+    panels: 0,
+    rewardShare: 0,
+    drivesEv: true,
+    systemLabel: '',
+    lang: 'en',
+    home: { x: 204, y: 184 },
+    homeBayId: 'central-mall',
+    blurb: 'On the public SunD Pass (RM 129 a month): 100 kWh of charging, unlimited SunD eBike rides and unlimited mall parking.',
+  },
   elder: {
     id: 'elder',
     label: 'B40 · lives alone',
@@ -121,4 +140,4 @@ export const PERSONAS: Record<PersonaId, Persona> = {
   },
 };
 
-export const PERSONA_IDS: PersonaId[] = ['condo', 'landed', 'public', 'elder'];
+export const PERSONA_IDS: PersonaId[] = ['condo', 'landed', 'public', 'member', 'elder'];

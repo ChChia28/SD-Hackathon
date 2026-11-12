@@ -55,6 +55,8 @@ interface Actions {
   triggerSurplus: (bayId?: string) => string;
   resetDemo: () => void;
   startSession: (bayId: string, connectorId: string, targetKwh: number) => boolean;
+  /** Pitch mode: a charging session already under way, from `fromSoc` to `atSoc` battery, held there. */
+  pitchCharge: (bayId: string, connectorId: string, fromSoc: number, atSoc: number) => void;
   stopSession: () => void;
   clearSession: () => void;
   buySaver: (packIndex: number, method: string) => string;
@@ -87,12 +89,7 @@ function initialData(): Data {
   return {
     onboarded: false,
     persona: 'condo',
-    profiles: {
-      landed: seedProfile('landed', simTime, weather),
-      condo: seedProfile('condo', simTime, weather),
-      public: seedProfile('public', simTime, weather),
-      elder: seedProfile('elder', simTime, weather),
-    },
+    profiles: Object.fromEntries(PERSONA_IDS.map((id) => [id, seedProfile(id, simTime, weather)])) as Record<PersonaId, Profile>,
     simTime,
     speed: 60,
     weather,
@@ -366,7 +363,8 @@ export const useStore = create<State>()(
         set((s) => {
           const patch = s.speed > 0 ? advance(s, s.simTime + realDt * s.speed) : {};
           const merged = { ...s, ...patch } as State;
-          if (merged.session?.status === 'charging') return { ...patch, ...chargeStep(merged, realDt) };
+          // Pitch mode holds every screen still, including a live charge.
+          if (merged.session?.status === 'charging' && !merged.pitch.on) return { ...patch, ...chargeStep(merged, realDt) };
           return patch;
         }),
 
@@ -451,6 +449,29 @@ export const useStore = create<State>()(
           bays: { ...s.bays, [bayId]: { ...live, busy: { ...live.busy, [conn.id]: (live.busy[conn.id] ?? 0) + 1 } } },
         });
         return true;
+      },
+
+      pitchCharge: (bayId, connectorId, fromSoc, atSoc) => {
+        // Start clean: no session, a free charger, the battery where the story starts.
+        set((s) => {
+          const live = s.bays[bayId];
+          return {
+            session: null,
+            bays: { ...s.bays, [bayId]: { ...live, busy: { ...live.busy, [connectorId]: 0 } } },
+            profiles: { ...s.profiles, [s.persona]: { ...s.profiles[s.persona], evSoc: fromSoc } },
+          };
+        });
+        if (!get().startSession(bayId, connectorId, ((80 - fromSoc) / 100) * EV.batteryKwh)) return;
+        set((s) => {
+          let cur = s as State;
+          let out: Partial<State> = {};
+          for (let i = 0; i < 2000 && cur.session?.status === 'charging' && cur.profiles[cur.persona].evSoc < atSoc; i++) {
+            const step = chargeStep(cur, 100);
+            out = { ...out, ...step };
+            cur = { ...cur, ...step } as State;
+          }
+          return out;
+        });
       },
 
       stopSession: () => set((s) => finalize(s)),
@@ -589,6 +610,11 @@ export const useStore = create<State>()(
       name: 'sund-wallet-demo-v4',
       version: 1,
       storage: createJSONStorage(() => localStorage),
+      // A saved demo from before a persona was added has no wallet for them: seed one so switching to them works.
+      merge: (saved, current) => {
+        const p = (saved ?? {}) as Partial<Data>;
+        return { ...current, ...p, profiles: { ...current.profiles, ...(p.profiles ?? {}) } };
+      },
       partialize: (s) => ({
         onboarded: s.onboarded,
         persona: s.persona,

@@ -77,7 +77,7 @@ export default function Rewards() {
 
         <section>
           <SectionTitle action={<SeeAll to="/map?tab=ebike">Map</SeeAll>}>SunD eBike</SectionTitle>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2" data-pitch="rewards-ebike">
             {EBIKES.slice(0, 3).map((f) => (
               <FacilityRow key={f.id} f={f} />
             ))}
@@ -86,12 +86,14 @@ export default function Rewards() {
 
         <section>
           <SectionTitle action={<SeeAll to="/wallet/saver">Top up</SeeAll>}>Elmina Central Mall</SectionTitle>
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2" data-pitch="rewards-mall">
             {MALL_SPOTS.map((f) => (
               <FacilityRow key={f.id} f={f} />
             ))}
           </div>
-          <div className="mt-2 text-[14px] text-ink-muted">Parking and shops take Saver Credits · parking is free with SunD Pass</div>
+          <div className="mt-2 text-[14px] text-ink-muted" data-pitch="rewards-note">
+            Parking and shops take Saver Credits · parking is free with SunD Pass
+          </div>
         </section>
 
         <section>

@@ -63,6 +63,10 @@ export const MALL_SPOTS = FACILITIES.filter((f) => f.kind === 'parking' || f.kin
 
 export const getFacility = (id: string) => FACILITIES.find((f) => f.id === id) ?? FACILITIES[0];
 
+/** The SunD eBike dock nearest a point on the township map (the person's home or workplace). */
+export const nearestEbike = (at: { x: number; y: number }) =>
+  EBIKES.reduce((best, f) => (Math.hypot(f.x - at.x, f.y - at.y) < Math.hypot(best.x - at.x, best.y - at.y) ? f : best));
+
 /** What kind of place a redeem transaction was spent at. */
 export const txFacilityKind = (t: Tx): FacilityKind | undefined => (t.type === 'redeem' ? FACILITIES.find((f) => f.id === t.facilityId)?.kind : undefined);
 export const isEbikeTx = (t: Tx) => txFacilityKind(t) === 'ebike';
@@ -128,7 +132,7 @@ export const OFFERS = [
   { id: 'ebike', title: 'Ride while you charge', body: 'eBike dock at every SunD Bay', tag: 'eBike', to: '/map?tab=ebike', resident: false },
   { id: 'park', title: 'Weekend park +5%', body: 'Central Park · Sat & Sun', tag: 'Weekend', to: '/map', resident: true },
   { id: 'pass', title: 'SunD Pass', body: '100 kWh + unlimited eBike & mall parking', tag: 'Monthly', to: '/wallet/pass', resident: false },
-  { id: 'saver', title: 'Saver up to +30%', body: 'RM 50 → 60 · RM 100 → 125 · RM 200 → 260', tag: 'Everyone', to: '/wallet/saver', resident: false },
+  { id: 'saver', title: 'Saver up to +30%', body: 'RM 100 → 115 · RM 200 → 240 · RM 500 → 650', tag: 'Everyone', to: '/wallet/saver', resident: false },
 ];
 
 export const LEADERBOARD = [

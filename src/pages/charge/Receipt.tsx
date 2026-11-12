@@ -60,7 +60,7 @@ export default function Receipt() {
           </span>
           <h1 className="mt-4 text-[26px] font-bold leading-8">Charging complete</h1>
           <div className="mt-2 font-display text-[56px] font-bold leading-[56px] tabular">+{fmtInt(tx.km ?? 0)} km</div>
-          <div className="mt-1 text-ink-muted">
+          <div className="mt-1 text-ink-muted" data-pitch="receipt-place">
             SunD Bay · {tx.place} · {fmtTime(tx.at)}
           </div>
         </div>
@@ -96,8 +96,8 @@ export default function Receipt() {
           {!!tx.sc && <Row label="Paid with SunD Credits" value={`${fmt(Math.abs(tx.sc), 2)} SC`} />}
           {!!tx.saver && <Row label="Paid with Saver Credits" value={fmtRm(tx.saver)} />}
           {!!tx.rm && <Row label="Card payment" value={fmtRm(tx.rm)} />}
-          {!tx.rm && <Row label="Cash paid" value="RM 0.00" tone="leaf" />}
-          <Row label="CO₂ avoided" value={`${fmt(tx.co2 ?? 0)} kg`} tone="leaf" />
+          {!tx.rm && <Row label="Cash paid" value="RM 0.00" tone="leaf" pitch="receipt-cash" />}
+          <Row label="CO₂ avoided" value={`${fmt(tx.co2 ?? 0)} kg`} tone="leaf" pitch="receipt-co2" />
           <Row label="Charging time" value={`${tx.durationMin} min`} />
         </Card>
 

@@ -38,6 +38,7 @@ export default function Wallet() {
     <>
       <TabHeader title="Wallet" />
       <div className="flex flex-col gap-6 px-5 pb-8 pt-2">
+        {persona.drivesEv && prof.pass && <PassCard />}
         {persona.drivesEv && <div className="grid grid-cols-2 gap-3">
           {resident ? (
             <div className="card-navy p-4">
@@ -65,7 +66,7 @@ export default function Wallet() {
             <div className="text-[14px] text-ink-muted">Up to +{SAVER_MAX_PCT}% · spend anywhere</div>
           </div>
         </div>}
-        {persona.drivesEv && <PassCard />}
+        {persona.drivesEv && !prof.pass && <PassCard />}
 
         {persona.reward === 'slice' && <SliceCard />}
         {persona.reward === 'cream' && (
@@ -118,7 +119,7 @@ export default function Wallet() {
           </Card>
         )}
 
-        <section>
+        <section data-pitch="wallet-activity">
           <SectionTitle
             action={
               <Link to="/wallet/rules" className="text-[15px] font-bold text-sky-deep">

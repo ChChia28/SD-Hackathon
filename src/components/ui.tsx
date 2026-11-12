@@ -26,21 +26,26 @@ const WASH = {
 } as const;
 export type Wash = keyof typeof WASH;
 
-export function Card({ className, children, to, onClick, tone }: { className?: string; children: ReactNode; to?: string; onClick?: () => void; tone?: Wash }) {
+/** `pitch` tags an element so pitch mode can point an annotation at it (data-pitch). */
+export function Card({ className, children, to, onClick, tone, pitch }: { className?: string; children: ReactNode; to?: string; onClick?: () => void; tone?: Wash; pitch?: string }) {
   const cls = cx('card', tone && WASH[tone], className);
   if (to)
     return (
-      <Link to={to} className={cx('card-link', cls)}>
+      <Link to={to} className={cx('card-link', cls)} data-pitch={pitch}>
         {children}
       </Link>
     );
   if (onClick)
     return (
-      <button type="button" onClick={onClick} className={cx('card-link w-full text-left', cls)}>
+      <button type="button" onClick={onClick} className={cx('card-link w-full text-left', cls)} data-pitch={pitch}>
         {children}
       </button>
     );
-  return <div className={cls}>{children}</div>;
+  return (
+    <div className={cls} data-pitch={pitch}>
+      {children}
+    </div>
+  );
 }
 
 export function ProgressBar({ value, className, color }: { value: number; className?: string; color?: string }) {
@@ -106,10 +111,10 @@ export function PageHeader({ title, right, back }: { title: string; right?: Reac
   );
 }
 
-export function Row({ label, value, strong, tone }: { label: ReactNode; value: ReactNode; strong?: boolean; tone?: 'leaf' | 'berry' | 'coral' | 'sun' }) {
+export function Row({ label, value, strong, tone, pitch }: { label: ReactNode; value: ReactNode; strong?: boolean; tone?: 'leaf' | 'berry' | 'coral' | 'sun'; pitch?: string }) {
   const toneCls = tone === 'leaf' ? 'text-leaf-ink' : tone === 'berry' ? 'text-berry-ink' : tone === 'coral' ? 'text-coral-ink' : tone === 'sun' ? 'text-sun-ink' : 'text-ink';
   return (
-    <div className="flex items-center justify-between gap-4 py-2.5">
+    <div className="flex items-center justify-between gap-4 py-2.5" data-pitch={pitch}>
       <span className="text-ink-muted">{label}</span>
       <span className={cx('tabular text-right', strong ? 'font-bold text-[17px]' : 'font-bold', toneCls)}>{value}</span>
     </div>

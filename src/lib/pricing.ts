@@ -84,11 +84,15 @@ export function estimatePayment(kwh: number, balance: { sc: number; saver: numbe
   return { pass, sc, saver, rm };
 }
 
-/** Bonus on a Saver pack, whole %: RM 50 → 60 is 20. */
+/** Bonus on a Saver pack, whole %: RM 500 → 650 is 30. */
 export const saverBonusPct = (p: { pay: number; get: number }) => Math.round((p.get / p.pay - 1) * 100);
 /** The biggest Saver bonus on offer, whole % (the top pack). */
 export const SAVER_MAX_PCT = Math.max(...SAVER_PACKS.map(saverBonusPct));
 export const SAVER_MIN_PCT = Math.min(...SAVER_PACKS.map(saverBonusPct));
+/** The top Saver pack, RM 500 → RM 650 (the deck's top-up example). */
+export const TOP_UP = SAVER_PACKS[SAVER_PACKS.length - 1];
+/** What a kWh really costs when paid with credits from the top pack: RM 1.40 ÷ 1.30 ≈ RM 1.08 (deck slide 5). */
+export const withTopUp = (rate: number) => (rate * TOP_UP.pay) / TOP_UP.get;
 
 /** Standard charging rate for a Pass audience: RM 0.90 for residents (paid in credits), RM 1.40 for the public. */
 export const standardRate = (who: PassAudience) => (who === 'resident' ? RESIDENT_PRICE : PUBLIC_PRICE);

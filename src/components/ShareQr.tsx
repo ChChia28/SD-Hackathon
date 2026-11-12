@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 /** The public demo link, so judges can open it on their own phones. */
 export const demoUrl = () => (typeof window === 'undefined' ? '' : `${window.location.origin}${window.location.pathname}`);
 
+/** The site link: a scan opens the home page, where the audience picks Pitch mode or the Live prototype. */
 export function ShareQr({ size = 156 }: { size?: number }) {
   const url = demoUrl();
   const cells = useMemo(() => {
@@ -24,7 +25,7 @@ export function ShareQr({ size = 156 }: { size?: number }) {
         ))}
       </svg>
       <div className="min-w-0 text-[13px] leading-5 text-ink-muted">
-        <div className="font-bold text-ink">Try it on your phone</div>
+        <div className="font-bold text-ink">Open SunD on your phone</div>
         <div className="break-all">{url.replace(/^https?:\/\//, '')}</div>
       </div>
     </div>

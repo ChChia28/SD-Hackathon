@@ -61,7 +61,7 @@ export default function MapPage() {
     <>
       <TabHeader title="Map" />
       <div className="flex flex-col gap-4 px-5 pb-8 pt-2">
-        <div className="segmented" role="group" aria-label="Show">
+        <div className="segmented" role="group" aria-label="Show" data-pitch="map-modes">
           {MODES.map((m) => (
             <button
               key={m.id}
@@ -94,11 +94,11 @@ export default function MapPage() {
         )}
 
         <div className="card aspect-[360/430] overflow-hidden">
-          <TownshipMap views={shown} home={persona.home} mode={mode} selected={selected} coolOpen={coolOpen} onSelect={(id) => setSelected(id === selected ? undefined : id)} />
+          <TownshipMap views={shown} home={persona.home} mode={mode} selected={selected} coolOpen={coolOpen} cream={persona.reward === 'cream'} onSelect={(id) => setSelected(id === selected ? undefined : id)} />
         </div>
 
         {mode === 'bays' && (
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-[14px] text-ink-muted" aria-label="Legend">
+          <div className="flex flex-wrap gap-x-4 gap-y-1 text-[14px] text-ink-muted" aria-label="Legend" data-pitch="map-legend">
             {(Object.keys(STATUS_META) as BayStatus[]).map((st) => {
               const m = STATUS_META[st];
               return (

@@ -38,8 +38,16 @@ export default function Home() {
         <SessionBanner />
         {persona.reward === 'cream' && <LiveSolarCard />}
         {persona.reward === 'slice' && <SliceCard />}
-        {persona.reward === 'none' && <SaverCard />}
-        {persona.reward === 'none' && <PassCard />}
+        {prof.pass ? (
+          <PassCard />
+        ) : (
+          persona.reward === 'none' && (
+            <>
+              <SaverCard />
+              <PassCard />
+            </>
+          )
+        )}
         <SponsoredNote />
         <PeakNudgeCard />
         {resident && persona.drivesEv && <CreditCard />}
@@ -219,7 +227,7 @@ function NearestBay() {
   const views = useBayViews();
   const pick = views.find((v) => v.status === 'surplus') ?? views.find((v) => v.status !== 'busy') ?? views[0];
   return (
-    <section>
+    <section data-pitch="home-bay">
       <SectionTitle action={<SeeAll to="/map">Map</SeeAll>}>{pick.status === 'surplus' ? 'Green SunD Bay nearby' : 'Nearest SunD Bay'}</SectionTitle>
       <BayRow v={pick} />
     </section>
@@ -235,7 +243,7 @@ function QuickActions() {
     </Link>
   );
   return (
-    <section className="grid grid-cols-4 gap-2">
+    <section className="grid grid-cols-4 gap-2" data-pitch="quick-actions">
       {action('/map', t('Find bay'), <MapPin size={22} />)}
       {action('/charge', t('Scan to charge'), <QrCode size={22} />)}
       {action('/map?tab=walk', 'SunD Walk', <Footprints size={22} />)}

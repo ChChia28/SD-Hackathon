@@ -20,9 +20,11 @@ export default function Balcony() {
             <div className="flex items-center gap-2 text-[15px] font-bold text-white/80">
               <Grid3x3 size={18} className="text-sun-bright" /> {t('Your own panels, on your balcony')}
             </div>
-            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-[13px] font-bold">2027</span>
+            <span className="rounded-full bg-white/15 px-2.5 py-0.5 text-[13px] font-bold" data-pitch="balcony-2027">
+              2027
+            </span>
           </div>
-          <div className="mt-2 font-display text-[30px] font-bold leading-9 tabular">
+          <div className="mt-2 font-display text-[30px] font-bold leading-9 tabular" data-pitch="balcony-kwh">
             ~{BALCONY.kwhMonth} kWh <span className="text-[17px] text-white/60">/ {t('month')}</span>
           </div>
           <div className="mt-1 text-[15px] text-white/75 tabular">

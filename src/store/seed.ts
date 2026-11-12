@@ -1,12 +1,12 @@
 import { BAYS } from '../data/bays';
-import { CO2_KG_PER_KWH, DEFAULT_CASH_SHARE, EV, KM_PER_KWH } from '../data/constants';
+import { CO2_KG_PER_KWH, DEFAULT_CASH_SHARE, EV, KM_PER_KWH, PASS_DAYS, PASS_KWH, PASS_PLANS } from '../data/constants';
 import { PERSONAS } from '../data/personas';
 import { awardAchievements, getFacility } from '../data/rewards';
 import { monthName } from '../lib/format';
 import { splitReward } from '../lib/pricing';
 import { hourKeyOf, occupancy } from '../sim/bays';
 import { dayKey, energyBetween, hourOf, pastDailyKwh } from '../sim/solar';
-import type { BayLive, Notice, PersonaId, Profile, Tx, Weather } from './types';
+import type { BayLive, Notice, Pass, PersonaId, Profile, Tx, Weather } from './types';
 
 const HOUR = 3_600_000;
 const DAY = 24 * HOUR;
@@ -29,12 +29,39 @@ interface ChargeSeed {
   bayId: string;
   kwh: number;
   solarPct: number;
-  pay: 'sc' | 'saver' | 'rm';
+  pay: 'sc' | 'saver' | 'rm' | 'pass';
   rate?: number;
   bonus?: number;
 }
 
-const SEEDS: Record<PersonaId, { carry: number; saver: number; charged: number; greenCharges: number; surplusCharges: number; streak: number; priorGen: number; billShare: number; charges: ChargeSeed[]; redeem?: { daysAgo: number; facilityId: string; cost: number; title: string }; rides?: { daysAgo: number; hour: number; facilityId: string; pay: 'sc' | 'saver' }[]; topup?: { daysAgo: number; pay: number; get: number }; nudgeKwh?: number; coolDaysAgo?: number[] }> = {
+/** A SunD Pass bought `daysAgo`; `parkDaysAgo` are the mall parking entries it covered. */
+interface PassSeed {
+  planId: string;
+  daysAgo: number;
+  hour: number;
+  method: string;
+  parkDaysAgo: number[];
+}
+
+interface Seed {
+  carry: number;
+  saver: number;
+  charged: number;
+  greenCharges: number;
+  surplusCharges: number;
+  streak: number;
+  priorGen: number;
+  billShare: number;
+  charges: ChargeSeed[];
+  redeem?: { daysAgo: number; facilityId: string; cost: number; title: string };
+  rides?: { daysAgo: number; hour: number; facilityId: string; pay: 'sc' | 'saver' | 'pass' }[];
+  topup?: { daysAgo: number; pay: number; get: number };
+  pass?: PassSeed;
+  nudgeKwh?: number;
+  coolDaysAgo?: number[];
+}
+
+const SEEDS: Record<PersonaId, Seed> = {
   landed: {
     carry: 34,
     saver: 0,
@@ -82,7 +109,35 @@ const SEEDS: Record<PersonaId, { carry: number; saver: number; charged: number; 
       { daysAgo: 8, hour: 16.1, bayId: 'lakeside', kwh: 8, solarPct: 92, pay: 'rm', rate: 1.4 },
     ],
     rides: [{ daysAgo: 3, hour: 13, facilityId: 'ebike-central', pay: 'saver' }],
-    topup: { daysAgo: 9, pay: 50, get: 60 },
+    topup: { daysAgo: 9, pay: 50, get: 55 },
+  },
+  // Farah: day 14 of her public SunD Pass. 66 of 100 kWh used, 6 rides, 10 parking entries:
+  // RM 92.40 + RM 12 + RM 30 = RM 134.40 of value for RM 129, so the Pass has already paid for itself.
+  member: {
+    carry: 0,
+    saver: 0,
+    charged: 64,
+    greenCharges: 4,
+    surplusCharges: 1,
+    streak: 1,
+    priorGen: 0,
+    billShare: 0,
+    charges: [
+      { daysAgo: 1, hour: 12.6, bayId: 'central-mall', kwh: 15, solarPct: 100, pay: 'pass' },
+      { daysAgo: 5, hour: 12.4, bayId: 'central-mall', kwh: 17, solarPct: 96, pay: 'pass' },
+      { daysAgo: 8, hour: 13.1, bayId: 'central-mall', kwh: 16, solarPct: 100, pay: 'pass' },
+      { daysAgo: 12, hour: 12.2, bayId: 'central-mall', kwh: 18, solarPct: 94, pay: 'pass' },
+    ],
+    rides: [
+      { daysAgo: 1, hour: 13.2, facilityId: 'ebike-central', pay: 'pass' },
+      { daysAgo: 3, hour: 13.1, facilityId: 'ebike-park', pay: 'pass' },
+      { daysAgo: 5, hour: 18.4, facilityId: 'ebike-central', pay: 'pass' },
+      { daysAgo: 7, hour: 13.3, facilityId: 'ebike-central', pay: 'pass' },
+      { daysAgo: 9, hour: 12.9, facilityId: 'ebike-park', pay: 'pass' },
+      { daysAgo: 12, hour: 13.0, facilityId: 'ebike-central', pay: 'pass' },
+    ],
+    pass: { planId: 'public-1', daysAgo: 14, hour: 8.4, method: 'FPX online banking', parkDaysAgo: [1, 2, 3, 5, 6, 7, 8, 9, 12, 13] },
+    nudgeKwh: 18,
   },
   elder: {
     carry: 0,
@@ -123,6 +178,7 @@ export function seedProfile(id: PersonaId, now: number, weather: Weather): Profi
   const month = splitReward(monthKwh, id, cashShare);
   let sc = seed.carry + month.credits;
   let saver = seed.saver;
+  let passKwhUsed = 0;
   seed.charges.forEach((c, i) => {
     const bay = BAYS.find((b) => b.id === c.bayId)!;
     const solar = (c.kwh * c.solarPct) / 100;
@@ -145,6 +201,9 @@ export function seedProfile(id: PersonaId, now: number, weather: Weather): Profi
       sc += tx.sc + (c.bonus ?? 0);
     } else if (c.pay === 'saver') {
       tx.saver = -c.kwh * (c.rate ?? 1);
+    } else if (c.pay === 'pass') {
+      tx.passKwh = c.kwh;
+      passKwhUsed += c.kwh;
     } else {
       tx.rm = -c.kwh * (c.rate ?? 1);
     }
@@ -156,9 +215,31 @@ export function seedProfile(id: PersonaId, now: number, weather: Weather): Profi
   }
   seed.rides?.forEach((r, i) => {
     const f = getFacility(r.facilityId);
-    txs.push({ id: `seed-ride-${id}-${i}`, type: 'redeem', at: dayStart - r.daysAgo * DAY + r.hour * HOUR, title: f.item, place: f.name, facilityId: f.id, ...(r.pay === 'sc' ? { sc: -(f.cost ?? 0) } : { saver: -(f.saverRm ?? 0) }) });
+    const paid = r.pay === 'pass' ? { viaPass: true } : r.pay === 'sc' ? { sc: -(f.cost ?? 0) } : { saver: -(f.saverRm ?? 0) };
+    txs.push({ id: `seed-ride-${id}-${i}`, type: 'redeem', at: dayStart - r.daysAgo * DAY + r.hour * HOUR, title: f.item, place: f.name, facilityId: f.id, ...paid });
     if (r.pay === 'sc') sc -= f.cost ?? 0;
   });
+  let pass: Pass | null = null;
+  if (seed.pass) {
+    const plan = PASS_PLANS.find((x) => x.id === seed.pass!.planId)!;
+    const startedAt = dayStart - seed.pass.daysAgo * DAY + seed.pass.hour * HOUR;
+    const parking = getFacility('mall-parking');
+    txs.push({ id: `seed-pass-${id}`, type: 'pass', at: startedAt, title: 'SunD Pass', rm: -plan.price, kwh: PASS_KWH, method: seed.pass.method });
+    seed.pass.parkDaysAgo.forEach((d, i) => {
+      txs.push({ id: `seed-park-${id}-${i}`, type: 'redeem', at: dayStart - d * DAY + 8.8 * HOUR, title: parking.item, place: parking.name, facilityId: parking.id, viaPass: true });
+    });
+    pass = {
+      planId: plan.id,
+      price: plan.price,
+      startedAt,
+      renewsAt: startedAt + PASS_DAYS * DAY,
+      commitUntil: plan.months > 1 ? startedAt + plan.months * PASS_DAYS * DAY : undefined,
+      autoRenew: true,
+      kwhLeft: PASS_KWH - passKwhUsed,
+      rides: (seed.rides ?? []).filter((r) => r.pay === 'pass').length,
+      parks: seed.pass.parkDaysAgo.length,
+    };
+  }
   seed.coolDaysAgo?.forEach((d, i) => {
     txs.push({ id: `seed-cool-${id}-${i}`, type: 'checkin', at: dayStart - d * DAY + 13.5 * HOUR, title: 'SunD Cool check-in', place: 'Elmina Community Hall' });
   });
@@ -170,7 +251,7 @@ export function seedProfile(id: PersonaId, now: number, weather: Weather): Profi
   const profile: Profile = {
     sc: p.reward === 'none' ? 0 : Math.max(sc, p.reward === 'slice' ? 6 : 18),
     saver,
-    pass: null,
+    pass,
     cashShare,
     todayKwh,
     todayCredits: today.credits,

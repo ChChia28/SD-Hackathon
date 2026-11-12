@@ -76,7 +76,7 @@ export default function Cool() {
       <PageHeader title="SunD Cool" />
       <div className="flex flex-col gap-6 px-5 pb-10 pt-4">
         {heat.on ? (
-          <div className="flex items-center gap-3 rounded-[20px] bg-sun px-5 py-4 text-white">
+          <div className="flex items-center gap-3 rounded-[20px] bg-sun px-5 py-4 text-white" data-pitch="cool-heat">
             <ThermometerSun size={28} />
             <div className="flex-1">
               <div className="font-display text-[20px] font-bold leading-6">{t('Heat alert · {temp} °C', { temp: heat.tempC })}</div>
@@ -103,7 +103,7 @@ export default function Cool() {
           </Card>
         )}
 
-        <section className="card-navy p-5">
+        <section className="card-navy p-5" data-pitch="cool-nearest">
           <div className="flex items-center gap-2 text-[15px] font-bold text-white/80">
             <Snowflake size={18} className="text-sun-bright" /> {t('Nearest SunD Cool')}
           </div>
@@ -159,7 +159,7 @@ export default function Cool() {
               { Icon: Sofa, label: t('Seats and rest area') },
               { Icon: HeartPulse, label: t('First aid on site') },
             ].map((x) => (
-              <div key={x.label} className="card flex items-center gap-3 p-3.5">
+              <div key={x.label} className="card flex items-center gap-3 p-3.5" data-pitch={x.Icon === Zap ? 'cool-solar' : undefined}>
                 <IconBubble tone="berry" size={40}>
                   <x.Icon size={20} />
                 </IconBubble>

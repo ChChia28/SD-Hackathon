@@ -51,16 +51,19 @@ export const CHARGE_TIMELAPSE = 180;
 export const EV = { name: 'Proton e.MAS 5', batteryKwh: 40, startSoc: 34 };
 
 /**
- * Saver Credits (team update, 10 Nov 2026 — replaces the deck's RM 20 → 30 at high-solar bays only):
- * top up at least RM 50, spendable anywhere in SunD — charging at every bay, eBikes, mall parking,
- * the clubhouse (residents) and mall shops. The more you top up, the bigger the bonus: +20%, +25%, +30%.
+ * Saver Credits, the SunD top-up (Sheet Inputs and the v12 pitch deck, 12 Nov 2026 — replaces the old RM 20 → 30):
+ * spendable anywhere in SunD — charging at every bay, eBikes, mall parking, the clubhouse (residents) and mall shops.
+ * The more you top up, the bigger the bonus: +10% at RM 50 up to +30% at RM 500 (RM 500 → RM 650, the deck's example).
+ * At RM 1.40/kWh public, a RM 500 top-up makes charging RM 1.40 ÷ 1.30 ≈ RM 1.08 a kWh (deck slide 5).
  * Capped at +30% so the SunD Pass stays the better deal for regulars: a typical Pass month is worth +40% or more
  * (PASS_TYPICAL_MONTH). tests/numbers.test.ts enforces that gap.
  */
 export const SAVER_PACKS = [
-  { pay: 50, get: 60 },
-  { pay: 100, get: 125 },
-  { pay: 200, get: 260 },
+  { pay: 50, get: 55 },
+  { pay: 100, get: 115 },
+  { pay: 200, get: 240 },
+  { pay: 300, get: 375 },
+  { pay: 500, get: 650 },
 ];
 
 /**

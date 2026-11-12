@@ -160,7 +160,7 @@ export default function Dashboard() {
               <Sun size={16} className="text-sun" /> Nudges · kWh moved into 11am–3pm
             </div>
             <div className="font-display text-[30px] font-bold tabular">
-              {fmtInt((Object.values(profiles).reduce((a, p) => a + p.nudgeKwh, 0) / 4) * (312 + demoWallets))} <span className="text-[14px] text-ink-muted">kWh this month</span>
+              {fmtInt((Object.values(profiles).reduce((a, p) => a + p.nudgeKwh, 0) / Object.keys(profiles).length) * (312 + demoWallets))} <span className="text-[14px] text-ink-muted">kWh this month</span>
             </div>
             <div className="text-[12px] text-ink-subtle">Demo personas’ average × wallets · read from TNB smart-meter data in the pilot</div>
           </div>

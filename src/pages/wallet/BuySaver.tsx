@@ -1,6 +1,6 @@
 import { ArrowRight, BadgeCheck, Check, ChevronRight, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { SpendAnywhere } from '../../components/pass';
 import { PayMethodPicker, PAY_METHODS } from '../../components/payment';
 import { Button, Card, IconBubble, LinkButton, PageHeader } from '../../components/ui';
@@ -37,7 +37,9 @@ export default function BuySaver() {
   const rate = standardRate(audienceOf(persona.id));
   const buy = useStore((s) => s.buySaver);
   const nav = useNavigate();
-  const [pack, setPack] = useState(0);
+  // ?pack=500 opens with that pack chosen (pitch mode shows the deck's RM 500 → RM 650).
+  const [params] = useSearchParams();
+  const [pack, setPack] = useState(() => Math.max(0, SAVER_PACKS.findIndex((x) => x.pay === Number(params.get('pack')))));
   const [method, setMethod] = useState(PAY_METHODS[0].id);
   const [stage, setStage] = useState<'choose' | 'paying' | 'done'>('choose');
   const p = SAVER_PACKS[pack];
@@ -81,18 +83,18 @@ export default function BuySaver() {
       <PageHeader title="Buy Saver Credits" />
       <div className="flex flex-col gap-6 px-5 pb-10 pt-4">
         <div className="rounded-[20px] border border-sky-soft bg-sky-wash p-5">
-          <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center justify-center gap-4" data-pitch="saver-amounts">
             <div className="text-center">
               <div className="text-[14px] text-ink-muted">You pay</div>
-              <div className="font-display text-[28px] font-bold tabular">{fmtRm(p.pay)}</div>
+              <div className="whitespace-nowrap font-display text-[28px] font-bold tabular">RM {fmtInt(p.pay)}</div>
             </div>
             <ArrowRight size={28} className="text-sky" />
             <div className="text-center">
               <div className="text-[14px] text-ink-muted">You get</div>
-              <div className="font-display text-[28px] font-bold text-leaf-ink tabular">{fmtRm(p.get)}</div>
+              <div className="whitespace-nowrap font-display text-[28px] font-bold text-leaf-ink tabular">RM {fmtInt(p.get)}</div>
             </div>
           </div>
-          <div className="mt-4 rounded-2xl bg-sky-soft p-3">
+          <div className="mt-4 rounded-2xl bg-sky-soft p-3" data-pitch="spend-anywhere">
             <div className="mb-2 text-center text-[14px] font-bold text-sky-deep">Spend anywhere in SunD</div>
             <SpendAnywhere />
           </div>
