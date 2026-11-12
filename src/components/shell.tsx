@@ -124,7 +124,7 @@ export function TabHeader({ title }: { title?: ReactNode }) {
   const night = !isDaylight(hourOf(simTime));
 
   return (
-    <header className="flex items-center gap-3 px-5 pb-2 pt-3">
+    <header className="flex items-center gap-3 px-5 pb-2 pt-3" data-pitch="app-header">
       <button type="button" className="shrink-0 select-none rounded-xl" aria-label="SunD Wallet (long-press for demo controls)" {...press}>
         <SunMark size={44} />
       </button>

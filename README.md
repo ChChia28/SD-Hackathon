@@ -59,32 +59,28 @@ Added after the deck (10 Nov 2026), so the deck, PDF and video still show the ol
 
 ## Pitch mode (follows SunD_Pitch_v12_10slides.pdf)
 
-Every step goes with one page of the 10-slide deck and sets the person, the clock and one app screen.
+Ten slides, one for each page of the deck, each one a still screen of the app. Phones and laptops look the same.
 
-- **For the audience (phones):** scan the QR code, open the home page and tap **Pitch mode**. Each step shows three parts that read apart: a navy slide bar on top (slide, headline, and on slide 4 the time and moment), the app as an outlined box with numbered rings, and a caption card underneath ("On this screen") saying what each number means, with **Back / Next** and a dot per slide. Each number has its own colour (blue, amber, purple) on both the ring and its caption. Swiping left or right on the slide bar, the captions or a picture page also moves through it. The last step's button is **Explore the app**, and **Home** (top left) returns to the home page.
-- **For the presenter (laptop, 1200 px wide or more):** the slide on the left with the QR code on slides 1, 9 and 10, the app in the middle, and up to three labels on the right, each with a straight line to the part of the app it explains. Start it from the home page, the presenter controls or `#/pitch`. Use **← →**, a clicker (Page Up/Down), the slide numbers 1–10 or the moment list on slide 4. **Home** (top of the slide panel) or **Esc** goes back to the home page.
+- **Top bar:** **Home** (back to the home page), the slide number (Slide 4/10) and the slide's title. Nothing else.
+- **The app:** fills nearly all the screen. Up to three coloured rings mark what matters, each with a few words on a tag right next to it (blue, amber, purple). You can scroll the app to see more, but nothing in it can be tapped; the rings and tags follow as you scroll.
+- **Bottom:** Back, a dot per slide and **Slide X** for the next slide (**Explore the app** on the last). On slide 4 a row above shows the time of Aisyah's day with a **Next** button that steps through 7:00 AM → 8:10 → 8:30 → 8:45 → 2:00 PM → 8:00 PM.
+- **Keys and swipes:** ← → (or a clicker's Page Up/Down) move between slides, ↑ ↓ step through the times on slide 4, Esc goes home. On a phone, swipe left or right on the top bar or the buttons.
 - **Held still:** the clock is paused, a charge holds at its value and pop-ups stay hidden.
-- **Three picture pages** replace the phone: slide 1 (the township picture with its six SunD facilities and the solar loop: make, use, spend, grow), slide 2 (who pays, who feels it) and slide 7 (bear, base and bull cases).
 
-| # | Slide | Screen | Labels |
-|---|---|---|---|
-| 1 | 1 · SunD | Picture: the deck's township illustration (1 mall roof, 2 SunD Bay, 3 home solar, 4 balcony, 5 Walk, 6 Cool; Phase 1 and 2) and the solar loop | |
-| 2 | 2 · The problem | Picture: who pays to build (100% Sime Darby → top-ups 53%) and what a resident feels (almost nothing → +30%) | |
-| 3 | 3 · The solution | Map | Phase 1: mall roof + SunD Bay · green pin = spare solar · Phase 2: Walk and Cool |
-| 4 | 4 · Her day, 7:00 AM | SunD Balcony | 800 W kit ≈ 47 kWh a month · Phase 2, 2027 sandbox |
-| 5 | 4 · Her day, 8:10 AM | Top-up, RM 500 chosen | RM 500 in, RM 650 to spend · spend anywhere in Sime Darby |
-| 6 | 4 · Her day, 8:30 AM | SunD Walk A | Solar roof over the hottest route · 3.1 °C cooler in its shade |
-| 7 | 4 · Her day, 8:45 AM | Charging at the mall bay, held at 72% | At the mall's SunD Bay · solar from this canopy · RM 0 cash |
-| 8 | 4 · Her day, 2:00 PM | SunD Cool on a heat-alert day | Level 1, 36 °C · nearest cool room · cooled by solar |
-| 9 | 4 · Her day, 8:00 PM | Wallet activity | Coffee and mall parking on credits · this morning's solar charge |
-| 10 | 5 · Why SunD | Daniel at the mall bay | Made on site · RM 1.40 ÷ 1.30 = RM 1.08 a kWh with a RM 500 top-up |
-| 11 | 6 · Business model | Rewards: eBikes and the mall | eBikes on Sime Darby's solar · spent in Sime Darby's own mall |
-| 12 | 7 · The numbers | Picture: NPV RM 2.26M, IRR 12.0%, payback 9.0 years; bear / base / bull NPV RM 0.69M / 2.26M / 4.82M | |
-| 13 | 8 · Impact | Receipt of the 8:45 charge | Sime Darby: its sun, its bay · residents: RM 0 cash · planet: CO₂ avoided |
-| 14 | 9 · Feasibility | Sign-up, township list (QR on the slide) | One Elmina precinct first · next townships once proven |
-| 15 | 10 · The ask | Home (QR on the slide) | Charge at SunD Bay, on sunshine · enjoy solar-driven facilities |
+| Slide | App screen | Tags |
+|---|---|---|
+| 1 · SunD | Home (Aisyah) | One wallet for the township · powered by Elmina's own solar · use power while the sun shines |
+| 2 · The problem | Township Impact | Solar Sime Darby paid for alone · SunD: every resident feels it · used where it is made |
+| 3 · The solution | Map | Phase 2: Walk and Cool · Phase 1: mall roof + SunD Bay · green pin = spare solar |
+| 4 · Her day | Six screens, one per time: balcony (7:00), RM 500 → RM 650 top-up (8:10), SunD Walk (8:30), charging held at 72% (8:45), SunD Cool on a heat-alert day (2:00 PM), wallet activity (8:00 PM) | Two or three per screen, e.g. "RM 500 in, RM 650 to spend" |
+| 5 · Why SunD | Daniel at the mall bay | Made on site, by the sun · RM 1.40 ÷ 1.30 = RM 1.08 a kWh |
+| 6 · Business model | Rewards: eBikes and the mall | eBikes on Sime Darby's solar · spent in Sime Darby's own mall |
+| 7 · The numbers | Pilot business case (new screen) | NPV RM 2.26M · IRR 12% · 9 years · top-ups pay 53% of the build · positive in every case |
+| 8 · Impact | Receipt of the 8:45 charge | Sime Darby: its sun, its bay · residents: RM 0 cash · planet: CO₂ avoided |
+| 9 · Feasibility | Sign-up, township list | One Elmina precinct first · next townships once proven |
+| 10 · The ask | Home, nearest bay and shortcuts | Charge at SunD Bay, on sunshine · enjoy solar-driven facilities |
 
-The steps live in `src/components/pitch.tsx` (`PITCH_STEPS`); each label points at an element tagged `data-pitch="…"`. The SDP dashboard is no longer a pitch step: it still uses the older appendix figures (payback 4.7–6.8 years, a month-6 decision), which differ from the v12 deck.
+The steps live in `src/components/pitch.tsx` (`PITCH_STEPS`); each tag points at an element tagged `data-pitch="…"`. **Pilot business case** (`#/pilot`, also under Profile) is a phone screen for Sime Darby with the deck's slide 7 figures (`src/data/pilot.ts`). The SDP dashboard is not a pitch step: it still uses the older appendix figures (payback 4.7–6.8 years, a month-6 decision), which differ from the v12 deck.
 
 ## Presenter controls
 

@@ -5,8 +5,6 @@ import { SAVER_PACKS } from '../data/constants';
 import { cx } from '../lib/format';
 import type { PersonaId } from '../store/types';
 import { useStore, type State } from '../store/useStore';
-import { ShareQr } from './ShareQr';
-import { SunMark } from './shell';
 
 interface Ctx {
   s: () => State;
@@ -33,14 +31,8 @@ export interface PitchStep {
   phase?: 1 | 2;
   /** At most three, a few words each, listed top to bottom as they sit on the screen. */
   notes?: PitchNote[];
-  /** Scroll this tagged element into view before pointing at things. */
+  /** Scroll this tagged element into view before pointing at things (default: the first note, if it is cut off). */
   scroll?: { at: string; block?: 'start' | 'center' | 'end' };
-  /** Phones show less of the screen; scroll here instead when it differs. */
-  phoneScroll?: { at: string; block?: 'start' | 'center' | 'end' };
-  /** A picture or chart instead of the phone (slides 1, 2 and 7). */
-  visual?: 'cover' | 'problem' | 'numbers';
-  /** On a laptop, show the QR code that opens this walkthrough on the audience's phones. */
-  qr?: boolean;
   run: (c: Ctx) => void;
 }
 
@@ -84,8 +76,11 @@ export const PITCH_STEPS: PitchStep[] = [
     label: 'SunD',
     title: 'The township wallet, *powered by its own sun*',
     sub: 'One solar ecosystem: Wallet, solar roofs, SunD Bay, home solar, balcony, Walk and Cool.',
-    visual: 'cover',
-    qr: true,
+    notes: [
+      { at: 'app-header', text: 'One wallet for the township' },
+      { at: 'home-solar', text: 'Powered by Elmina’s own solar' },
+      { at: 'home-nudge', text: 'Use power while the sun shines' },
+    ],
     run: (c) => {
       c.s().resetDemo();
       as(c, AISYAH);
@@ -97,9 +92,17 @@ export const PITCH_STEPS: PitchStep[] = [
     slide: 2,
     label: 'The problem',
     title: 'Paid for by the developer *alone*, felt by almost *no resident*',
-    sub: 'So township solar stays a pilot.',
-    visual: 'problem',
-    run: () => {},
+    sub: 'So township solar stays a pilot. SunD shares it through one wallet.',
+    notes: [
+      { at: 'impact-roofs', text: 'Solar Sime Darby paid for alone' },
+      { at: 'impact-wallet', text: 'SunD: every resident feels it' },
+      { at: 'impact-use', text: 'Used where it is made' },
+    ],
+    run: (c) => {
+      as(c, AISYAH);
+      c.s().setHeat(false);
+      c.nav('/home/impact');
+    },
   },
   {
     slide: 3,
@@ -125,8 +128,8 @@ export const PITCH_STEPS: PitchStep[] = [
     moment: 'Balcony power',
     phase: 2,
     notes: [
-      { at: 'balcony-2027', text: 'Phase 2: 2027 sandbox' },
       { at: 'balcony-kwh', text: '800 W kit: ≈ 47 kWh a month' },
+      { at: 'balcony-join', text: 'Phase 2: the 2027 sandbox' },
     ],
     run: (c) => {
       as(c, AISYAH);
@@ -178,8 +181,7 @@ export const PITCH_STEPS: PitchStep[] = [
       { at: 'session-source', text: 'Solar from this canopy' },
       { at: 'session-cash', text: 'Paid with credits: RM 0 cash' },
     ],
-    scroll: { at: 'session-cash', block: 'end' },
-    phoneScroll: { at: 'session-ring', block: 'start' },
+    scroll: { at: 'session-ring', block: 'start' },
     run: (c) => {
       as(c, AISYAH);
       ensureTopUp(c);
@@ -267,8 +269,15 @@ export const PITCH_STEPS: PitchStep[] = [
     label: 'The numbers',
     title: 'Phase 1 pays back in *9 years*',
     sub: 'One Elmina precinct, 25 years, 8% discount rate.',
-    visual: 'numbers',
-    run: () => {},
+    notes: [
+      { at: 'case-kpis', text: 'NPV RM 2.26M · IRR 12% · 9 years' },
+      { at: 'case-pays', text: 'Top-ups pay 53% of the build' },
+      { at: 'case-cases', text: 'Positive in every case' },
+    ],
+    run: (c) => {
+      as(c, AISYAH);
+      c.nav('/pilot');
+    },
   },
   {
     slide: 8,
@@ -280,7 +289,7 @@ export const PITCH_STEPS: PitchStep[] = [
       { at: 'receipt-cash', text: 'Residents: RM 0 cash' },
       { at: 'receipt-co2', text: 'Planet: CO₂ avoided, every charge' },
     ],
-    phoneScroll: { at: 'receipt-co2', block: 'end' },
+    scroll: { at: 'receipt-co2', block: 'end' },
     run: (c) => {
       as(c, AISYAH);
       endCharge(c);
@@ -293,7 +302,6 @@ export const PITCH_STEPS: PitchStep[] = [
     label: 'Feasibility',
     title: 'Can it start now? *Yes.*',
     sub: 'Months 0–3 launch the wallet. 3–9 build the mall roof and first bay. 9–18 measure, decide.',
-    qr: true,
     notes: [
       { at: 'town-live', text: 'One Elmina precinct first' },
       { at: 'town-soon', text: 'Next townships once proven' },
@@ -305,7 +313,6 @@ export const PITCH_STEPS: PitchStep[] = [
     label: 'The ask',
     title: 'Spend a *Sunny Day*. Charge at *SunD* Bay.',
     sub: 'Welcome to the Sustainably Designed Sime Darby township of tomorrow.',
-    qr: true,
     notes: [
       { at: 'home-bay', text: 'Charge at SunD Bay, on sunshine' },
       { at: 'quick-actions', text: 'Enjoy solar-driven facilities' },
@@ -351,8 +358,36 @@ export function usePitch() {
     exit();
     nav('/start');
   }, [exit, nav]);
-  return { pitch: { ...pitch, step: index }, go, exit, home, step: PITCH_STEPS[index] };
+  const step = PITCH_STEPS[index];
+  // Pitch mode moves slide by slide (10, like the deck). Slide 4 has six times of Aisyah's day inside it.
+  const goSlide = (n: number) => {
+    const i = firstOfSlide(n);
+    if (i >= 0) go(i);
+  };
+  const moments = PITCH_STEPS.map((s, i) => ({ s, i })).filter((x) => x.s.slide === step.slide && x.s.time);
+  const momentAt = moments.findIndex((m) => m.i === index);
+  const nextMoment = moments.length ? moments[(momentAt + 1) % moments.length] : undefined;
+  return {
+    pitch: { ...pitch, step: index },
+    go,
+    exit,
+    home,
+    step,
+    goSlide,
+    nextSlide: () => goSlide(step.slide + 1),
+    prevSlide: () => goSlide(step.slide - 1),
+    isFirstSlide: step.slide === 1,
+    isLastSlide: step.slide === SLIDE_COUNT,
+    moments,
+    momentAt,
+    /** The next time on slide 4, wrapping back to the first after 8 pm. */
+    nextMoment,
+    goNextMoment: () => nextMoment && go(nextMoment.i),
+    goPrevMoment: () => momentAt > 0 && go(moments[momentAt - 1].i),
+  };
 }
+
+const firstOfSlide = (n: number) => PITCH_STEPS.findIndex((s) => s.slide === n);
 
 /** *Asterisks* → SunD red, as on the deck (a brighter red on navy). */
 function Rich({ text, onNavy = false }: { text: string; onNavy?: boolean }) {
@@ -371,116 +406,36 @@ function Rich({ text, onNavy = false }: { text: string; onNavy?: boolean }) {
   );
 }
 
-/** Arrow keys, Page Up/Down (presentation clickers) and Esc drive pitch mode. */
+/** ← → and Page Up/Down (presentation clickers) move between slides; ↑ ↓ step through the times on slide 4; Esc goes home. */
 export function PitchKeyBridge() {
-  const { pitch, go, home } = usePitch();
+  const p = usePitch();
+  const ref = useRef(p);
+  ref.current = p;
+  const on = p.pitch.on;
   useEffect(() => {
-    if (!pitch.on) return;
+    if (!on) return;
     const onKey = (e: KeyboardEvent) => {
       const el = e.target as HTMLElement | null;
       if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable)) return;
+      const c = ref.current;
       if (e.key === 'ArrowRight' || e.key === 'PageDown') {
         e.preventDefault();
-        go(pitch.step + 1);
+        c.nextSlide();
       } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
         e.preventDefault();
-        go(pitch.step - 1);
-      } else if (e.key === 'Escape') home();
+        c.prevSlide();
+      } else if (e.key === 'ArrowDown' && c.moments.length) {
+        e.preventDefault();
+        c.goNextMoment();
+      } else if (e.key === 'ArrowUp' && c.moments.length) {
+        e.preventDefault();
+        c.goPrevMoment();
+      } else if (e.key === 'Escape') c.home();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [pitch.on, pitch.step, go, home]);
+  }, [on]);
   return null;
-}
-
-/** Same height as the framed phone, so the slide panel and the phone line up. */
-export const PITCH_HEIGHT = 'min(844px, calc(100dvh - 48px))';
-
-/** Left of the phone on a laptop: the slide this step goes with, its headline, and the controls. */
-export function PitchSlide() {
-  const { pitch, step, go, home } = usePitch();
-  if (!pitch.on) return null;
-  const moments = PITCH_STEPS.map((s, i) => ({ s, i })).filter((x) => x.s.slide === step.slide && x.s.time);
-  const first = (n: number) => PITCH_STEPS.findIndex((s) => s.slide === n);
-  return (
-    <aside className="hidden w-[380px] shrink-0 flex-col justify-between min-[1200px]:flex" style={{ height: PITCH_HEIGHT }}>
-      <div className="flex items-center gap-2.5">
-        <SunMark size={30} />
-        <span className="text-[13px] font-extrabold uppercase tracking-[0.18em] text-sun">SunD · Team UrbanByte</span>
-        <button type="button" onClick={home} className="ml-auto flex h-9 items-center gap-1.5 rounded-full border border-outline bg-page px-3 text-[14px] font-bold text-ink hover:border-sky-bright">
-          <House size={16} /> Home
-        </button>
-      </div>
-
-      <div key={pitch.step} className="rise-in">
-        <div className="text-[14px] font-extrabold uppercase tracking-[0.16em] text-sun">
-          Slide {step.slide} · {step.label}
-        </div>
-        <span className="mt-2 block h-[3px] w-14 rounded-full bg-sun" />
-        <h1 className="mt-5 text-[38px] font-bold leading-[44px] tracking-[-0.01em] text-ink">
-          <Rich text={step.title} />
-        </h1>
-        {step.sub && <p className="mt-4 text-[19px] leading-7 text-ink-muted">{step.sub}</p>}
-        {moments.length > 0 && (
-          <>
-            <ol className="mt-6 flex flex-col gap-1">
-              {moments.map(({ s, i }) => {
-                const on = i === pitch.step;
-                return (
-                  <li key={i}>
-                    <button type="button" onClick={() => go(i)} className={cx('flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left', on ? 'bg-sun-soft' : 'hover:bg-sunken')}>
-                      <span className={cx('w-[74px] shrink-0 text-[14px] font-extrabold tabular', on ? 'text-sun' : 'text-ink-subtle')}>{s.time}</span>
-                      <span className={cx('flex-1 text-[17px] font-bold', on ? 'text-ink' : 'text-ink-muted')}>{s.moment}</span>
-                      <span className={cx('h-2.5 w-2.5 shrink-0 rounded-full', s.phase === 1 ? 'bg-sun' : 'bg-sky')} aria-label={`Phase ${s.phase}`} />
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-            <div className="mt-2 flex gap-4 px-3 text-[13px] font-bold text-ink-muted">
-              <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-sun" /> Phase 1
-              </span>
-              <span className="flex items-center gap-1.5">
-                <span className="h-2.5 w-2.5 rounded-full bg-sky" /> Phase 2
-              </span>
-            </div>
-          </>
-        )}
-        {step.qr && (
-          <div className="mt-6 rounded-2xl border border-outline bg-page p-4 shadow-soft">
-            <ShareQr size={108} />
-          </div>
-        )}
-      </div>
-
-      <div>
-        <div className="flex gap-1" role="group" aria-label="Slides">
-          {Array.from({ length: SLIDE_COUNT }, (_, k) => k + 1).map((n) => (
-            <button
-              key={n}
-              type="button"
-              aria-label={`Slide ${n}`}
-              aria-current={n === step.slide ? 'step' : undefined}
-              onClick={() => go(first(n))}
-              className={cx('flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-bold tabular', n === step.slide ? 'bg-sun text-white' : n < step.slide ? 'bg-sky text-white' : 'border border-outline bg-page text-ink-muted hover:border-sky-bright')}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
-        <div className="mt-3 flex items-center gap-2">
-          <button type="button" aria-label="Previous" className="btn btn-secondary !min-h-11 !px-3" onClick={() => go(pitch.step - 1)} disabled={pitch.step === 0}>
-            <ChevronLeft size={20} />
-          </button>
-          <button type="button" className="btn btn-primary !min-h-11 !px-5" onClick={() => go(pitch.step + 1)} disabled={pitch.step === PITCH_STEPS.length - 1}>
-            Next <ChevronRight size={20} />
-          </button>
-          <span className="ml-1 text-[13px] text-ink-subtle">← → to move · Esc for home</span>
-        </div>
-      </div>
-    </aside>
-  );
 }
 
 /** Scrolls the nearest scrolling box inside the phone so `el` sits at the start, centre or end ('nearest' only if it is cut off). */
@@ -502,61 +457,45 @@ function scrollInPhone(el: HTMLElement, block: 'start' | 'center' | 'end' | 'nea
   box.scrollTop += delta / zoom;
 }
 
-/** True on screens wide enough for the laptop layout (slide panel, phone, labels). */
-function useWide() {
-  const query = '(min-width: 1200px)';
-  const [wide, setWide] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
-  useEffect(() => {
-    const m = window.matchMedia(query);
-    const on = () => setWide(m.matches);
-    m.addEventListener('change', on);
-    return () => m.removeEventListener('change', on);
-  }, []);
-  return wide;
-}
-
-interface Placed {
-  /** The note's number: its place in the step's list. */
-  n: number;
-  text: string;
-  /** Where the line meets the element (laptop) or the badge sits (phone). */
-  tx: number;
-  ty: number;
-  ring: { x: number; y: number; w: number; h: number };
-  /** Label centre, y (laptop only). */
-  ly: number;
-}
-
-const LABEL_H = 52;
-const LABEL_GAP = 14;
-
 /**
- * One colour per note, so ring 2 on the app matches caption 2. Chosen to stand apart from the app's own
- * red, navy and green, and checked for colour-blind separation (dataviz validator). The numbers carry it too.
+ * One colour per note, chosen to stand apart from the app's own red, navy and green and checked for
+ * colour-blind separation (dataviz validator).
  */
 const NOTE_COLORS = ['#3E63DD', '#C2680A', '#9B3FB5'];
 export const noteColor = (n: number) => NOTE_COLORS[(n - 1) % NOTE_COLORS.length];
 
+interface Tagged {
+  n: number;
+  text: string;
+  ring: { x: number; y: number; w: number; h: number };
+  tag: { x: number; y: number; w: number };
+}
+
+const TAG_H = 24;
+/** Rough width of a tag before it renders: 12.5 px bold text plus padding. */
+const tagWidth = (text: string) => Math.round(text.length * 6.9 + 22);
+type Box = { x: number; y: number; w: number; h: number };
+/** Cost of each spot round a ring: above, top edge, bottom edge, below, inside. */
+const SPOT_COST = [0, 100, 400, 4000, 5000];
+/** Area two boxes share (0 if apart). */
+const shared = (a: Box, b: Box) => Math.max(0, Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x)) * Math.max(0, Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y));
+
 /**
- * Points at the parts of the app a step talks about. Each one gets a red ring and its number.
- * On a laptop the words sit beside the phone with a straight line to the ring;
- * on a phone the words are in the caption card under the app, so only the numbered ring shows.
+ * Points at the parts of the app a step talks about: a coloured ring round each one, and its few words on a tag
+ * sitting on the ring's edge (top, or bottom when there is no room), right where the eye already is.
  */
 export function PitchNotes() {
   const { pitch, step } = usePitch();
   const loc = useLocation();
-  const wide = useWide();
-  const [placed, setPlaced] = useState<{ lx: number; items: Placed[] } | null>(null);
-  const notes = pitch.on && !step.visual ? (step.notes ?? []) : [];
-  const key = `${pitch.on}-${pitch.step}-${wide}`;
+  const [placed, setPlaced] = useState<Tagged[] | null>(null);
+  const notes = pitch.on ? (step.notes ?? []) : [];
+  const key = `${pitch.on}-${pitch.step}`;
 
   useEffect(() => {
-    if (!pitch.on || step.visual) return;
-    // Phones show less of the screen: bring the first thing pointed at into view if no scroll is set.
-    const set = wide ? step.scroll : (step.phoneScroll ?? step.scroll);
-    const target = set?.at ?? (wide ? undefined : step.notes?.[0]?.at);
+    if (!pitch.on) return;
+    const target = step.scroll?.at ?? step.notes?.[0]?.at;
     if (!target) return;
-    const block = set?.block ?? 'nearest';
+    const block = step.scroll?.block ?? 'nearest';
     let tries = 0;
     let again = 0;
     const id = window.setInterval(() => {
@@ -572,7 +511,7 @@ export function PitchNotes() {
       window.clearInterval(id);
       window.clearTimeout(again);
     };
-    // Re-run when the step, the layout or the screen changes.
+    // Re-run when the step or the screen changes.
   }, [key, loc.key]);
 
   useEffect(() => {
@@ -584,86 +523,86 @@ export function PitchNotes() {
     let last = '';
     const frame = () => {
       raf = requestAnimationFrame(frame);
-      const phone = document.querySelector('.phone');
       const screen = document.querySelector('.phone .screen');
-      if (!phone || !screen) return;
-      const pr = phone.getBoundingClientRect();
+      if (!screen) return;
       const sr = screen.getBoundingClientRect();
-      if (!pr.width) return;
-      const items = notes
+      if (!sr.width) return;
+      // First the rings, so each tag can keep clear of every annotated part, then the tags.
+      const rings = notes
         .map((n, i) => ({ n: i + 1, text: n.text, el: document.querySelector(`.phone [data-pitch="${n.at}"]`) }))
         .flatMap(({ n, text, el }) => {
           if (!el) return [];
           const r = el.getBoundingClientRect();
-          if (!r.width || r.bottom < sr.top + 10 || r.top > sr.bottom - 10) return [];
+          // Skip a part that has (mostly) scrolled out of view, so no sliver of a ring is left at the edge.
+          const visible = Math.min(r.bottom, sr.bottom) - Math.max(r.top, sr.top);
+          if (!r.width || visible < Math.min(28, r.height) || visible < r.height * 0.4) return [];
           const top = Math.max(r.top, sr.top + 4);
           const bottom = Math.min(r.bottom, sr.bottom - 4);
           const left = Math.max(r.left, sr.left + 4);
           const right = Math.min(r.right, sr.right - 4);
-          const ring = { x: left - 6, y: top - 4, w: right - left + 12, h: bottom - top + 8 };
-          // Phone: the badge sits on the ring's top-right corner, kept inside the screen.
-          const edge = Math.min(sr.right, pr.right, window.innerWidth) - 18;
-          const badge = { x: Math.min(ring.x + ring.w - 6, edge), y: Math.max(ring.y + 6, sr.top + 16) };
-          if (!wide) ring.w = Math.min(ring.w, edge + 14 - ring.x);
-          return [{ n, text, ring, ...(wide ? { tx: right + 6, ty: (top + bottom) / 2 } : { tx: badge.x, ty: badge.y }) }];
-        })
-        .sort((a, b) => a.ty - b.ty);
-      // Laptop: stack the labels without overlap, each as level with its element as it can be.
-      let y = -Infinity;
-      const ly = items.map((it) => (y = Math.max(it.ty, y + LABEL_H + LABEL_GAP)));
-      const over = ly.length ? ly[ly.length - 1] - (pr.bottom - LABEL_H / 2) : 0;
-      if (over > 0) {
-        for (let i = 0; i < ly.length; i++) ly[i] -= over;
-        for (let i = 0; i < ly.length; i++) ly[i] = Math.max(ly[i], i ? ly[i - 1] + LABEL_H + LABEL_GAP : pr.top + LABEL_H / 2);
-      }
-      const next = { lx: Math.round(pr.right + 40), items: items.map((it, i) => ({ ...it, ly: Math.round(ly[i]) })) };
-      const sig = JSON.stringify(next);
+          return [{ n, text, ring: { x: left - 5, y: top - 4, w: right - left + 10, h: bottom - top + 8 } }];
+        });
+      const tags: Box[] = [];
+      const items = rings.map(({ n, text, ring }) => {
+        const w = Math.min(tagWidth(text), sr.width - 16);
+        const clampX = (x: number) => Math.max(sr.left + 8, Math.min(x, sr.right - 8 - w));
+        const xs = [clampX(ring.x + 10), clampX(ring.x + ring.w - w - 10)];
+        // Same order as SPOT_COST: just above the ring, on its top edge, on its bottom edge, just below, inside its top.
+        const ys = [ring.y - TAG_H - 3, ring.y - TAG_H * 0.55, ring.y + ring.h - TAG_H * 0.45, ring.y + ring.h + 3, ring.y + 5];
+        let best: Box | null = null;
+        let bestScore = Infinity;
+        ys.forEach((y, yi) =>
+          xs.forEach((x, xi) => {
+            const t = { x, y, w, h: TAG_H };
+            if (y < sr.top + 2 || y + TAG_H > sr.bottom - 2) return;
+            const score =
+              tags.reduce((a, o) => a + shared(t, o) * 50, 0) + // never on another tag
+              rings.reduce((a, o) => a + shared(t, o.ring) * (o.n === n ? 0.2 : 2.5), 0) + // keep other annotated parts readable
+              SPOT_COST[yi] + xi * 20; // prefer above or on the top edge, so a tag never drifts onto the next card
+            if (score < bestScore) {
+              bestScore = score;
+              best = t;
+            }
+          }),
+        );
+        const tag = best ?? { x: xs[0], y: ring.y + 5, w, h: TAG_H };
+        tags.push(tag);
+        return { n, text, ring, tag };
+      });
+      const sig = JSON.stringify(items);
       if (sig !== last) {
         last = sig;
-        setPlaced(next);
+        setPlaced(items);
       }
     };
     raf = requestAnimationFrame(frame);
     return () => cancelAnimationFrame(raf);
   }, [key]);
 
-  if (!notes.length || !placed?.items.length) return null;
+  if (!notes.length || !placed?.length) return null;
   return (
     <div className="pointer-events-none fixed inset-0 z-[60]" aria-hidden="true">
       <svg className="absolute inset-0 h-full w-full">
-        {placed.items.map((it) => (
-          <g key={it.n}>
-            <rect x={it.ring.x} y={it.ring.y} width={it.ring.w} height={it.ring.h} rx={14} fill={noteColor(it.n)} fillOpacity={0.06} stroke={noteColor(it.n)} strokeWidth={2} />
-            {wide && (
-              <>
-                <path d={`M${placed.lx} ${it.ly} L${it.tx} ${it.ty}`} stroke={noteColor(it.n)} strokeWidth={2} fill="none" />
-                <circle cx={it.tx} cy={it.ty} r={5.5} fill={noteColor(it.n)} stroke="#fff" strokeWidth={2} />
-              </>
-            )}
-          </g>
+        {placed.map((it) => (
+          <rect key={it.n} x={it.ring.x} y={it.ring.y} width={it.ring.w} height={it.ring.h} rx={14} fill={noteColor(it.n)} fillOpacity={0.06} stroke={noteColor(it.n)} strokeWidth={2} />
         ))}
       </svg>
-      {placed.items.map((it) =>
-        wide ? (
-          <div key={it.n} className="rise-in absolute flex items-center gap-3 whitespace-nowrap rounded-2xl border border-outline bg-page py-2.5 pl-2.5 pr-4 shadow-soft" style={{ left: placed.lx, top: it.ly, transform: 'translateY(-50%)' }}>
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-white" style={{ background: noteColor(it.n) }}>
-              {it.n}
-            </span>
-            <span className="text-[18px] font-bold leading-6 text-ink">{it.text}</span>
-          </div>
-        ) : (
-          <span key={it.n} className="rise-in absolute flex h-7 w-7 items-center justify-center rounded-full text-[14px] font-bold text-white shadow-soft ring-2 ring-white" style={{ left: it.tx, top: it.ty, transform: 'translate(-50%, -50%)', background: noteColor(it.n) }}>
-            {it.n}
-          </span>
-        ),
-      )}
+      {placed.map((it) => (
+        <span
+          key={it.n}
+          className="rise-in absolute flex items-center whitespace-nowrap rounded-full px-2.5 text-[12.5px] font-bold leading-none text-white shadow-soft ring-2 ring-white"
+          style={{ left: it.tag.x, top: it.tag.y, height: TAG_H, maxWidth: it.tag.w + 12, background: noteColor(it.n) }}
+        >
+          <span className="truncate">{it.text}</span>
+        </span>
+      ))}
     </div>
   );
 }
 
-/** Swipe left or right outside the app screen (slide bar, captions, picture pages) to move through the pitch. */
+/** Swipe left or right on the slide bar or the navigation to move between slides. */
 export function usePitchSwipe() {
-  const { pitch, go } = usePitch();
+  const { pitch, nextSlide, prevSlide } = usePitch();
   const start = useRef<{ x: number; y: number } | null>(null);
   return {
     onTouchStart: (e: TouchEvent) => {
@@ -676,84 +615,82 @@ export function usePitchSwipe() {
       if (!s) return;
       const dx = e.changedTouches[0].clientX - s.x;
       const dy = e.changedTouches[0].clientY - s.y;
-      if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) go(pitch.step + (dx < 0 ? 1 : -1));
+      if (Math.abs(dx) > 50 && Math.abs(dx) > 1.5 * Math.abs(dy)) (dx < 0 ? nextSlide : prevSlide)();
     },
   };
 }
 
-/** Phones and tablets: the slide this step goes with, above the app. */
+/** Above the app: Home, the slide number, the slide's title. Nothing else. */
 export function PitchTop() {
   const { pitch, step, home } = usePitch();
   if (!pitch.on) return null;
   return (
-    <header className="w-full shrink-0 bg-sky px-4 pb-3 pt-[max(10px,env(safe-area-inset-top))] text-white sm:rounded-[24px] sm:pt-3 min-[1200px]:hidden">
+    <header className="w-full shrink-0 bg-sky px-3 pb-2.5 pt-[max(8px,env(safe-area-inset-top))] text-white sm:rounded-[22px] sm:pt-2.5">
       <div className="flex items-center gap-2">
-        <button type="button" onClick={home} aria-label="Home: choose Pitch mode or Live prototype" className="-ml-1 flex h-8 shrink-0 items-center gap-1 rounded-full bg-white/10 px-2.5 text-[13px] font-bold hover:bg-white/20">
+        <button type="button" onClick={home} aria-label="Home: choose Pitch mode or Live prototype" className="flex h-8 shrink-0 items-center gap-1 rounded-full bg-white/10 px-2.5 text-[13px] font-bold hover:bg-white/20">
           <House size={15} /> Home
         </button>
-        <span className="shrink-0 rounded-full bg-sun px-2 py-0.5 text-[12px] font-bold">Slide {step.slide}</span>
-        <span className="min-w-0 flex-1 truncate text-[12px] font-extrabold uppercase tracking-[0.14em] text-white/70">{step.label}</span>
-        <span className="text-[13px] font-bold text-white/60 tabular">
-          {pitch.step + 1}/{PITCH_STEPS.length}
+        <span className="ml-auto shrink-0 rounded-full bg-sun px-2.5 py-0.5 text-[13px] font-bold tabular">
+          Slide {step.slide}/{SLIDE_COUNT}
         </span>
       </div>
-      <h1 key={pitch.step} className="rise-in mt-1 text-[20px] font-bold leading-[26px]">
+      <h1 key={pitch.step} className="rise-in mt-1.5 px-0.5 text-[18px] font-bold leading-6">
         <Rich text={step.title} onNavy />
       </h1>
-      {step.time ? (
-        <div className="mt-1 flex items-center gap-2 text-[15px] font-bold">
-          <span className="text-sun-bright tabular">{step.time}</span>
-          <span>{step.moment}</span>
-          <span className={cx('ml-auto rounded-full px-2 py-0.5 text-[11px]', step.phase === 1 ? 'bg-sun' : 'bg-white/15')}>Phase {step.phase}</span>
-        </div>
-      ) : (
-        step.visual && step.sub && <p className="mt-1 text-[14px] leading-5 text-white/75">{step.sub}</p>
-      )}
     </header>
   );
 }
 
-/** Phones and tablets: what the numbered rings mean, then Back / Next. */
+/** Below the app: on slide 4 the time of Aisyah's day and a Next-time button, then Back · slide dots · Slide X. */
 export function PitchBottom() {
-  const { pitch, step, go, exit } = usePitch();
+  const { pitch, step, go, exit, goSlide, nextSlide, prevSlide, isFirstSlide, isLastSlide, moments, momentAt, nextMoment, goNextMoment } = usePitch();
   if (!pitch.on) return null;
-  const last = pitch.step === PITCH_STEPS.length - 1;
-  const first = (n: number) => PITCH_STEPS.findIndex((s) => s.slide === n);
   return (
-    <footer className="mt-2.5 w-full shrink-0 rounded-t-[20px] bg-page px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-6px_20px_rgba(26,31,58,0.08)] sm:mt-0 sm:rounded-[24px] sm:border sm:border-outline sm:shadow-soft min-[1200px]:hidden">
-      {!!step.notes?.length && !step.visual && (
-        <div key={pitch.step} className="rise-in mb-3">
-          <div className="mb-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-ink-subtle">On this screen</div>
-          <ol className="flex flex-col gap-1.5">
-            {step.notes.map((n, i) => (
-              <li key={n.at} className="flex items-center gap-2.5">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white" style={{ background: noteColor(i + 1) }}>
-                  {i + 1}
-                </span>
-                <span className="text-[15px] font-bold leading-5 text-ink">{n.text}</span>
-              </li>
+    <footer className="w-full shrink-0 bg-page px-3 pb-[max(10px,env(safe-area-inset-bottom))] pt-2.5 sm:rounded-[22px] sm:border sm:border-outline sm:pb-2.5 sm:shadow-soft">
+      {step.time && (
+        <div className="mb-2.5">
+          <div className="flex items-center gap-2">
+            <span className="text-[15px] font-bold text-sun tabular">{step.time}</span>
+            <span className="min-w-0 truncate text-[15px] font-bold text-ink">{step.moment}</span>
+            {nextMoment && (
+              <button type="button" onClick={goNextMoment} aria-label={`Next time: ${nextMoment.s.time}, ${nextMoment.s.moment}`} className="ml-auto flex h-8 shrink-0 items-center gap-1 rounded-full bg-sun-soft pl-3 pr-2 text-[13px] font-bold text-sun-ink hover:bg-sun hover:text-white">
+                {momentAt === moments.length - 1 ? (
+                  <>Back to {nextMoment.s.time}</>
+                ) : (
+                  <>
+                    Next {nextMoment.s.time} <ChevronRight size={15} />
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+          <div className="mt-1.5 flex gap-1" role="group" aria-label="Times of the day">
+            {moments.map((m, k) => (
+              <button key={m.i} type="button" aria-label={`${m.s.time} · ${m.s.moment}`} aria-current={k === momentAt ? 'step' : undefined} onClick={() => go(m.i)} className="flex h-3 flex-1 items-center">
+                <span className={cx('block h-1 w-full rounded-full', k <= momentAt ? 'bg-sun' : 'bg-ink-faint')} />
+              </button>
             ))}
-          </ol>
+          </div>
         </div>
       )}
       <div className="flex items-center gap-2">
-        <button type="button" aria-label="Previous" disabled={pitch.step === 0} onClick={() => go(pitch.step - 1)} className="btn btn-secondary !min-h-11 !w-11 shrink-0 !px-0">
+        <button type="button" aria-label={`Slide ${step.slide - 1}`} disabled={isFirstSlide} onClick={prevSlide} className="btn btn-secondary !min-h-11 !w-11 shrink-0 !px-0">
           <ChevronLeft size={20} />
         </button>
         <div className="flex min-w-0 flex-1 items-center justify-center" role="group" aria-label="Slides">
           {Array.from({ length: SLIDE_COUNT }, (_, k) => k + 1).map((n) => (
-            <button key={n} type="button" aria-label={`Slide ${n}`} aria-current={n === step.slide ? 'step' : undefined} onClick={() => go(first(n))} className="flex h-8 items-center px-[3px]">
+            <button key={n} type="button" aria-label={`Slide ${n}`} aria-current={n === step.slide ? 'step' : undefined} onClick={() => goSlide(n)} className="flex h-8 items-center px-[3px]">
               <span className={cx('block h-2 rounded-full transition-all', n === step.slide ? 'w-5 bg-sun' : n < step.slide ? 'w-2 bg-sky' : 'w-2 bg-ink-faint')} />
             </button>
           ))}
         </div>
-        {last ? (
+        {isLastSlide ? (
           <button type="button" onClick={exit} className="btn btn-primary !min-h-11 shrink-0 !px-4">
             Explore the app
           </button>
         ) : (
-          <button type="button" onClick={() => go(pitch.step + 1)} className="btn btn-red !min-h-11 shrink-0 !px-4">
-            Next <ChevronRight size={18} />
+          <button type="button" onClick={nextSlide} className="btn btn-red !min-h-11 shrink-0 !px-4">
+            Slide {step.slide + 1} <ChevronRight size={18} />
           </button>
         )}
       </div>
@@ -797,7 +734,7 @@ export function PitchEntry() {
 
 /** Pitch-mode card inside the presenter controls (phones and small laptops). */
 export function PitchPanel() {
-  const { pitch, go, exit, step } = usePitch();
+  const { pitch, go, exit, step, goSlide, nextSlide, prevSlide, isFirstSlide, isLastSlide, nextMoment, goNextMoment } = usePitch();
   if (!pitch.on)
     return (
       <button type="button" className="btn btn-primary w-full" onClick={() => go(0)}>
@@ -816,8 +753,13 @@ export function PitchPanel() {
       </div>
       <div className="mt-2 text-[18px] font-bold leading-6">{step.title.replace(/\*/g, '')}</div>
       {step.time && (
-        <div className="mt-1 text-[14px] font-bold text-sun-bright">
+        <div className="mt-1 flex items-center gap-2 text-[14px] font-bold text-sun-bright">
           {step.time} · {step.moment}
+          {nextMoment && (
+            <button type="button" onClick={goNextMoment} className="ml-auto rounded-full bg-white/10 px-2.5 py-1 text-[12px] text-white hover:bg-white/20">
+              Next: {nextMoment.s.time}
+            </button>
+          )}
         </div>
       )}
       {step.sub && <p className="mt-1 text-[14px] leading-5 text-white/75">{step.sub}</p>}
@@ -829,25 +771,31 @@ export function PitchPanel() {
         </ol>
       )}
       <div className="mt-3 flex items-center gap-2">
-        <button type="button" className="btn btn-onnavy !min-h-11 flex-1" onClick={() => go(pitch.step - 1)} disabled={pitch.step === 0}>
-          <ChevronLeft size={18} /> Back
+        <button type="button" className="btn btn-onnavy !min-h-11 flex-1" onClick={prevSlide} disabled={isFirstSlide}>
+          <ChevronLeft size={18} /> Slide {Math.max(1, step.slide - 1)}
         </button>
-        <button type="button" className="btn btn-red !min-h-11 flex-[2]" onClick={() => go(pitch.step + 1)} disabled={pitch.step === PITCH_STEPS.length - 1}>
-          Next <ChevronRight size={18} />
-        </button>
+        {isLastSlide ? (
+          <button type="button" className="btn btn-red !min-h-11 flex-[2]" onClick={exit}>
+            Explore the app
+          </button>
+        ) : (
+          <button type="button" className="btn btn-red !min-h-11 flex-[2]" onClick={nextSlide}>
+            Slide {step.slide + 1} <ChevronRight size={18} />
+          </button>
+        )}
       </div>
-      <div className="mt-3 flex gap-1" aria-label={`Step ${pitch.step + 1} of ${PITCH_STEPS.length}`}>
-        {PITCH_STEPS.map((_, i) => (
+      <div className="mt-3 flex gap-1" aria-label={`Slide ${step.slide} of ${SLIDE_COUNT}`}>
+        {Array.from({ length: SLIDE_COUNT }, (_, k) => k + 1).map((n) => (
           <button
-            key={i}
+            key={n}
             type="button"
-            aria-label={`Go to step ${i + 1}`}
-            onClick={() => go(i)}
-            className={cx('h-1.5 flex-1 rounded-full', i === pitch.step ? 'bg-sun' : i < pitch.step ? 'bg-white/60' : 'bg-white/20')}
+            aria-label={`Go to slide ${n}`}
+            onClick={() => goSlide(n)}
+            className={cx('h-1.5 flex-1 rounded-full', n === step.slide ? 'bg-sun' : n < step.slide ? 'bg-white/60' : 'bg-white/20')}
           />
         ))}
       </div>
-      <div className="mt-2 text-[12px] text-white/50">← → or a presentation clicker · Esc to exit</div>
+      <div className="mt-2 text-[12px] text-white/50">← → slides · ↑ ↓ times on slide 4 · Esc for home</div>
     </div>
   );
 }

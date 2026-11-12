@@ -226,6 +226,9 @@ export function DemoControls({ onDone }: { onDone?: () => void }) {
           <button type="button" className="btn btn-secondary !justify-start" onClick={() => go('/home/impact')}>
             <Leaf size={20} /> Open Township Impact
           </button>
+          <button type="button" className="btn btn-secondary !justify-start" onClick={() => go('/pilot')}>
+            <LayoutDashboard size={20} /> Pilot business case
+          </button>
           <button type="button" className="btn btn-secondary !justify-start" onClick={() => go('/sources')}>
             <BookOpen size={20} /> Sources
           </button>

@@ -9,6 +9,7 @@ import { BAY_SIZES, DEFAULT_WHATIF, bayEconomics } from '../src/lib/economics';
 import { FACILITIES, getFacility } from '../src/data/rewards';
 import { estimatePayment, facilityPayment, passMonthValue, passPlansFor, SAVER_MAX_PCT, SAVER_MIN_PCT, saverBonusPct, sliceValueRm, splitReward, TOP_UP, withTopUp } from '../src/lib/pricing';
 import { seedProfile } from '../src/store/seed';
+import { PILOT_CASE } from '../src/data/pilot';
 import type { Pass } from '../src/store/types';
 
 const near = (a: number, b: number, tol: number) => expect(Math.abs(a - b)).toBeLessThanOrEqual(tol);
@@ -154,6 +155,19 @@ describe('Farah, the SunD Pass member demo', () => {
     const value = (C.PASS_KWH - pass.kwhLeft) * C.PUBLIC_PRICE + pass.rides * C.EBIKE_RIDE_RM + pass.parks * C.MALL_PARKING_RM;
     near(value, 134.4, 1e-9);
     expect(value).toBeGreaterThan(pass.price);
+  });
+});
+
+describe('pilot business case (v12 deck slide 7, Sheet Scenarios tab)', () => {
+  it('build RM 7.2M = bays 3.5 + roof solar 2.6 + canopy 1.05 (rounded); top-ups RM 3.8M + Sime Darby RM 3.4M', () => {
+    near(PILOT_CASE.build.parts.reduce((a, p) => a + p.m, 0), PILOT_CASE.build.totalM, 0.06);
+    near(PILOT_CASE.pays.topUpsM + PILOT_CASE.pays.sdpM, PILOT_CASE.build.totalM, 1e-9);
+  });
+  it('top-ups pay 53% of the build; base case NPV RM 2.26M, IRR 12%, payback 9 years', () => {
+    expect(Math.round((PILOT_CASE.pays.topUpsM / PILOT_CASE.build.totalM) * 100)).toBe(53);
+    expect([PILOT_CASE.npvM, PILOT_CASE.irrPct, PILOT_CASE.paybackYears]).toEqual([2.26, 12, 9]);
+    expect(PILOT_CASE.cases.find((c) => c.name === 'Base')!.npvM).toBe(PILOT_CASE.npvM);
+    for (const c of PILOT_CASE.cases) expect(c.npvM).toBeGreaterThan(0);
   });
 });
 

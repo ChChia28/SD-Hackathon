@@ -167,6 +167,10 @@ export default function Profile() {
               </div>
               <Toggle on={prof.largeText} onChange={setLarge} label="Large text" />
             </div>
+            <Link to="/pilot" className="flex min-h-16 items-center gap-3 px-4">
+              <Building size={20} className="text-ink-muted" />
+              <span className="flex-1 font-bold">Pilot business case · for Sime Darby</span>
+            </Link>
             <Link to="/sources" className="flex min-h-16 items-center gap-3 px-4">
               <BookOpen size={20} className="text-ink-muted" />
               <span className="flex-1 font-bold">Sources and assumptions</span>

@@ -1,7 +1,7 @@
+import { useEffect, useRef } from 'react';
 import { HashRouter, Navigate, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 import { Confetti, DashboardFloat, DemoSheet, DemoSidePanel, Toasts } from './components/overlays';
-import { ModeBar, PITCH_STEPS, PitchBottom, PitchEntry, PitchKeyBridge, PitchNotes, PitchSlide, PitchTop, usePitchSwipe } from './components/pitch';
-import { PitchVisual } from './components/pitchVisuals';
+import { ModeBar, PitchBottom, PitchEntry, PitchKeyBridge, PitchNotes, PitchTop, usePitchSwipe } from './components/pitch';
 import { StatusBar, SubShell, TabShell } from './components/shell';
 import Receipt from './pages/charge/Receipt';
 import Scan from './pages/charge/Scan';
@@ -30,6 +30,7 @@ import Balcony from './pages/wallet/Balcony';
 import Cool from './pages/cool/Cool';
 import Sources from './pages/Sources';
 import Dashboard from './pages/sdp/Dashboard';
+import PilotCase from './pages/sdp/PilotCase';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { cx } from './lib/format';
 import { useSimulation } from './store/hooks';
@@ -58,6 +59,7 @@ function AppRoutes() {
         <Route path="wallet/balcony" element={<Balcony />} />
         <Route path="cool" element={<Cool />} />
         <Route path="sources" element={<Sources />} />
+        <Route path="pilot" element={<PilotCase />} />
         <Route path="map/bay/:id" element={<BayDetail />} />
         <Route path="charge" element={<Scan />} />
         <Route path="charge/setup/:bayId" element={<Setup />} />
@@ -85,9 +87,27 @@ function Stage() {
   const onboarded = useStore((s) => s.onboarded);
   const large = useStore((s) => s.profiles[s.persona].largeText);
   const pitch = useStore((s) => s.pitch);
-  const visual = pitch.on ? PITCH_STEPS[Math.min(pitch.step, PITCH_STEPS.length - 1)].visual : undefined;
   const loc = useLocation();
   const swipe = usePitchSwipe();
+  // Pitch mode: the app scrolls, but nothing in it can be pressed. Clicks (and keyboard presses, which arrive as clicks),
+  // form changes and the logo's long-press are stopped before they reach the app; scrolling is left alone.
+  const screenRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = screenRef.current;
+    if (!el || !pitch.on) return;
+    const block = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    const stop = (e: Event) => e.stopPropagation();
+    const blocked = ['click', 'dblclick', 'auxclick', 'contextmenu', 'submit', 'change', 'beforeinput'];
+    blocked.forEach((t) => el.addEventListener(t, block, true));
+    el.addEventListener('pointerdown', stop, true);
+    return () => {
+      blocked.forEach((t) => el.removeEventListener(t, block, true));
+      el.removeEventListener('pointerdown', stop, true);
+    };
+  }, [pitch.on]);
   // The home page: choose Pitch mode or the Live prototype. The site link opens here.
   if (loc.pathname === '/start')
     return (
@@ -104,18 +124,15 @@ function Stage() {
     );
   return (
     <div className="stage">
-      {/* Pitch mode on a laptop: the slide on the left, the app in the middle, labels on the right. */}
-      <PitchSlide />
-      {/* The phone column: a bar on top with the Home button (live prototype) or the slide (pitch mode), then the app.
-          Full width on phones; a framed 390 px phone from sm up. Below 1200 px pitch mode adds captions with Back / Next. */}
+      {/* The phone column, the same on phones and laptops: a bar on top (Home + mode in the live prototype;
+          Home, slide number and title in pitch mode), the app, and in pitch mode the navigation below.
+          Full width on phones; a framed 390 px phone from sm up. */}
       <div className={cx('app-col flex w-full flex-col items-center sm:w-auto', pitch.on && 'pitch-col')} {...(pitch.on ? swipe : {})}>
         <ModeBar />
         <PitchTop />
-        {visual && <PitchVisual kind={visual} />}
-        {/* Hidden, not unmounted, on picture steps so the app keeps its place. */}
-        <div className={cx('phone', large && 'large-text')} style={visual ? { display: 'none' } : undefined}>
+        <div className={cx('phone', large && 'large-text')}>
           <StatusBar />
-          <div className="screen">
+          <div className="screen" ref={screenRef}>
             <ErrorBoundary>{onboarded ? <AppRoutes /> : <Onboarding />}</ErrorBoundary>
             <Toasts />
             <DemoSheet />
@@ -124,7 +141,6 @@ function Stage() {
         </div>
         <PitchBottom />
       </div>
-      {pitch.on && !visual && <div className="hidden w-[300px] shrink-0 min-[1200px]:block" aria-hidden="true" />}
       <div className={pitch.on ? 'hidden' : 'contents'}>
         <DemoSidePanel />
       </div>

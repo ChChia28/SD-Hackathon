@@ -7,11 +7,11 @@ import { useBayViews } from '../../store/hooks';
 import { useStore } from '../../store/useStore';
 
 /** A node in the flow diagram. */
-function Node({ x, y, w, h = 48, title, sub, tone }: { x: number; y: number; w: number; h?: number; title: string; sub: string; tone: 'leaf' | 'sky' | 'sun' | 'slate' | 'berry' }) {
+function Node({ x, y, w, h = 48, title, sub, tone, pitch }: { x: number; y: number; w: number; h?: number; title: string; sub: string; tone: 'leaf' | 'sky' | 'sun' | 'slate' | 'berry'; pitch?: string }) {
   const fills = { leaf: 'var(--color-leaf-soft)', sky: 'var(--color-sky-soft)', sun: 'var(--color-sun-soft)', slate: 'var(--color-sunken)', berry: 'var(--color-berry-soft)' };
   const strokes = { leaf: 'var(--color-leaf-deep)', sky: 'var(--color-sky)', sun: 'var(--color-sun-deep)', slate: 'var(--color-outline-strong)', berry: 'var(--color-berry)' };
   return (
-    <g>
+    <g data-pitch={pitch}>
       <rect x={x} y={y} width={w} height={h} rx={12} fill={fills[tone]} stroke={strokes[tone]} strokeWidth={1.5} />
       <text x={x + w / 2} y={y + h / 2 - 3} textAnchor="middle" fontSize={13} fontWeight={700} fill="var(--color-ink)">
         {title}
@@ -63,16 +63,16 @@ export default function Impact() {
               </marker>
             </defs>
             <text x={10} y={16} fontSize={11} fontWeight={800} letterSpacing="0.12em" fill="var(--color-sun-deep)">GENERATE</text>
-            <Node x={col[0]} y={24} w={98} title="Rooftops" sub={`${TOWNSHIP.mwp} MWp today`} tone="sun" />
+            <Node x={col[0]} y={24} w={98} title="Rooftops" sub={`${TOWNSHIP.mwp} MWp today`} tone="sun" pitch="impact-roofs" />
             <Node x={col[1]} y={24} w={98} title="Bay canopies" sub="2.5 kWp / lot" tone="sun" />
             <Node x={col[2]} y={24} w={98} title="Walkway roofs" sub="SunD Walk" tone="sun" />
             <text x={175} y={92} textAnchor="middle" fontSize={11} fill="var(--color-ink-muted)">+ SunD Balcony kits · 2027 sandbox</text>
 
             <text x={10} y={128} fontSize={11} fontWeight={800} letterSpacing="0.12em" fill="var(--color-sky)">SHARE</text>
-            <Node x={18} y={136} w={314} h={56} title="SunD Wallet · one account per resident" sub="Roof hosts · 1 kW slices · sponsored B40" tone="sky" />
+            <Node x={18} y={136} w={314} h={56} title="SunD Wallet · one account per resident" sub="Roof hosts · 1 kW slices · sponsored B40" tone="sky" pitch="impact-wallet" />
 
             <text x={10} y={232} fontSize={11} fontWeight={800} letterSpacing="0.12em" fill="var(--color-leaf-ink)">USE</text>
-            <Node x={col[0]} y={240} w={98} title="SunD Bay" sub="0 km, solar first" tone="leaf" />
+            <Node x={col[0]} y={240} w={98} title="SunD Bay" sub="0 km, solar first" tone="leaf" pitch="impact-use" />
             <Node x={col[1]} y={240} w={98} title="SunD Walk" sub={`−${WALK_DELTA_C} °C shade`} tone="leaf" />
             <Node x={col[2]} y={240} w={98} title="SunD Cool" sub="heat-alert days" tone="leaf" />
             <Node x={18} y={346} w={314} title="Public drivers pay per kWh" sub="Revenue funds the next canopy and bay" tone="berry" />

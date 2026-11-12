@@ -116,7 +116,7 @@ export function SliceCard() {
   const expected = (SLICE_KWH_PER_MONTH * dom) / 30;
 
   return (
-    <section className="card-navy p-5">
+    <section className="card-navy p-5" data-pitch="home-solar">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-[15px] font-bold text-white/80">
           <Sun size={18} className="text-sun-bright" /> {t('Your 1 kW solar slice')}
@@ -196,7 +196,7 @@ export function PeakNudgeCard() {
     return null;
   const live = h >= PEAK.from;
   return (
-    <section className="rounded-[20px] border border-sun-soft bg-sun-wash p-5">
+    <section className="rounded-[20px] border border-sun-soft bg-sun-wash p-5" data-pitch="home-nudge">
       <div className="flex items-center gap-2">
         <Pill tone="sun" icon={<Sun size={15} />}>
           {live ? t('Solar peak now') : t('Solar peak at 11 am')}

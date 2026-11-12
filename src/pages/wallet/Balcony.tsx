@@ -30,7 +30,7 @@ export default function Balcony() {
           <div className="mt-1 text-[15px] text-white/75 tabular">
             {BALCONY.watts} W {t('plug-in kit')} · RM {BALCONY.rmLow}–{BALCONY.rmHigh} {t('off the bill a month')}
           </div>
-          <div className="mt-4">
+          <div className="mt-4" data-pitch="balcony-join">
             {prof.balconyWaitlist ? (
               <div className="flex items-center gap-2 font-bold text-sun-bright">
                 <CheckCircle2 size={20} /> {t('On the waitlist for the sandbox pilot')}
