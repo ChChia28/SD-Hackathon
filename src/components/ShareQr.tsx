@@ -1,12 +1,12 @@
 import qrcode from 'qrcode-generator';
 import { useMemo } from 'react';
 
-/** The public demo link, so judges can open it on their own phones. */
-export const demoUrl = () => (typeof window === 'undefined' ? '' : `${window.location.origin}${window.location.pathname}`);
+/** The public demo on GitHub Pages. QR codes always point here, even when the app runs on a laptop (localhost). */
+export const DEMO_URL = 'https://chchia28.github.io/SD-Hackathon/';
 
 /** The site link: a scan opens the home page, where the audience picks Pitch mode or the Live prototype. */
 export function ShareQr({ size = 156 }: { size?: number }) {
-  const url = demoUrl();
+  const url = DEMO_URL;
   const cells = useMemo(() => {
     const qr = qrcode(0, 'M');
     qr.addData(url);

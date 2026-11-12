@@ -311,8 +311,18 @@ h1, h2, h3, .font-display {
 .app-col .phone { flex: 1 1 0; min-height: 0; height: auto; }
 .pitch-visual { height: min(844px, calc(100dvh - 48px)); }
 .app-col .pitch-visual { flex: 1 1 0; min-height: 0; height: auto; width: 100%; }
+/* Phones in pitch mode: three parts that read apart. The navy slide bar, the app (or picture) as an outlined box
+   on grey, and the captions as a card underneath. */
 @media (max-width: 639px) {
-  .app-col .pitch-visual { border: 0; border-radius: 0; box-shadow: none; }
+  .pitch-col { background: var(--color-sunken); }
+  .pitch-col .phone,
+  .pitch-col .pitch-visual {
+    width: calc(100% - 20px);
+    margin: 10px 10px 0;
+    border: 1px solid var(--color-ink-faint);
+    border-radius: 18px;
+    box-shadow: 0 1px 4px rgba(26, 31, 58, 0.08);
+  }
 }
 @media (min-width: 640px) {
   .app-col { height: min(896px, calc(100dvh - 48px)); width: 390px; gap: 8px; }

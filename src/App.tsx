@@ -67,6 +67,8 @@ function AppRoutes() {
         <Route path="rewards/achievements" element={<Achievements />} />
       </Route>
       <Route path="welcome" element={<Welcome />} />
+      {/* #/pitch and #/pitch/N: PitchEntry moves to the step's screen; nothing to show meanwhile. */}
+      <Route path="pitch/*" element={null} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

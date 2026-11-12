@@ -531,6 +531,13 @@ const LABEL_H = 52;
 const LABEL_GAP = 14;
 
 /**
+ * One colour per note, so ring 2 on the app matches caption 2. Chosen to stand apart from the app's own
+ * red, navy and green, and checked for colour-blind separation (dataviz validator). The numbers carry it too.
+ */
+const NOTE_COLORS = ['#3E63DD', '#C2680A', '#9B3FB5'];
+export const noteColor = (n: number) => NOTE_COLORS[(n - 1) % NOTE_COLORS.length];
+
+/**
  * Points at the parts of the app a step talks about. Each one gets a red ring and its number.
  * On a laptop the words sit beside the phone with a straight line to the ring;
  * on a phone the words are in the caption card under the app, so only the numbered ring shows.
@@ -626,11 +633,11 @@ export function PitchNotes() {
       <svg className="absolute inset-0 h-full w-full">
         {placed.items.map((it) => (
           <g key={it.n}>
-            <rect x={it.ring.x} y={it.ring.y} width={it.ring.w} height={it.ring.h} rx={14} fill="rgba(237, 27, 36, 0.05)" stroke="var(--color-sun)" strokeWidth={2} />
+            <rect x={it.ring.x} y={it.ring.y} width={it.ring.w} height={it.ring.h} rx={14} fill={noteColor(it.n)} fillOpacity={0.06} stroke={noteColor(it.n)} strokeWidth={2} />
             {wide && (
               <>
-                <path d={`M${placed.lx} ${it.ly} L${it.tx} ${it.ty}`} stroke="var(--color-sun)" strokeWidth={2} fill="none" />
-                <circle cx={it.tx} cy={it.ty} r={5.5} fill="var(--color-sun)" stroke="#fff" strokeWidth={2} />
+                <path d={`M${placed.lx} ${it.ly} L${it.tx} ${it.ty}`} stroke={noteColor(it.n)} strokeWidth={2} fill="none" />
+                <circle cx={it.tx} cy={it.ty} r={5.5} fill={noteColor(it.n)} stroke="#fff" strokeWidth={2} />
               </>
             )}
           </g>
@@ -639,11 +646,13 @@ export function PitchNotes() {
       {placed.items.map((it) =>
         wide ? (
           <div key={it.n} className="rise-in absolute flex items-center gap-3 whitespace-nowrap rounded-2xl border border-outline bg-page py-2.5 pl-2.5 pr-4 shadow-soft" style={{ left: placed.lx, top: it.ly, transform: 'translateY(-50%)' }}>
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sun text-[15px] font-bold text-white">{it.n}</span>
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[15px] font-bold text-white" style={{ background: noteColor(it.n) }}>
+              {it.n}
+            </span>
             <span className="text-[18px] font-bold leading-6 text-ink">{it.text}</span>
           </div>
         ) : (
-          <span key={it.n} className="rise-in absolute flex h-7 w-7 items-center justify-center rounded-full bg-sun text-[14px] font-bold text-white shadow-soft ring-2 ring-white" style={{ left: it.tx, top: it.ty, transform: 'translate(-50%, -50%)' }}>
+          <span key={it.n} className="rise-in absolute flex h-7 w-7 items-center justify-center rounded-full text-[14px] font-bold text-white shadow-soft ring-2 ring-white" style={{ left: it.tx, top: it.ty, transform: 'translate(-50%, -50%)', background: noteColor(it.n) }}>
             {it.n}
           </span>
         ),
@@ -711,16 +720,21 @@ export function PitchBottom() {
   const last = pitch.step === PITCH_STEPS.length - 1;
   const first = (n: number) => PITCH_STEPS.findIndex((s) => s.slide === n);
   return (
-    <footer className="w-full shrink-0 border-t border-outline bg-page px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 sm:rounded-[24px] sm:border sm:shadow-soft min-[1200px]:hidden">
+    <footer className="mt-2.5 w-full shrink-0 rounded-t-[20px] bg-page px-4 pb-[max(12px,env(safe-area-inset-bottom))] pt-3 shadow-[0_-6px_20px_rgba(26,31,58,0.08)] sm:mt-0 sm:rounded-[24px] sm:border sm:border-outline sm:shadow-soft min-[1200px]:hidden">
       {!!step.notes?.length && !step.visual && (
-        <ol key={pitch.step} className="rise-in mb-3 flex flex-col gap-1.5">
-          {step.notes.map((n, i) => (
-            <li key={n.at} className="flex items-center gap-2.5">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-sun text-[13px] font-bold text-white">{i + 1}</span>
-              <span className="text-[15px] font-bold leading-5 text-ink">{n.text}</span>
-            </li>
-          ))}
-        </ol>
+        <div key={pitch.step} className="rise-in mb-3">
+          <div className="mb-1.5 text-[11px] font-extrabold uppercase tracking-[0.14em] text-ink-subtle">On this screen</div>
+          <ol className="flex flex-col gap-1.5">
+            {step.notes.map((n, i) => (
+              <li key={n.at} className="flex items-center gap-2.5">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[13px] font-bold text-white" style={{ background: noteColor(i + 1) }}>
+                  {i + 1}
+                </span>
+                <span className="text-[15px] font-bold leading-5 text-ink">{n.text}</span>
+              </li>
+            ))}
+          </ol>
+        </div>
       )}
       <div className="flex items-center gap-2">
         <button type="button" aria-label="Previous" disabled={pitch.step === 0} onClick={() => go(pitch.step - 1)} className="btn btn-secondary !min-h-11 !w-11 shrink-0 !px-0">
